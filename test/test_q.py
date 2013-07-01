@@ -1,4 +1,4 @@
-import inputpy.Q as Q
+import inputpy.q as Q
 import unittest
 
 class TestQ(unittest.TestCase):

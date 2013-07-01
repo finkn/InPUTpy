@@ -1,5 +1,5 @@
 import inputpy.config as config
-import inputpy.Q as Q
+import inputpy.q as Q
 import unittest
 
 DESIGN_FILE = "testDesign.xml"
