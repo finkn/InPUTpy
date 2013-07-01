@@ -1,7 +1,7 @@
 from inputpy.design import DesignSpace
 from inputpy.exceptions import InPUTException
-from test.helpers import SecondSingleComplexChoice, SingleComplexChoice
-from test.helpers import SomeComplexStructural
+from test import SecondSingleComplexChoice, SingleComplexChoice
+from test import SomeComplexStructural
 import unittest
 
 DESIGN_SPACE_FILE = "testSpace.xml"

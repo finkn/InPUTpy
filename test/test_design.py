@@ -1,11 +1,11 @@
 from inputpy.design import Design
 from inputpy.exceptions import InPUTException
 from inputpy.impexp import XMLFileImporter, XMLFileExporter
-from test.helpers import SomeComplexStructural, SingleComplexChoice, Wrapper
-from test.helpers import SomeCommonStructural, SomeStructural
-from test.helpers import SomeFirstChoice, SomeSecondChoice
-from test.helpers import SomeSubChoice, AnotherSubChoice
-from test.helpers import AnotherStructuralParent
+from test import SomeComplexStructural, SingleComplexChoice, Wrapper
+from test import SomeCommonStructural, SomeStructural
+from test import SomeFirstChoice, SomeSecondChoice
+from test import SomeSubChoice, AnotherSubChoice
+from test import AnotherStructuralParent
 import unittest
 
 DESIGN_FILE = "testDesign.xml"
