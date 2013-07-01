@@ -1,10 +1,15 @@
 """
+inputpy.Q
+
 A helper module that contains all the identifiers of objects and concepts used
-in InPUT. References should all point here, and no String that are meaningful for
-InPUT should be solely defined in another class.
+in InPUT. References should all point here, and no String that are meaningful
+for InPUT should be solely defined in another class.
 
 This set of constants isn't complete, relative to the Q class in the original
 Java version.
+
+:copyright: (c) 2013 by Christoffer Fink.
+:license: MIT. See LICENSE for details.
 """
 
 SCHEMA_LOCATION_ATTR = "schemaLocation"

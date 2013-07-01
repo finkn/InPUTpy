@@ -1,11 +1,23 @@
+"""
+inputpy.design
+
+This module exports two core interfaces:
+- Design
+- DesignSpace
+
+:copyright: (c) 2013 by Christoffer Fink.
+:license: MIT. See LICENSE for details.
+"""
 from inputpy.exceptions import InPUTException
 import random
 
 rng = random.Random()
 
+__all__ = ('Design', 'DesignSpace')
+
 class Design:
-    """\
-    A Design represents the parameters for a Design Space.
+    """
+    A Design represents one set of instantiated parameters for a Design Space.
     """
 
     def __init__(self, fileName=None):
@@ -51,6 +63,11 @@ class Design:
         self.isReadOnly = True
 
 class DesignSpace:
+    """
+    A DesignSpace contains the set of parameters and their restrictions. It
+    can generate a Design by setting values for each parameter.
+    """
+
     def __init__(self, fileName=None):
         self.parameters = {}
         self.fileName = fileName
