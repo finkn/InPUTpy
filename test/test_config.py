@@ -4,7 +4,7 @@ import unittest
 
 DESIGN_FILE = "testDesign.xml"
 
-class TestInPUTConfig(unittest.TestCase):
+class TestConfig(unittest.TestCase):
 
     @unittest.skip("Not implemented yet.")
     def testGetValue(self):
