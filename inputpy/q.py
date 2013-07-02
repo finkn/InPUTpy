@@ -12,12 +12,16 @@ Java version.
 :license: MIT. See LICENSE for details.
 """
 
+from inputpy import config
+
 SCHEMA_LOCATION_ATTR = "schemaLocation"
 MY_NAMESPACE_PREFIX = "in"
+NAMESPACE_ID = "http://TheInPUT.org/"
 XML = ".xml"
 XSD = ".xsd"        # Specific to InPUTpy
 DESIGN_ROOT = "Design"
 DESIGN_SPACE_ROOT = "DesignSpace"
+DESIGN_NAMESPACE_ID = NAMESPACE_ID + DESIGN_ROOT;
 NVALUE = "NValue"
 SVALUE = "SValue"
 NPARAM = "NParam"
@@ -80,5 +84,5 @@ DESIGN_SPACE_ELEMENT_IDS = (
 )
 
 def getSchemaLocation():
-    s = DESIGN_SPACE_ID + InPUTConfig.getValue(SCHEMA_PATH) + DESIGN_ROOT + XSD
+    s = DESIGN_NAMESPACE_ID + config.getValue(SCHEMA_PATH) + DESIGN_ROOT + XSD
     return s

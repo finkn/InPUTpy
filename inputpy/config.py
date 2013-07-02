@@ -11,7 +11,7 @@ This is purely a dummy implementation.
 """
 
 def getValue(name):
-    return None
+    return name
 
 def isLoggingActive():
     return False
