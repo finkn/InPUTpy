@@ -308,9 +308,11 @@ class TestDesignSpace(unittest.TestCase):
     def testNextInjectCustomizedParametersWithDimensions(self):
         self.fail("Not implemented yet.")
 
-    @unittest.skip("Not implemented yet.")
+    #@unittest.skip("Not implemented yet.")
     def testNextParameterConstructorOverwrite(self):
-        self.fail("Not implemented yet.")
+        paramId = "SomeStructuralParent"
+        actualParams = (14, 10.0)
+        parent = self.space.next(paramId, actualParams)
 
     def testIsFile(self):
         self.assertTrue(self.space.isFile())
