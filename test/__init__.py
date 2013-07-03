@@ -27,6 +27,30 @@ class SomeFirstChoice(SomeCommonStructural):
 class SomeSecondChoice(SomeCommonStructural):
     pass
 
+# Interface is still incomplete.
+class SomeStructuralParent:
+    def __init__(self, someSharedPrimitiveSub):
+        self.someSharedPrimitiveSub = someSharedPrimitiveSub
+
+    def getSomeSharedPrimitiveSub(self):
+        return self.someSharedPrimitiveSub
+
+class YetAnotherThirdChoice(SomeStructuralParent):
+    def __init__(self, someSharedPrimitiveSub, someChoiceSpecificPrimitiveSub):
+        SomeStructuralParent.__init__(self, someSharedPrimitiveSub)
+        self.someChoiceSpecificPrimitiveSub = someChoiceSpecificPrimitiveSub
+
+    def getSomeChoiceSpecificPrimitiveSub(self):
+        return self.someChoiceSpecificPrimitiveSub
+
+class YetAnotherFirstChoice(SomeStructuralParent):
+    def __init__(self, someSharedPrimitiveSub):
+        SomeStructuralParent.__init__(self, someSharedPrimitiveSub)
+
+class YetAnotherSecondChoice(YetAnotherFirstChoice):
+    def __init__(self):
+        YetAnotherFirstChoice.__init__(self, 42)
+
 class SomeSharedStructuralSub:
     pass
 
