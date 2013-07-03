@@ -1,7 +1,7 @@
 from inputpy.design import DesignSpace
 from inputpy.exceptions import InPUTException
-from test import SecondSingleComplexChoice, SingleComplexChoice
-from test import SomeComplexStructural
+from test import *
+from inputpy import q as Q
 import unittest
 
 DESIGN_SPACE_FILE = "testSpace.xml"
@@ -308,11 +308,23 @@ class TestDesignSpace(unittest.TestCase):
     def testNextInjectCustomizedParametersWithDimensions(self):
         self.fail("Not implemented yet.")
 
-    #@unittest.skip("Not implemented yet.")
+    @unittest.skip("Not implemented yet.")
     def testNextParameterConstructorOverwrite(self):
-        paramId = "SomeStructuralParent"
         actualParams = (14, 10.0)
-        parent = self.space.next(paramId, actualParams)
+        actualParamsWithBlank = (Q.BLANK, 10.0)
+        iterations = 10
+        paramId = "SomeStructuralParent"
+
+        params = actualParams
+        for i in range(iterations):
+            param = self.space.next(paramId, params)
+            self.firstParamTest(param, params)
+            self.secondParamTest(param, params)
+
+        params = actualParamsWithBlank
+        for i in range(iterations):
+            param = self.space.next(paramId, params)
+            self.secondParamTest(param, params)
 
     def testIsFile(self):
         self.assertTrue(self.space.isFile())
@@ -454,6 +466,25 @@ class TestDesignSpace(unittest.TestCase):
             # Check each element, not just the first one.
             for element in array:
                 self.compareDimensions(rest, element)
+
+    def firstParamTest(self, param, params):
+        value = param.getSomeSharedPrimitiveSub()
+        # If the parameter is of this type, then the value was set by the
+        # constructor (using the hard-coded value). None of the others take a
+        # constructor argument for this parameter, so in all other cases it
+        # was initialized using the first element of actualParams argument.
+        if isinstance(param, YetAnotherSecondChoice):
+            self.assertEquals(42, value)
+        else:
+            self.assertEquals(params[0], value)
+
+    def secondParamTest(self, param, params):
+        if not isinstance(param, YetAnotherThirdChoice):
+            return
+        # We always expect the parameter to have been initialized by the
+        # constructor using the second element of the actualParams argument.
+        value = param.getSomeChoiceSpecificPrimitiveSub()
+        self.assertEquals(params[1], value)
 
 
 if __name__ == '__main__':
