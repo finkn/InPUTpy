@@ -320,9 +320,44 @@ class TestDesignSpace(unittest.TestCase):
             value = parent.getAnotherSharedPrimitiveSub()
             self.assertEquals(initialized, value)
 
+    # This test, together with the previous one above, needs to be cleaned up.
+    # They essentially do the same thing, so there should be a way to reduce
+    # code duplication.
     @unittest.skip("Not implemented yet.")
     def testNextInjectCustomizedParametersAndConstructorOverwrite(self):
-        self.fail("Not implemented yet.")
+        childId = "AnotherSharedPrimitiveSub"
+        parentId = "SomeStructuralParent"
+        iterations = 20
+        expected = 24
+        subParams = {
+            childId: expected,
+            "SomeThingThatShouldNotHaveAnyImpact": "Foobar",
+        }
+        actualParams = (14, 10.0)
+
+        for i in range(iterations):
+            parent = self.space.next(parentId, subParams, actualParams)
+            # This is slightly paranoid. The expected value is already known
+            # because it was put into the subParams dictionary. Get it back
+            # from the dictionary anyway to make sure that the dictionary
+            # wasn't changed by the call to next().
+            initialized = subParams[childId]
+            self.assertEquals(expected, initialized)
+            # Now check that the child parameter was initialized to the value
+            # that was set in the dictionary.
+            value = parent.getAnotherSharedPrimitiveSub()
+            self.assertEquals(initialized, value)
+
+            # This part is unique compared with the previous test.
+            value = parent.getSomeSharedPrimitiveSub()
+            if isinstance(parent, YetAnotherSecondChoice):
+                # This type uses a hard-coded argument to super().
+                # It should ignore any extra parameters.
+                self.assertEquals(42, value)
+            else:
+                # The other types use constructor arguments. They should be
+                # overwritten by the values given in actualParams.
+                self.assertEquals(actualParams[0], value)
 
     @unittest.skip("Not implemented yet.")
     def testNextInjectCustomizedParametersWithDimensions(self):

@@ -82,7 +82,8 @@ class DesignSpace:
     def getId(self):
         return None
 
-    def next(self, paramId, dimensions=None):
+    def next(self, paramId,
+            dimensions=None, subParams=None, actualParams=None):
         try:
             value = self.parameters[paramId]
         except KeyError:
