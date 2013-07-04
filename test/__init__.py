@@ -11,6 +11,7 @@ parameter configuration.
 class SomeStructural:
     pass
 
+
 class SomeCommonStructural(SomeStructural):
     def __init__(self):
         self.wrapper = None
@@ -21,11 +22,14 @@ class SomeCommonStructural(SomeStructural):
     def getPrimitive(self):
         return self.wrapper
 
+
 class SomeFirstChoice(SomeCommonStructural):
     pass
 
+
 class SomeSecondChoice(SomeCommonStructural):
     pass
+
 
 # Interface is still incomplete.
 class SomeStructuralParent:
@@ -54,6 +58,7 @@ class SomeStructuralParent:
     def setSomeSharedStructuralSub(self, someSharedStructuralSub):
         self.someSharedStructuralSub = someSharedStructuralSub
 
+
 class YetAnotherThirdChoice(SomeStructuralParent):
     def __init__(self, someSharedPrimitiveSub, someChoiceSpecificPrimitiveSub):
         SomeStructuralParent.__init__(self, someSharedPrimitiveSub)
@@ -62,22 +67,28 @@ class YetAnotherThirdChoice(SomeStructuralParent):
     def getSomeChoiceSpecificPrimitiveSub(self):
         return self.someChoiceSpecificPrimitiveSub
 
+
 class YetAnotherFirstChoice(SomeStructuralParent):
     def __init__(self, someSharedPrimitiveSub):
         SomeStructuralParent.__init__(self, someSharedPrimitiveSub)
+
 
 class YetAnotherSecondChoice(YetAnotherFirstChoice):
     def __init__(self):
         YetAnotherFirstChoice.__init__(self, 42)
 
+
 class SomeSharedStructuralSub:
     pass
+
 
 class SomeSubChoice(SomeSharedStructuralSub):
     pass
 
+
 class AnotherSubChoice(SomeSharedStructuralSub):
     pass
+
 
 class AnotherStructuralParent:
     def __init__(self, sub):
@@ -86,8 +97,10 @@ class AnotherStructuralParent:
     def getSomeSharedStructuralSub(self):
         return self.sub
 
+
 class SomeAbstractComplexStructural:
     pass
+
 
 class SomeComplexStructural(SomeAbstractComplexStructural):
     def __init__(self):
@@ -102,6 +115,7 @@ class SomeComplexStructural(SomeAbstractComplexStructural):
     def size(self):
         return len(self.items)
 
+
 class SingleComplexChoice(SomeAbstractComplexStructural):
     def __init__(self, a=0.0):
         self.a = a
@@ -109,8 +123,10 @@ class SingleComplexChoice(SomeAbstractComplexStructural):
     def getA(self):
         return self.a
 
+
 class SecondSingleComplexChoice(SingleComplexChoice):
     pass
+
 
 class Wrapper:
     def __init__(self, value):
