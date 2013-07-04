@@ -31,9 +31,28 @@ class SomeSecondChoice(SomeCommonStructural):
 class SomeStructuralParent:
     def __init__(self, someSharedPrimitiveSub):
         self.someSharedPrimitiveSub = someSharedPrimitiveSub
+        # To copy the InPUT4j tests as closely as possible, initialize
+        # this data the way Java would do.
+        self.anotherSharedPrimitiveSub = 0  # long would be initialized to 0.
+        self.someSharedStructuralSub = None # String would be null.
 
     def getSomeSharedPrimitiveSub(self):
         return self.someSharedPrimitiveSub
+
+    def getAnotherSharedPrimitiveSub(self):
+        return self.anotherSharedPrimitiveSub
+
+    def getSomeSharedStructuralSub(self):
+        return self.someSharedStructuralSub
+
+    def setSomeSharedPrimitiveSub(self, someSharedPrimitiveSub):
+        self.someSharedPrimitiveSub = someSharedPrimitiveSub
+
+    def setAnotherSharedPrimitiveSub(self, anotherSharedPrimitiveSub):
+        self.anotherSharedPrimitiveSub = anotherSharedPrimitiveSub
+
+    def setSomeSharedStructuralSub(self, someSharedStructuralSub):
+        self.someSharedStructuralSub = someSharedStructuralSub
 
 class YetAnotherThirdChoice(SomeStructuralParent):
     def __init__(self, someSharedPrimitiveSub, someChoiceSpecificPrimitiveSub):
