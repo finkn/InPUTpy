@@ -31,7 +31,6 @@ class SomeSecondChoice(SomeCommonStructural):
     pass
 
 
-# Interface is still incomplete.
 class SomeStructuralParent:
     def __init__(self, someSharedPrimitiveSub):
         self.someSharedPrimitiveSub = someSharedPrimitiveSub
