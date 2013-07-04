@@ -298,7 +298,27 @@ class TestDesignSpace(unittest.TestCase):
 
     @unittest.skip("Not implemented yet.")
     def testNextInjectCustomizedParameters(self):
-        self.fail("Not implemented yet.")
+        childId = "AnotherSharedPrimitiveSub"
+        parentId = "SomeStructuralParent"
+        iterations = 20
+        expected = 24
+        subParams = {
+            childId: expected,
+            "SomeThingThatShouldNotHaveAnyImpact": "Foobar",
+        }
+
+        for i in range(iterations):
+            parent = self.space.next(parentId, subParams)
+            # This is slightly paranoid. The expected value is already known
+            # because it was put into the subParams dictionary. Get it back
+            # from the dictionary anyway to make sure that the dictionary
+            # wasn't changed by the call to next().
+            initialized = subParams[childId]
+            self.assertEquals(expected, initialized)
+            # Now check that the child parameter was initialized to the value
+            # that was set in the dictionary.
+            value = parent.getAnotherSharedPrimitiveSub()
+            self.assertEquals(initialized, value)
 
     @unittest.skip("Not implemented yet.")
     def testNextInjectCustomizedParametersAndConstructorOverwrite(self):
