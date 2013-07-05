@@ -7,6 +7,53 @@ import unittest
 DESIGN_SPACE_FILE = "testSpace.xml"
 DESIGN_MAPPING_FILE = "testSpaceMapping.xml"
 
+# Parameter IDs used in tests. This little section works similar to Q.
+anotherInteger = "AnotherInteger"
+aBiggerLong = "ABiggerLong"
+aSmallerLong = "ASmallerLong"
+aStrangeLong = "AStrangeLong"
+someBoolean = "SomeBoolean"
+someShort = "SomeShort"
+someInteger = "SomeInteger"
+someLong = "SomeLong"
+someDouble = "SomeDouble"
+someFloat = "SomeFloat"
+someDecimal = "SomeDecimal"
+
+anotherStructural = "AnotherStructural"
+anotherStructuralParent = "AnotherStructuralParent"
+anotherStringCustomizedByTheUser = "AnotherStringCustomizedByTheUser"
+anotherSharedPrimitiveSub = "AnotherSharedPrimitiveSub"
+anotherRestrictedPrimitive = "AnotherRestrictedPrimitive"
+andYetAnotherSecondChoice = "AndYetAnotherSecondChoice"
+customizableInputDemonstrator = "CustomizableInputDemonstrator"
+customizableSetGetPrimitive = "CustomizableSetGetPrimitive"
+someStructural = "SomeStructural"
+someStringCustomizedByTheUser = "SomeStringCustomizedByTheUser"
+someStructuralParent = "SomeStructuralParent"
+someComplexStructural = "SomeComplexStructural"
+someFixedArray = "SomeFixedArray"
+someLargePrimitiveArray = "SomeLargePrimitiveArray"
+someSharedPrimitiveSub = "SomeSharedPrimitiveSub"
+someSharedStructuralSub = "SomeSharedStructuralSub"
+someLargePrimitiveArray = "SomeLargePrimitiveArray"
+someStringArrayCustomizedByTheUser = "SomeStringArrayCustomizedByTheUser"
+somePrimitiveArrayOfUnspecifiedSize = "SomePrimitiveArrayOfUnspecifiedSize"
+someRestrictedPrimitive = "SomeRestrictedPrimitive"
+someVeryRestrictedPrimitive = "SomeVeryRestrictedPrimitive"
+wrappedPrimitive = "WrappedPrimitive"
+someFixed = "SomeFixed"
+
+somePrimitiveArrayOfUnspecifiedSize = "SomePrimitiveArrayOfUnspecifiedSize"
+somePrimitiveArrayOfSpecifiedSize = "SomePrimitiveArrayOfSpecifiedSize"
+someMultidimensionalArrayOfUnspecifiedSize = "SomeMultidimensionalArrayOfUnspecifiedSize"
+someMultiDimensionalArrayOfSpecifiedSize = "SomeMultidimensionalArrayOfSpecifiedSize"
+
+# Also a few values.
+anotherFile = "anotherFile.xml"
+anotherTestDesign = "anotherTestDesign.xml"
+someOtherTestDesign = "someOtherTestDesign.xml"
+
 class TestDesignSpace(unittest.TestCase):
 
     def setUp(self):
@@ -30,8 +77,8 @@ class TestDesignSpace(unittest.TestCase):
 
     def testNextPrimitive(self):
         params = (
-            "SomeBoolean", "SomeInteger", "SomeShort", "SomeLong",
-            "SomeDouble", "SomeFloat", "SomeDecimal"
+            someBoolean, someInteger, someShort, someLong,
+            someDouble, someFloat, someDecimal,
         )
         for param in params:
             self.getNextAndCompare(param)
@@ -39,10 +86,10 @@ class TestDesignSpace(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testNextString(self):
         space = self.space      # Alias to save typing.
-        paramId = "SomeStringCustomizedByTheUser"
+        paramId = someStringCustomizedByTheUser
         expected = paramId
-        anotherParamId = "AnotherStringCustomizedByTheUser"
-        arrayParamId = "SomeStringArrayCustomizedByTheUser"
+        anotherParamId = anotherStringCustomizedByTheUser
+        arrayParamId = someStringArrayCustomizedByTheUser 
         expectedAlternatives = (
             "someFile.xml", "someFile.txt", "anotherFile.xml"
         )
@@ -65,8 +112,8 @@ class TestDesignSpace(unittest.TestCase):
     def testNextStructural(self):
         space = self.space      # Alias to save typing.
         paramIds = (
-            "SomeStructural", "AnotherStructural",
-            "SomeStructuralParent", "AnotherStructuralParent",
+            someStructural, anotherStructural,
+            someStructuralParent, anotherStructuralParent,
         )
         for param in paramIds:
             self.getNextAndCompare(param)
@@ -117,7 +164,6 @@ class TestDesignSpace(unittest.TestCase):
         self.assertEquals(expectedLengthD2, len(array[0][0]))
         self.assertEquals(expectedLengthD3, len(array[0][0][0]))
 
-
     # The Java version has a single testNextNegative test.
     # That test has been split into the individual cases below.
     # However, the casting test has been skipped because Python is kewl.
@@ -144,18 +190,18 @@ class TestDesignSpace(unittest.TestCase):
 
     # Replaces testNextSubParameter.
     def testNextPrimitiveSubParameter(self):
-        paramId = "SomeStructuralParent.SomeSharedPrimitiveSub"
+        paramId = someStructuralParent + "." + someSharedPrimitiveSub
         self.getNextAndCompare(self.space.next(paramId))
 
     # Replaces testNextSubParameter.
     def testNextStructuralSubParameter(self):
-        paramId = "AnotherStructuralParent.AndYetAnotherSecondChoice"
+        paramId = anotherStructuralParent + "." + andYetAnotherSecondChoice
         self.getNextAndCompare(self.space.next(paramId))
 
     # Replaces testNextSubParameter.
     @unittest.skip("Not implemented yet.")
     def testNextChoiceParameter(self):
-        paramId = "AnotherStructuralParent.AndYetAnotherSecondChoice"
+        paramId = anotherStructuralParent + "." + andYetAnotherSecondChoice
         self.getNextAndCompare(self.space.next(paramId))
 
     # Test test.
@@ -188,7 +234,7 @@ class TestDesignSpace(unittest.TestCase):
     # Replaces testNextRestriction.
     @unittest.skip("Not implemented yet.")
     def testNextRestrictedParemeterWithSingleInclusiveRange(self):
-        paramId = "SomeRestrictedPrimitive"
+        paramId = someRestrictedPrimitive
         minLimit = -42
         maxLimit = 42
         iterations = 10
@@ -199,7 +245,7 @@ class TestDesignSpace(unittest.TestCase):
     # Replaces testNextRestriction.
     @unittest.skip("Not implemented yet.")
     def testNextRestrictedParameterWithMultipleExclusiveRanges(self):
-        paramId = "AnotherRestrictedPrimitive"
+        paramId = anotherRestrictedPrimitive
         firstMin = 0.1
         firstMax = 0.4
         secondMin = 0.8
@@ -222,7 +268,7 @@ class TestDesignSpace(unittest.TestCase):
     # Replaces testNextRestriction.
     @unittest.skip("Not implemented yet.")
     def testNextRestrictedParameterWithSingleExclusiveRange(self):
-        paramId = "SomeVeryRestrictedPrimitive"
+        paramId = someVeryRestrictedPrimitive
         minLimit = 0.42222222222
         maxLimit = 0.422222222221
         iterations = 10
@@ -237,7 +283,7 @@ class TestDesignSpace(unittest.TestCase):
     # Replaces testNextFixed.
     @unittest.skip("Not implemented yet.")
     def testNextFixedPrimitive(self):
-        paramId = "SomeFixed"
+        paramId = someFixed
         expected = 42
         value = self.space.next(paramId)
         self.assertEquals(expected, value)
@@ -245,7 +291,7 @@ class TestDesignSpace(unittest.TestCase):
     # Replaces testNextFixed.
     @unittest.skip("Not implemented yet.")
     def testNextFixedArray(self):
-        paramId = "SomeFixedArray"
+        paramId = someFixedArray
         expected = 42
         value = self.space.next(paramId)
         # Expecting array length and all element values to be 42.
@@ -264,7 +310,7 @@ class TestDesignSpace(unittest.TestCase):
     def testNextReadOnlyDesign(self):
         designId = "designId"
         readOnly = True
-        paramId = "SomeBoolean"
+        paramId = someBoolean
         design = self.space.nextDesign(designId, readOnly)
         # Trying to set a value for a read-only design should fail.
         with self.assertRaises(InPUTException):
@@ -280,14 +326,14 @@ class TestDesignSpace(unittest.TestCase):
     # Randomize lengths and/or number of dimensions in future versions.
     @unittest.skip("Not implemented yet.")
     def testNextWithMultidimensionalPrimitiveArray(self):
-        paramId = "SomeBoolean"
+        paramId = someBoolean
         dimensions = (3, 4, 1)
         someBooleans = self.space.next(paramId, dimensions)
         self.compareDimensions(dimensions, someBooleans)
 
     @unittest.skip("Not implemented yet.")
     def testNextWithMultidimensionalStructuralArray(self):
-        paramId = "SomeStructural"
+        paramId = someStructural
         dimensions = (3, 4, 1)
         someStructural = self.space.next(paramId, dimensions)
         self.compareDimensions(dimensions, someStructural)
@@ -298,8 +344,8 @@ class TestDesignSpace(unittest.TestCase):
 
     @unittest.skip("Not implemented yet.")
     def testNextInjectCustomizedParameters(self):
-        childId = "AnotherSharedPrimitiveSub"
-        parentId = "SomeStructuralParent"
+        childId = anotherSharedPrimitiveSub
+        parentId = someStructuralParent
         iterations = 20
         expected = 24
         subParams = {
@@ -325,8 +371,8 @@ class TestDesignSpace(unittest.TestCase):
     # code duplication.
     @unittest.skip("Not implemented yet.")
     def testNextInjectCustomizedParametersAndConstructorOverwrite(self):
-        childId = "AnotherSharedPrimitiveSub"
-        parentId = "SomeStructuralParent"
+        childId = anotherSharedPrimitiveSub
+        parentId = someStructuralParent
         iterations = 20
         expected = 24
         subParams = {
@@ -368,7 +414,7 @@ class TestDesignSpace(unittest.TestCase):
         actualParams = (14, 10.0)
         actualParamsWithBlank = (Q.BLANK, 10.0)
         iterations = 10
-        paramId = "SomeStructuralParent"
+        paramId = someStructuralParent
 
         params = actualParams
         for i in range(iterations):
@@ -393,7 +439,7 @@ class TestDesignSpace(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testGetSupportedParamIds(self):
         positive = (
-            "SomeStructural", "SomeFloat", "SomeDecimal",
+            someStructural, someFloat, someDecimal,
         )
         negative = (
             "IDontExist", "somedecimal", None,
@@ -407,10 +453,10 @@ class TestDesignSpace(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testRelativeNumericConsistency(self):
         iterations = 10
-        someLongId = "SomeLong"
-        aBiggerLongId = "ABiggerLong"
-        aSmallerLongId = "ASmallerLong"
-        aStrangeLongId = "AStrangeLong"
+        someLongId = someLong
+        aBiggerLongId = aBiggerLong
+        aSmallerLongId = aSmallerLong
+        aStrangeLongId = aStrangeLong
         for i in range(iterations):
             design = self.space.nextDesign("someId")
             someLong = design.getValue(someLongId)
@@ -430,7 +476,7 @@ class TestDesignSpace(unittest.TestCase):
 
     @unittest.skip("Not implemented yet.")
     def testComplexStructural(self):
-        paramId = "SomeComplexStructural"
+        paramId = someComplexStructural
         value = self.space.next(paramId)
         cls = SecondSingleComplexChoice
         # The order of the choices has been fixed, so TheSecondSingleChoice
@@ -445,15 +491,15 @@ class TestDesignSpace(unittest.TestCase):
     def testSetFixedPrimitive(self):
         # Randomize the expected values in the future.
         params = {
-            "SomeInteger": 2,
-            "SomeBoolean": True,
+            someInteger: 2,
+            someBoolean: True,
         }
 
         for (paramId, expected) in params.items():
             self.checkFixed(paramId, expected)  # Use default iterations.
 
     def testSetFixedToNoneShouldTurnOffFixedStatus(self):
-        params = ("SomeInteger", "SomeBoolean")
+        params = (someInteger, someBoolean)
         for paramId in params:
             self.checkFixedOff(paramId)
 
