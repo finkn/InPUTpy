@@ -14,6 +14,8 @@ PRECISION = 6
 # Parameter IDs used in tests. This little section works similar to Q.
 anotherInteger = "AnotherInteger"
 aBiggerLong = "ABiggerLong"
+aSmallerLong = "ASmallerLong"
+aStrangeLong = "AStrangeLong"
 someBoolean = "SomeBoolean"
 someShort = "SomeShort"
 someInteger = "SomeInteger"
@@ -45,8 +47,35 @@ someOtherTestDesign = "someOtherTestDesign.xml"
 
 class TestDesign(unittest.TestCase):
 
+    # All of these parameters are normally imported from an XML document.
+    # Until all the XML parsing and parameter handling has been implemented,
+    # initialize the design with the expected parameters to make sure all the
+    # tests do what they are supposed to.
+    def dummySetup(self):
+        params = self.design.parameters
+        params[someBoolean] = False
+        params[someLong] = 1700584710333745153
+        params[someShort] = -7448
+        params[someDecimal] = -7889858943241994240.07228988965664218113715833169408142566680908203125
+        params[someFloat] = 0.73908234
+        params[someDouble] = 0.12345778699671628
+        params[someInteger] = -1966342580
+        params[aSmallerLong] = -3991818661248199656
+        params[aBiggerLong] = 6671154699664551937
+        params[aStrangeLong] = 5908891008213154534
+
+        fixedArray = []
+        for i in range(42):
+            fixedArray.append(42)
+        params[someFixedArray] = tuple(fixedArray)
+
+        params[someStringCustomizedByTheUser] = "SomeStringCustomizedByTheUser"
+        params[someStructural] = SomeSecondChoice()
+
     def setUp(self):
         self.design = Design(DESIGN_FILE)
+        # Sets parameters to hard-coded expected values. Remove in the future.
+        self.dummySetup()
 
     def testSetReadOnly(self):
         design = self.design    # Alias to save typing.
@@ -55,7 +84,6 @@ class TestDesign(unittest.TestCase):
         with self.assertRaises(InPUTException):
             design.setValue(paramId, False)
 
-    @unittest.skip("Not implemented yet.")
     def testGetSpace(self):
         space = self.design.getSpace()
         self.assertTrue(space.isFile())
@@ -87,7 +115,6 @@ class TestDesign(unittest.TestCase):
     def testGetId(self):
         self.assertEquals("testDesign", self.design.getId())
 
-    @unittest.skip("Not implemented yet.")
     def testGetPrimitive(self):
         args = {
             someBoolean: False,
@@ -105,7 +132,6 @@ class TestDesign(unittest.TestCase):
         value = self.design.getValue(paramId)
         self.assertEquals(expected, value)
 
-    @unittest.skip("Not implemented yet.")
     def testSetPrimitive(self):
         args = {
             someBoolean: True,
@@ -281,7 +307,6 @@ class TestDesign(unittest.TestCase):
         parent = design.getValue(parentId)
         self.assertEquals(value, parent.andTheCustomizableGetter())
 
-    @unittest.skip("Not implemented yet.")
     def testGetStructural(self):
         paramId = someStructural
         value = self.design.getValue(paramId)
@@ -289,7 +314,6 @@ class TestDesign(unittest.TestCase):
 
     # This test is missing a case that is present in the Java version.
     # That case is handled separately in the following test.
-    @unittest.skip("Not implemented yet.")
     def testSetStructural(self):
         paramId = someStructural
         # Set the parameter to one SomeStructural and check that it was set.
@@ -317,7 +341,7 @@ class TestDesign(unittest.TestCase):
     def testGetWrapper(self):
         design = self.design    # Alias to save typing.
         parentId = customizableInputDemonstrator
-        wrapperId = parentId + ".WrappedPrimitive"
+        wrapperId = parentId + "." + wrappedPrimitive
         expected = 0.9369297592420026
         value = design.getValue(wrapperId)
         self.assertAlmostEquals(expected, value.toValue(), PRECISION)
