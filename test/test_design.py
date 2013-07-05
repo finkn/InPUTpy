@@ -11,6 +11,31 @@ import unittest
 DESIGN_FILE = "testDesign.xml"
 PRECISION = 6
 
+# Parameter IDs used in tests. This little section works similar to Q.
+anotherInteger = "AnotherInteger"
+someBoolean = "SomeBoolean"
+someShort = "SomeShort"
+someLong = "SomeLong"
+someDouble = "SomeDouble"
+someFloat = "SomeFloat"
+someDecimal = "SomeDecimal"
+
+anotherStructuralParent = "AnotherStructuralParent"
+anotherStringCustomizedByTheUser = "AnotherStringCustomizedByTheUser"
+anotherSharedPrimitiveSub = "AnotherSharedPrimitiveSub"
+customizableInputDemonstrator = "CustomizableInputDemonstrator"
+someStringCustomizedByTheUser = "SomeStringCustomizedByTheUser"
+someStructuralParent = "SomeStructuralParent"
+someComplexStructural = "SomeComplexStructural"
+someFixedArray = "SomeFixedArray"
+someLargePrimitiveArray = "SomeLargePrimitiveArray"
+someSharedStructuralSub = "SomeSharedStructuralSub"
+someLargePrimitiveArray = "SomeLargePrimitiveArray"
+
+# Also a few values.
+anotherTestDesign = "anotherTestDesign.xml"
+someOtherTestDesign = "someOtherTestDesign.xml"
+
 class TestDesign(unittest.TestCase):
 
     def setUp(self):
