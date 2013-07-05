@@ -13,8 +13,10 @@ PRECISION = 6
 
 # Parameter IDs used in tests. This little section works similar to Q.
 anotherInteger = "AnotherInteger"
+aBiggerLong = "ABiggerLong"
 someBoolean = "SomeBoolean"
 someShort = "SomeShort"
+someInteger = "SomeInteger"
 someLong = "SomeLong"
 someDouble = "SomeDouble"
 someFloat = "SomeFloat"
@@ -24,6 +26,8 @@ anotherStructuralParent = "AnotherStructuralParent"
 anotherStringCustomizedByTheUser = "AnotherStringCustomizedByTheUser"
 anotherSharedPrimitiveSub = "AnotherSharedPrimitiveSub"
 customizableInputDemonstrator = "CustomizableInputDemonstrator"
+customizableSetGetPrimitive = "CustomizableSetGetPrimitive"
+someStructural = "SomeStructural"
 someStringCustomizedByTheUser = "SomeStringCustomizedByTheUser"
 someStructuralParent = "SomeStructuralParent"
 someComplexStructural = "SomeComplexStructural"
@@ -31,8 +35,11 @@ someFixedArray = "SomeFixedArray"
 someLargePrimitiveArray = "SomeLargePrimitiveArray"
 someSharedStructuralSub = "SomeSharedStructuralSub"
 someLargePrimitiveArray = "SomeLargePrimitiveArray"
+wrappedPrimitive = "WrappedPrimitive"
+someFixed = "SomeFixed"
 
 # Also a few values.
+anotherFile = "anotherFile.xml"
 anotherTestDesign = "anotherTestDesign.xml"
 someOtherTestDesign = "someOtherTestDesign.xml"
 
@@ -43,7 +50,7 @@ class TestDesign(unittest.TestCase):
 
     def testSetReadOnly(self):
         design = self.design    # Alias to save typing.
-        paramId = "SomeBoolean"
+        paramId = someBoolean
         design.setReadOnly()
         with self.assertRaises(InPUTException):
             design.setValue(paramId, False)
@@ -59,8 +66,8 @@ class TestDesign(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testExtendScope(self):
         design = self.design    # Alias to save typing.
-        anotherDesignFile = "anotherTestDesign.xml"
-        paramId = "AnotherInteger"
+        anotherDesignFile = anotherTestDesign
+        paramId = anotherInteger
         expected = 42
 
         # The 'AnotherInteger' parameter should not be present in the design.
@@ -83,13 +90,13 @@ class TestDesign(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testGetPrimitive(self):
         args = {
-            "SomeBoolean": False,
-            "SomeInteger": -1966342580,
-            "SomeShort": -7448,
-            "SomeLong": 1700584710333745153,
-            "SomeDouble": 0.12345778699671628,
-            "SomeFloat": 0.73908234,
-            "SomeDecimal": -7889858943241994240.07228988965664218113715833169408142566680908203125,
+            someBoolean: False,
+            someInteger: -1966342580,
+            someShort: -7448,
+            someLong: 1700584710333745153,
+            someDouble: 0.12345778699671628,
+            someFloat: 0.73908234,
+            someDecimal: -7889858943241994240.07228988965664218113715833169408142566680908203125,
         }
         for (key, value) in args.items():
             self.getAndCompare(key, value)
@@ -101,13 +108,13 @@ class TestDesign(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testSetPrimitive(self):
         args = {
-            "SomeBoolean": True,
-            "SomeInteger": 1,
-            "SomeShort": 42,
-            "SomeLong": 1,
-            "SomeDouble": 0.42,
-            "SomeFloat": 0.84,
-            "SomeDecimal": 42,
+            someBoolean: True,
+            someInteger: 1,
+            someShort: 42,
+            someLong: 1,
+            someDouble: 0.42,
+            someFloat: 0.84,
+            someDecimal: 42,
         }
         for (key, value) in args.items():
             self.setAndCompare(key, value)
@@ -126,13 +133,13 @@ class TestDesign(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testSettingPrimitivesOfWrongTypeShouldFail(self):
         args = {
-            "SomeBoolean": True,
-            "SomeInteger": 1,
-            "SomeShort": 42,
-            "SomeLong": 1,
-            "SomeDouble": 0.42,
-            "SomeFloat": 0.84,
-            "SomeDecimal": 42,
+            someBoolean: True,
+            someInteger: 1,
+            someShort: 42,
+            someLong: 1,
+            someDouble: 0.42,
+            someFloat: 0.84,
+            someDecimal: 42,
         }
         for (key, value) in args.items():
             self.setValueShouldFail(key, value)
@@ -151,17 +158,17 @@ class TestDesign(unittest.TestCase):
 
     @unittest.skip("Not implemented yet.")
     def testGetStringParameter(self):
-        firstParamId = "SomeStringCustomizedByTheUser"
-        secondParamId = "AnotherStringCustomizedByTheUser"
-        secondValue = "anotherFile.xml"
+        firstParamId = someStringCustomizedByTheUser
+        secondParamId = anotherStringCustomizedByTheUser
+        secondValue = anotherFile
         self.setAndCompare(firstParamId, firstParamId)
         self.setAndCompare(secondValue, secondParamId)
 
     @unittest.skip("Not implemented yet.")
     def testGetInjectedPrimitive(self):
         design = self.design    # Alias to save typing.
-        paramId = "SomeStructuralParent"
-        childId = paramId + ".AnotherSharedPrimitiveSub"
+        paramId = someStructuralParent
+        childId = paramId + "." + anotherSharedPrimitiveSub
         expected = 5938400921453047807
         parent = design.getValue(paramId)
         # Get child value by implicitly using the custom getter.
@@ -174,8 +181,8 @@ class TestDesign(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testSetRelativePrimitives(self):
         design = self.design    # Alias to save typing.
-        someLongId = "SomeLong"
-        biggerLongId = "ABiggerLong"
+        someLongId = someLong
+        biggerLongId = aBiggerLong
 
         someLong = design.getValue(someLongId)
         # someLong is just outside of (1 below) the range of allowed values
@@ -188,8 +195,8 @@ class TestDesign(unittest.TestCase):
     @unittest.skip("I don't know what this test is supposed to do.")
     def testGetInjectedStructural(self):
         design = self.design    # Alias to save typing.
-        paramId = "AnotherStructuralParent"
-        childId = paramId + ".SomeStructuralSub"
+        paramId = anotherStructuralParent
+        childId = paramId + "." + someStructuralSub
         parent = design.getValue(paramId)
         # Get child value by implicitly using the custom getter.
         child = design.getValue(childId)
@@ -203,8 +210,8 @@ class TestDesign(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testSetInjectedStructural(self):
         design = self.design    # Alias to save typing.
-        parentId = "SomeStructuralParent"
-        paramId = parentId + ".SomeSharedStructuralSub"
+        parentId = SomeStructuralParent
+        paramId = parentId + "." + someSharedStructuralSub
         value = "anotherString"
         # Because SomeSharedStructuralSub is initialized by injection, rather
         # than the constructor, setting the value should work.
@@ -224,7 +231,7 @@ class TestDesign(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testSettingConstructorInitializedParamWithInjectionShouldFail(self):
         design = self.design    # Alias to save typing.
-        paramId = "AnotherStructuralParent.SomeSharedStructuralSub"
+        paramId = anotherStructuralParent + "." + someSharedStructuralSub
         value = SomeSubChoice()
         # value was created locally, so it shouldn't be identical to the
         # current parameter value. Check before and after trying to set the
@@ -246,8 +253,8 @@ class TestDesign(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testGetCustomizableGetter(self):
         design = self.design    # Alias to save typing.
-        parentId = "CustomizableInputDemonstrator"
-        mutatorId = parentId + ".CustomizableSetGetPrimitive"
+        parentId = customizableInputDemonstrator
+        mutatorId = parentId + "." + customizableSetGetPrimitive
         value = 2.860933188245651E-4
         # Get the value by using the custom getter and by getting the parent
         # and then invoking the getter manually.
@@ -265,8 +272,8 @@ class TestDesign(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testSetCustomizableGetter(self):
         design = self.design    # Alias to save typing.
-        parentId = "CustomizableInputDemonstrator"
-        mutatorId = parentId + ".CustomizableSetGetPrimitive"
+        parentId = customizableInputDemonstrator
+        mutatorId = parentId + "." + customizableSetGetPrimitive
         value = 0.5
         # Set the value that is wrapped by the parent by invoking the mutator.
         design.setValue(mutatorId, value)
@@ -276,7 +283,7 @@ class TestDesign(unittest.TestCase):
 
     @unittest.skip("Not implemented yet.")
     def testGetStructural(self):
-        paramId = "SomeStructural"
+        paramId = someStructural
         value = self.design.getValue(paramId)
         self.assertTrue(isinstance(value, SomeStructural))
 
@@ -284,7 +291,7 @@ class TestDesign(unittest.TestCase):
     # That case is handled separately in the following test.
     @unittest.skip("Not implemented yet.")
     def testSetStructural(self):
-        paramId = "SomeStructural"
+        paramId = someStructural
         # Set the parameter to one SomeStructural and check that it was set.
         choice = SomeFirstChoice()          # This is a SomeStructural.
         self.setStructural(paramId, choice)
@@ -301,7 +308,7 @@ class TestDesign(unittest.TestCase):
     # testSetStructural test in the Java version.
     @unittest.skip("Not implemented yet.")
     def testSetStructuralWithWrongTypeShouldFail(self):
-        paramId = "SomeStructural"
+        paramId = someStructural
         choice = AnotherSubChoice()     # This is not a SomeStructural!
         with self.assertRaises(InPUTException):
             self.design.setValue(paramId, choice)
@@ -309,7 +316,7 @@ class TestDesign(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testGetWrapper(self):
         design = self.design    # Alias to save typing.
-        parentId = "CustomizableInputDemonstrator"
+        parentId = customizableInputDemonstrator
         wrapperId = parentId + ".WrappedPrimitive"
         expected = 0.9369297592420026
         value = design.getValue(wrapperId)
@@ -320,8 +327,8 @@ class TestDesign(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testSetWrapper(self):
         design = self.design    # Alias to save typing.
-        parentId = "CustomizableInputDemonstrator"
-        wrapperId = parentId + ".WrappedPrimitive"
+        parentId = customizableInputDemonstrator
+        wrapperId = parentId + "." + wrappedPrimitive
         # Create a Wrapper object and set the parameter.
         value = Wrapper(.3)
         design.setValue(wrapperId, value)
@@ -336,13 +343,13 @@ class TestDesign(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testGetArray(self):
         design = self.design    # Alias to save typing.
-        paramId = "SomeFixedArray"
+        paramId = someFixedArray
         elemValue = 42              # All elements are set to the value 42.
         length = 42                 # Total length of array, also last index.
         firstId = paramId + ".1"                        # First element.
         lastId = paramId + "." + str(length)            # Last element
         outsideId = paramId + "." + str(length + 1)     # Out of range.
-        largeId = "SomeLargePrimitiveArray"
+        largeId = someLargePrimitiveArray
 
         # Get array and make sure it has the expected length.
         array = design.getValue(paramId)
@@ -366,8 +373,8 @@ class TestDesign(unittest.TestCase):
 
     def testSetArray(self):
         design = self.design    # Alias to save typing.
-        elemId = "SomeLargePrimitiveArray.1.1.1.1"
-        arrayId = "SomeLargePrimitiveArray.1.1.42"
+        elemId = someLargePrimitiveArray + ".1.1.1.1"
+        arrayId = someLargePrimitiveArray + ".1.1.42"
         value = 13
         design.setValue(elemId, value)
         current = design.getValue(elemId)
@@ -393,27 +400,27 @@ class TestDesign(unittest.TestCase):
     # The same fixed array is currently used for both.
     @unittest.skip("Not implemented yet.")
     def testSetValueForArrayElementWithOutOfRangeIndexShouldFail(self):
-        paramId = "SomeFixedArray.43"   # 43 is out of range.
+        paramId = someFixedArray + ".43"   # 43 is out of range.
         with self.assertRaises(InPUTException):
             self.design.setValue(paramId, 42)   # The value is irrelevant.
 
     @unittest.skip("Not implemented yet.")
     def testSetValueForFixedArrayElementShouldFail(self):
-        paramId = "SomeFixedArray.1"    # 1 is valid.
+        paramId = someFixedArray + ".1"    # 1 is valid.
         with self.assertRaises(InPUTException):
             self.design.setValue(paramId, 42)   # The value is irrelevant.
 
     @unittest.skip("Not implemented yet.")
     def testGetComplex(self):
         design = self.design    # Alias to save typing.
-        paramId = "SomeComplexStructural"
+        paramId = someComplexStructural
         value = design.getValue(paramId)
         self.assertTrue(isinstance(value, SomeComplexStructural))
         self.assertEquals(3, value.size())
 
     def testSetComplex(self):
         design = self.design    # Alias to save typing.
-        paramId = "SomeComplexStructural"
+        paramId = someComplexStructural
         # Construct expected complex object.
         complexStructural = SomeComplexStructural()
         complexStructural.addEntry(SingleComplexChoice())
@@ -455,7 +462,7 @@ class TestDesign(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testSetValueWithNullValueShouldFail(self):
         design = self.design    # Alias to save typing.
-        validId = "SomeStructuralParent"
+        validId = someStructuralParent
         # Check that the parameter isn't None to begin with.
         self.assertNotNull(design.getValue(validId))
         with self.assertRaises(InPUTException):
@@ -466,14 +473,14 @@ class TestDesign(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testSetFixed(self):
         with self.assertRaises(InPUTException):
-            self.design.setValue("SomeFixed", 43)
+            self.design.setValue(someFixed, 43)
 
     @unittest.skip("Not implemented yet.")
     def testExport(self):
         design = self.design    # Alias to save typing.
         designSpace = design.getSpace()
         # Export to file.
-        designName = "someOtherTestDesign.xml"
+        designName = someOtherTestDesign
         exporter = XMLFileExporter(designName)
         design.export(exporter)
         # Import the same design to create a new object.
