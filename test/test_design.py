@@ -9,35 +9,8 @@ PRECISION = 6
 
 class TestDesign(unittest.TestCase):
 
-    # All of these parameters are normally imported from an XML document.
-    # Until all the XML parsing and parameter handling has been implemented,
-    # initialize the design with the expected parameters to make sure all the
-    # tests do what they are supposed to.
-    def dummySetup(self):
-        params = self.design.parameters
-        params[SOME_BOOLEAN] = False
-        params[SOME_LONG] = 1700584710333745153
-        params[SOME_SHORT] = -7448
-        params[SOME_DECIMAL] = -7889858943241994240.07228988965664218113715833169408142566680908203125
-        params[SOME_FLOAT] = 0.73908234
-        params[SOME_DOUBLE] = 0.12345778699671628
-        params[SOME_INTEGER] = -1966342580
-        params[A_SMALLER_LONG] = -3991818661248199656
-        params[A_BIGGER_LONG] = 6671154699664551937
-        params[A_STRANGE_LONG] = 5908891008213154534
-
-        fixedArray = []
-        for i in range(42):
-            fixedArray.append(42)
-        params[SOME_FIXED_ARRAY] = tuple(fixedArray)
-
-        params[SOME_STRING_CUSTOMIZED_BY_THE_USER] = "SomeStringCustomizedByTheUser"
-        params[SOME_STRUCTURAL] = SomeSecondChoice()
-
     def setUp(self):
         self.design = Design(DESIGN_FILE)
-        # Sets parameters to hard-coded expected values. Remove in the future.
-        self.dummySetup()
 
     def testSetReadOnly(self):
         design = self.design    # Alias to save typing.

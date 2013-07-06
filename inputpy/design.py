@@ -10,6 +10,8 @@ This module exports two core interfaces:
 """
 from inputpy.exceptions import InPUTException
 import random
+# Only needed by DummyParameterStore.
+from test import *
 
 rng = random.Random()
 
@@ -25,6 +27,7 @@ class Design:
         self.fileName = fileName
         self.isReadOnly = False
         self.id = None
+        self.store = DummyParameterStore()  # Uses hard-coded test data.
 
     def impOrt(self, importer):
         pass
@@ -42,15 +45,14 @@ class Design:
     # InPUTException instead, but this is probably not the place for it, since
     # some sort of parameter store will be used in the background.
     def getValue(self, paramId, actualParam=None):
-        #raise InPUTException('invalid parameter')
-        return self.parameters[paramId]
+        return self.store.getValue(paramId)
 
-    # Perhaps the read-only flag and check also belongs in some parameter store.
+    # Perhaps the read-only flag check also belongs in some parameter store.
     def setValue(self, paramId, value):
         if self.isReadOnly:
             msg = "Cannot set '%s'. The design is read only!" % (paramId)
             raise InPUTException(msg)
-        self.parameters[paramId] = value
+        self.store.setValue(paramId, value)
 
     def same(self, design):
         return True
@@ -61,6 +63,43 @@ class Design:
 
     def setReadOnly(self):
         self.isReadOnly = True
+
+# All of these parameters are normally imported from an XML document.
+# Until all the XML parsing and parameter handling has been implemented,
+# initialize the design with the expected parameters to make sure all the
+# tests do what they are supposed to.
+class DummyParameterStore:
+    def __init__(self):
+        params = {}
+        params[SOME_BOOLEAN] = False
+        params[SOME_LONG] = 1700584710333745153
+        params[SOME_SHORT] = -7448
+        params[SOME_DECIMAL] = -7889858943241994240.07228988965664218113715833169408142566680908203125
+        params[SOME_FLOAT] = 0.73908234
+        params[SOME_DOUBLE] = 0.12345778699671628
+        params[SOME_INTEGER] = -1966342580
+        params[A_SMALLER_LONG] = -3991818661248199656
+        params[A_BIGGER_LONG] = 6671154699664551937
+        params[A_STRANGE_LONG] = 5908891008213154534
+
+        fixedArray = []
+        for i in range(42):
+            fixedArray.append(42)
+        params[SOME_FIXED_ARRAY] = tuple(fixedArray)
+
+        params[SOME_STRING_CUSTOMIZED_BY_THE_USER] = "SomeStringCustomizedByTheUser"
+        params[SOME_STRUCTURAL] = SomeSecondChoice()
+
+        self.parameters = params
+
+    def setValue(self, paramId, value):
+        self.parameters[paramId] = value
+
+    def getValue(self, paramId):
+        try:
+            return self.parameters[paramId]
+        except KeyError:
+            return None
 
 class DesignSpace:
     """
