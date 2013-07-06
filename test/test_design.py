@@ -394,7 +394,7 @@ class TestDesign(unittest.TestCase):
         self.assertTrue(isinstance(current, type(complexStructural)))
         self.assertEquals(complexStructural.size(), current.size())
 
-    def testGetValueWithInvalidIdShouldFail(self):
+    def testGetValueWithInvalidIdShouldReturnNone(self):
         # This test corresponds to testGetNegative from the Java version.
         self.getInvalidId("IDoNotExist")
         self.getInvalidId(None)

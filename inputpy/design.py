@@ -64,6 +64,7 @@ class Design:
     def setReadOnly(self):
         self.isReadOnly = True
 
+
 # All of these parameters are normally imported from an XML document.
 # Until all the XML parsing and parameter handling has been implemented,
 # initialize the design with the expected parameters to make sure all the
@@ -93,7 +94,13 @@ class DummyParameterStore:
         self.parameters = params
 
     def setValue(self, paramId, value):
-        self.parameters[paramId] = value
+        params = self.parameters
+        if value is None:
+            raise InPUTException("Can't set parameter. Invalid value: None.")
+        if not paramId in params:
+            raise InPUTException("Can't set parameter. Invalid ID: " + paramId)
+        else:
+            params[paramId] = value
 
     def getValue(self, paramId):
         try:
