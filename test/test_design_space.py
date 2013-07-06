@@ -35,8 +35,8 @@ class TestDesignSpace(unittest.TestCase):
 
     def testNextPrimitive(self):
         params = (
-            someBoolean, someInteger, someShort, someLong,
-            someDouble, someFloat, someDecimal,
+            SOME_BOOLEAN, SOME_INTEGER, SOME_SHORT, SOME_LONG,
+            SOME_DOUBLE, SOME_FLOAT, SOME_DECIMAL,
         )
         for param in params:
             self.getNextAndCompare(param)
@@ -70,8 +70,8 @@ class TestDesignSpace(unittest.TestCase):
     def testNextStructural(self):
         space = self.space      # Alias to save typing.
         paramIds = (
-            someStructural, anotherStructural,
-            someStructuralParent, anotherStructuralParent,
+            SOME_STRUCTURAL, ANOTHER_STRUCTURAL,
+            SOME_STRUCTURAL_PARENT, ANOTHER_STRUCTURAL_PARENT,
         )
         for param in paramIds:
             self.getNextAndCompare(param)
@@ -148,12 +148,12 @@ class TestDesignSpace(unittest.TestCase):
 
     # Replaces testNextSubParameter.
     def testNextPrimitiveSubParameter(self):
-        paramId = someStructuralParent + "." + someSharedPrimitiveSub
+        paramId = SOME_STRUCTURAL_PARENT + "." + SOME_SHARED_PRIMITIVE_SUB
         self.getNextAndCompare(self.space.next(paramId))
 
     # Replaces testNextSubParameter.
     def testNextStructuralSubParameter(self):
-        paramId = anotherStructuralParent + "." + andYetAnotherSecondChoice
+        paramId = ANOTHER_STRUCTURAL_PARENT + "." + AND_YET_ANOTHER_SECOND_CHOICE
         self.getNextAndCompare(self.space.next(paramId))
 
     # Replaces testNextSubParameter.
@@ -268,7 +268,7 @@ class TestDesignSpace(unittest.TestCase):
     def testNextReadOnlyDesign(self):
         designId = "designId"
         readOnly = True
-        paramId = someBoolean
+        paramId = SOME_BOOLEAN
         design = self.space.nextDesign(designId, readOnly)
         # Trying to set a value for a read-only design should fail.
         with self.assertRaises(InPUTException):
@@ -449,15 +449,15 @@ class TestDesignSpace(unittest.TestCase):
     def testSetFixedPrimitive(self):
         # Randomize the expected values in the future.
         params = {
-            someInteger: 2,
-            someBoolean: True,
+            SOME_INTEGER: 2,
+            SOME_BOOLEAN: True,
         }
 
         for (paramId, expected) in params.items():
             self.checkFixed(paramId, expected)  # Use default iterations.
 
     def testSetFixedToNoneShouldTurnOffFixedStatus(self):
-        params = (someInteger, someBoolean)
+        params = (SOME_INTEGER, SOME_BOOLEAN)
         for paramId in params:
             self.checkFixedOff(paramId)
 

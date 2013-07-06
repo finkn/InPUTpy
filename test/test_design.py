@@ -15,24 +15,24 @@ class TestDesign(unittest.TestCase):
     # tests do what they are supposed to.
     def dummySetup(self):
         params = self.design.parameters
-        params[someBoolean] = False
-        params[someLong] = 1700584710333745153
-        params[someShort] = -7448
-        params[someDecimal] = -7889858943241994240.07228988965664218113715833169408142566680908203125
-        params[someFloat] = 0.73908234
-        params[someDouble] = 0.12345778699671628
-        params[someInteger] = -1966342580
-        params[aSmallerLong] = -3991818661248199656
-        params[aBiggerLong] = 6671154699664551937
-        params[aStrangeLong] = 5908891008213154534
+        params[SOME_BOOLEAN] = False
+        params[SOME_LONG] = 1700584710333745153
+        params[SOME_SHORT] = -7448
+        params[SOME_DECIMAL] = -7889858943241994240.07228988965664218113715833169408142566680908203125
+        params[SOME_FLOAT] = 0.73908234
+        params[SOME_DOUBLE] = 0.12345778699671628
+        params[SOME_INTEGER] = -1966342580
+        params[A_SMALLER_LONG] = -3991818661248199656
+        params[A_BIGGER_LONG] = 6671154699664551937
+        params[A_STRANGE_LONG] = 5908891008213154534
 
         fixedArray = []
         for i in range(42):
             fixedArray.append(42)
-        params[someFixedArray] = tuple(fixedArray)
+        params[SOME_FIXED_ARRAY] = tuple(fixedArray)
 
-        params[someStringCustomizedByTheUser] = "SomeStringCustomizedByTheUser"
-        params[someStructural] = SomeSecondChoice()
+        params[SOME_STRING_CUSTOMIZED_BY_THE_USER] = "SomeStringCustomizedByTheUser"
+        params[SOME_STRUCTURAL] = SomeSecondChoice()
 
     def setUp(self):
         self.design = Design(DESIGN_FILE)
@@ -41,7 +41,7 @@ class TestDesign(unittest.TestCase):
 
     def testSetReadOnly(self):
         design = self.design    # Alias to save typing.
-        paramId = someBoolean
+        paramId = SOME_BOOLEAN
         design.setReadOnly()
         with self.assertRaises(InPUTException):
             design.setValue(paramId, False)
@@ -79,13 +79,13 @@ class TestDesign(unittest.TestCase):
 
     def testGetPrimitive(self):
         args = {
-            someBoolean: False,
-            someInteger: -1966342580,
-            someShort: -7448,
-            someLong: 1700584710333745153,
-            someDouble: 0.12345778699671628,
-            someFloat: 0.73908234,
-            someDecimal: -7889858943241994240.07228988965664218113715833169408142566680908203125,
+            SOME_BOOLEAN: False,
+            SOME_INTEGER: -1966342580,
+            SOME_SHORT: -7448,
+            SOME_LONG: 1700584710333745153,
+            SOME_DOUBLE: 0.12345778699671628,
+            SOME_FLOAT: 0.73908234,
+            SOME_DECIMAL: -7889858943241994240.07228988965664218113715833169408142566680908203125,
         }
         for (key, value) in args.items():
             self.getAndCompare(key, value)
@@ -96,13 +96,13 @@ class TestDesign(unittest.TestCase):
 
     def testSetPrimitive(self):
         args = {
-            someBoolean: True,
-            someInteger: 1,
-            someShort: 42,
-            someLong: 1,
-            someDouble: 0.42,
-            someFloat: 0.84,
-            someDecimal: 42,
+            SOME_BOOLEAN: True,
+            SOME_INTEGER: 1,
+            SOME_SHORT: 42,
+            SOME_LONG: 1,
+            SOME_DOUBLE: 0.42,
+            SOME_FLOAT: 0.84,
+            SOME_DECIMAL: 42,
         }
         for (key, value) in args.items():
             self.setAndCompare(key, value)
@@ -270,14 +270,14 @@ class TestDesign(unittest.TestCase):
         self.assertEquals(value, parent.andTheCustomizableGetter())
 
     def testGetStructural(self):
-        paramId = someStructural
+        paramId = SOME_STRUCTURAL
         value = self.design.getValue(paramId)
         self.assertTrue(isinstance(value, SomeStructural))
 
     # This test is missing a case that is present in the Java version.
     # That case is handled separately in the following test.
     def testSetStructural(self):
-        paramId = someStructural
+        paramId = SOME_STRUCTURAL
         # Set the parameter to one SomeStructural and check that it was set.
         choice = SomeFirstChoice()          # This is a SomeStructural.
         self.setStructural(paramId, choice)
@@ -359,8 +359,8 @@ class TestDesign(unittest.TestCase):
 
     def testSetArray(self):
         design = self.design    # Alias to save typing.
-        elemId = someLargePrimitiveArray + ".1.1.1.1"
-        arrayId = someLargePrimitiveArray + ".1.1.42"
+        elemId = SOME_LARGE_PRIMITIVE_ARRAY + ".1.1.1.1"
+        arrayId = SOME_LARGE_PRIMITIVE_ARRAY + ".1.1.42"
         value = 13
         design.setValue(elemId, value)
         current = design.getValue(elemId)
@@ -406,7 +406,7 @@ class TestDesign(unittest.TestCase):
 
     def testSetComplex(self):
         design = self.design    # Alias to save typing.
-        paramId = someComplexStructural
+        paramId = SOME_COMPLEX_STRUCTURAL
         # Construct expected complex object.
         complexStructural = SomeComplexStructural()
         complexStructural.addEntry(SingleComplexChoice())
