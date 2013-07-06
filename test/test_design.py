@@ -394,20 +394,16 @@ class TestDesign(unittest.TestCase):
         self.assertTrue(isinstance(current, type(complexStructural)))
         self.assertEquals(complexStructural.size(), current.size())
 
-    @unittest.skip("Not implemented yet.")
     def testGetValueWithInvalidIdShouldFail(self):
         # This test corresponds to testGetNegative from the Java version.
-        self.getNegative("IDoNotExist")
-        self.getNegative(None)
+        self.getInvalidId("IDoNotExist")
+        self.getInvalidId(None)
 
-    def getNegative(self, invalidId):
+    def getInvalidId(self, invalidId):
         design = self.design    # Alias to save typing.
-        with self.assertRaises(InPUTException):
-            design.getValue(invalidId)
-        with self.assertRaises(InPUTException):
-            design.getValue(invalidId, None)
-        with self.assertRaises(InPUTException):
-            design.getValue(invalidId, ())     # Empty tuple.
+        self.assertIsNone(design.getValue(invalidId))
+        self.assertIsNone(design.getValue(invalidId, None))
+        self.assertIsNone(design.getValue(invalidId, ()))     # Empty tuple.
 
     # The Java version has a testSetNegative test which itself contains two
     # cases where a setValue call fails for different reasons.
