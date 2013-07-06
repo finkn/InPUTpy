@@ -7,11 +7,6 @@ import unittest
 DESIGN_SPACE_FILE = "testSpace.xml"
 DESIGN_MAPPING_FILE = "testSpaceMapping.xml"
 
-# Also a few values.
-anotherFile = "anotherFile.xml"
-anotherTestDesign = "anotherTestDesign.xml"
-someOtherTestDesign = "someOtherTestDesign.xml"
-
 class TestDesignSpace(unittest.TestCase):
 
     def setUp(self):
