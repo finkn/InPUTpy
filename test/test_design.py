@@ -408,22 +408,20 @@ class TestDesign(unittest.TestCase):
     # The Java version has a testSetNegative test which itself contains two
     # cases where a setValue call fails for different reasons.
     # Those cases are instead represented here in these two separate tests.
-    @unittest.skip("Not implemented yet.")
     def testSetValueWithInvalidIdShouldFail(self):
         invalidId = "IDoNotExist"
         with self.assertRaises(InPUTException):
             self.design.setValue(invalidId, "some value")
 
-    @unittest.skip("Not implemented yet.")
     def testSetValueWithNullValueShouldFail(self):
         design = self.design    # Alias to save typing.
-        validId = someStructuralParent
+        validId = SOME_STRUCTURAL_PARENT
         # Check that the parameter isn't None to begin with.
-        self.assertNotNull(design.getValue(validId))
+        self.assertIsNotNone(design.getValue(validId))
         with self.assertRaises(InPUTException):
             design.setValue(validId, None)
         # Check that the parameter is still not None (it wasn't set).
-        self.assertNotNull(design.getValue(validId))
+        self.assertIsNotNone(design.getValue(validId))
 
     @unittest.skip("Not implemented yet.")
     def testSetFixed(self):
