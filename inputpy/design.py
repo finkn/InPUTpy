@@ -65,6 +65,17 @@ class Design:
         self.isReadOnly = True
 
 
+# SomeLargePrimitiveArray, used in DummyParameterStore for initialization.
+CACHED_ARRAY = [
+    [
+        [
+            [
+                a for a in range(42)
+            ] for b in range(42)
+        ] for c in range(42)
+    ] for d in range(42)
+]
+
 # All of these parameters are normally imported from an XML document.
 # Until all the XML parsing and parameter handling has been implemented,
 # initialize the design with the expected parameters to make sure all the
@@ -90,6 +101,27 @@ class DummyParameterStore:
 
         params[SOME_STRING_CUSTOMIZED_BY_THE_USER] = "SomeStringCustomizedByTheUser"
         params[SOME_STRUCTURAL] = SomeSecondChoice()
+        # Initialize SomeStructuralParent.
+        someStructuralParent = YetAnotherFirstChoice(1618927800)
+        someStructuralParent.setAnotherSharedPrimitiveSub(5938400921453047807)
+        someStructuralParent.someSharedStructuralSub = "testString"
+        params[SOME_STRUCTURAL_PARENT] = someStructuralParent
+        # Initialize SomeComplexStructural.
+        complexStructural = SomeComplexStructural()
+        complexStructural.addEntry(SingleComplexChoice())
+        complexStructural.addEntry(SingleComplexChoice())
+        complexStructural.addEntry(SingleComplexChoice())
+        params[SOME_COMPLEX_STRUCTURAL] = complexStructural
+        # Initialize SomeLargePrimitiveArray.
+        # Note: This one is more of a cheat than the others since indexes
+        # aren't handled properly at all.
+        someLargePrimitiveArray = CACHED_ARRAY
+        params[SOME_LARGE_PRIMITIVE_ARRAY] = someLargePrimitiveArray
+        params[SOME_LARGE_PRIMITIVE_ARRAY] = someLargePrimitiveArray
+        arrayId = SOME_LARGE_PRIMITIVE_ARRAY + ".1.1.1.1"
+        params[arrayId] = someLargePrimitiveArray[0][0][0]
+        arrayId = SOME_LARGE_PRIMITIVE_ARRAY + ".1.1.42"
+        params[arrayId] = someLargePrimitiveArray[0][0][41]
 
         self.parameters = params
 
