@@ -1,49 +1,11 @@
 from inputpy.design import Design
 from inputpy.exceptions import InPUTException
 from inputpy.impexp import XMLFileImporter, XMLFileExporter
-from test import SomeComplexStructural, SingleComplexChoice, Wrapper
-from test import SomeCommonStructural, SomeStructural
-from test import SomeFirstChoice, SomeSecondChoice
-from test import SomeSubChoice, AnotherSubChoice
-from test import AnotherStructuralParent
+from test import *
 import unittest
 
 DESIGN_FILE = "testDesign.xml"
 PRECISION = 6
-
-# Parameter IDs used in tests. This little section works similar to Q.
-anotherInteger = "AnotherInteger"
-aBiggerLong = "ABiggerLong"
-aSmallerLong = "ASmallerLong"
-aStrangeLong = "AStrangeLong"
-someBoolean = "SomeBoolean"
-someShort = "SomeShort"
-someInteger = "SomeInteger"
-someLong = "SomeLong"
-someDouble = "SomeDouble"
-someFloat = "SomeFloat"
-someDecimal = "SomeDecimal"
-
-anotherStructuralParent = "AnotherStructuralParent"
-anotherStringCustomizedByTheUser = "AnotherStringCustomizedByTheUser"
-anotherSharedPrimitiveSub = "AnotherSharedPrimitiveSub"
-customizableInputDemonstrator = "CustomizableInputDemonstrator"
-customizableSetGetPrimitive = "CustomizableSetGetPrimitive"
-someStructural = "SomeStructural"
-someStringCustomizedByTheUser = "SomeStringCustomizedByTheUser"
-someStructuralParent = "SomeStructuralParent"
-someComplexStructural = "SomeComplexStructural"
-someFixedArray = "SomeFixedArray"
-someLargePrimitiveArray = "SomeLargePrimitiveArray"
-someSharedStructuralSub = "SomeSharedStructuralSub"
-someLargePrimitiveArray = "SomeLargePrimitiveArray"
-wrappedPrimitive = "WrappedPrimitive"
-someFixed = "SomeFixed"
-
-# Also a few values.
-anotherFile = "anotherFile.xml"
-anotherTestDesign = "anotherTestDesign.xml"
-someOtherTestDesign = "someOtherTestDesign.xml"
 
 class TestDesign(unittest.TestCase):
 
