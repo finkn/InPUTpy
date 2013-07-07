@@ -355,9 +355,8 @@ class TestDesign(unittest.TestCase):
     # Maybe the test using an out of range index should use a non-fixed array,
     # since such a parameter shouldn't be settable anyway?
     # The same fixed array is currently used for both.
-    @unittest.skip("Not implemented yet.")
     def testSetValueForArrayElementWithOutOfRangeIndexShouldFail(self):
-        paramId = someFixedArray + ".43"   # 43 is out of range.
+        paramId = SOME_FIXED_ARRAY + ".43"   # 43 is out of range.
         with self.assertRaises(InPUTException):
             self.design.setValue(paramId, 42)   # The value is irrelevant.
 
