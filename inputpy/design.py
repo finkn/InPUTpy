@@ -51,6 +51,12 @@ class Design:
         return DesignSpace()
 
     def getValue(self, paramId, actualParam=None):
+        """
+        Return the value for the specified parameter or None if the parameter
+        id is invalid (either None or unknown).
+        If the design has been extended, parameters from the extending designs
+        may be returned.
+        """
         value = self.store.getValue(paramId)
         if value is not None:
             return value
@@ -61,6 +67,14 @@ class Design:
 
     # Perhaps the read-only flag check also belongs in some parameter store.
     def setValue(self, paramId, value):
+        """
+        Sets the value for the specified parameter.
+
+        Raises InPUTException if:
+        - Trying to set a None value
+        - Trying to set a value for an invalid parameter ID.
+        - Trying to set any value and this design has been set read-only.
+        """
         if self.isReadOnly:
             msg = "Cannot set '%s'. The design is read only!" % (paramId)
             raise InPUTException(msg)
@@ -74,6 +88,12 @@ class Design:
         return self.id
 
     def setReadOnly(self):
+        """
+        Mark the design as read-only.
+
+        Calling setValue() after will result in an InPUTException.
+        Other modifications (such as extending the design) are allowed.
+        """
         self.isReadOnly = True
 
     def extendScope(self, design):
