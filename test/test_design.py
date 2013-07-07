@@ -438,11 +438,10 @@ class TestDesign(unittest.TestCase):
         impDesign = designSpace.impOrt(importer)
         self.assertTrue(design.same(impDesign))
 
-    @unittest.skip("Not implemented yet.")
     def testDesign(self):
         flawedFileNames = (None, "someNotExistent.xml")
-        with self.assertRaises(InPUTException):
-            for fileName in flawedFileNames:
+        for fileName in flawedFileNames:
+            with self.assertRaises(InPUTException):
                 self.design = Design(fileName)
 
 if __name__ == '__main__':

@@ -22,11 +22,19 @@ class Design:
     A Design represents one set of instantiated parameters for a Design Space.
     """
 
-    def __init__(self, fileName=None):
+    def __init__(self, fileName=None, document=None, designId=None):
+        # If these aren't set, then expect a file.
+        if (document is None and designId is None) or fileName is not None:
+            try:
+                f = open(fileName)
+                f.close()
+            except (IOError, TypeError):
+                raise InPUTException("Couldn't open file: %s" % (fileName))
+
         self.parameters = {}
         self.fileName = fileName
         self.isReadOnly = False
-        self.id = None
+        self.id = designId
         self.store = DummyParameterStore()  # Uses hard-coded test data.
 
     def impOrt(self, importer):
@@ -187,7 +195,7 @@ class DesignSpace:
             return value
 
     def nextDesign(self, designId, readOnly=False):
-        design = Design()
+        design = Design(designId=designId)
         design.setReadOnly()
         return design
 
@@ -204,6 +212,6 @@ class DesignSpace:
         return self.fileName
 
     def nextEmptyDesign(self, designId):
-        design = Design()
+        design = Design(designId=designId)
         design.id = designId
         return design
