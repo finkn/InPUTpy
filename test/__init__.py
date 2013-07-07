@@ -142,7 +142,7 @@ class Wrapper:
         if result is NotImplemented:
             return result
         else:
-            return result
+            return not result
 
     def toValue(self):
         return self.value
