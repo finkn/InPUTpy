@@ -4,8 +4,8 @@ from test import *
 from inputpy import q as Q
 import unittest
 
-DESIGN_SPACE_FILE = "testSpace.xml"
-DESIGN_MAPPING_FILE = "testSpaceMapping.xml"
+DESIGN_SPACE_FILE = "test/testSpace.xml"
+DESIGN_MAPPING_FILE = "test/testSpaceMapping.xml"
 
 class TestDesignSpace(unittest.TestCase):
 

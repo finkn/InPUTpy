@@ -4,7 +4,7 @@ from inputpy.impexp import XMLFileImporter, XMLFileExporter
 from test import *
 import unittest
 
-DESIGN_FILE = "testDesign.xml"
+DESIGN_FILE = "test/testDesign.xml"
 PRECISION = 6
 
 class TestDesign(unittest.TestCase):

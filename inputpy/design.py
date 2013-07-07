@@ -38,7 +38,7 @@ class Design:
         self.otherDesigns = []
 
         # Super dummy initialization: Pretend to be anotherDesign.
-        if fileName == "anotherTestDesign.xml":
+        if fileName == "test/anotherTestDesign.xml":
             self.store.parameters["AnotherInteger"] = 42
 
     def impOrt(self, importer):
