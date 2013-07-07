@@ -298,16 +298,15 @@ class TestDesign(unittest.TestCase):
         parent = design.getValue(parentId)
         self.assertEquals(value, parent.getPrimitive())
 
-    @unittest.skip("Not implemented yet.")
     def testGetArray(self):
         design = self.design    # Alias to save typing.
-        paramId = someFixedArray
+        paramId = SOME_FIXED_ARRAY
         elemValue = 42              # All elements are set to the value 42.
         length = 42                 # Total length of array, also last index.
         firstId = paramId + ".1"                        # First element.
         lastId = paramId + "." + str(length)            # Last element
         outsideId = paramId + "." + str(length + 1)     # Out of range.
-        largeId = someLargePrimitiveArray
+        largeId = SOME_LARGE_PRIMITIVE_ARRAY
 
         # Get array and make sure it has the expected length.
         array = design.getValue(paramId)
@@ -323,7 +322,7 @@ class TestDesign(unittest.TestCase):
         self.assertEquals(elemValue, value)
         # Fetching an element outside the range should yield a None.
         value = design.getValue(outsideId)
-        self.assertIsNone(elemValue, value)
+        self.assertIsNone(value)
 
         largeArray = design.getValue(largeId)
         self.assertEquals(length, len(largeArray))

@@ -130,6 +130,12 @@ class DummyParameterStore:
         wrapperId = CUSTOMIZABLE_INPUT_DEMONSTRATOR + "." + WRAPPED_PRIMITIVE
         params[wrapperId] = wrapper
         params[CUSTOMIZABLE_INPUT_DEMONSTRATOR] = customizableInputDemonstrator
+        # Initialize SomeFixedArray.
+        # Cheating with the indexes again.
+        someFixedArray = tuple([42 for i in range(42)])
+        params[SOME_FIXED_ARRAY] = someFixedArray
+        params[SOME_FIXED_ARRAY + ".1"] = someFixedArray[0]
+        params[SOME_FIXED_ARRAY + ".42"] = someFixedArray[41]
 
         self.parameters = params
 
