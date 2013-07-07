@@ -423,7 +423,7 @@ class TestDesign(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testSetFixed(self):
         with self.assertRaises(InPUTException):
-            self.design.setValue(someFixed, 43)
+            self.design.setValue(SOME_FIXED, 43)
 
     @unittest.skip("Not implemented yet.")
     def testExport(self):

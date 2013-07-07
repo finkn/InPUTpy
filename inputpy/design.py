@@ -144,6 +144,8 @@ class DummyParameterStore:
         params[SOME_FIXED_ARRAY] = someFixedArray
         params[SOME_FIXED_ARRAY + ".1"] = someFixedArray[0]
         params[SOME_FIXED_ARRAY + ".42"] = someFixedArray[41]
+        # Initialize SomeFixed.
+        params[SOME_FIXED] = 42
 
         self.parameters = params
 
