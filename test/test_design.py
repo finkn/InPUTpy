@@ -367,10 +367,9 @@ class TestDesign(unittest.TestCase):
         with self.assertRaises(InPUTException):
             self.design.setValue(paramId, 42)   # The value is irrelevant.
 
-    @unittest.skip("Not implemented yet.")
     def testGetComplex(self):
         design = self.design    # Alias to save typing.
-        paramId = someComplexStructural
+        paramId = SOME_COMPLEX_STRUCTURAL
         value = design.getValue(paramId)
         self.assertTrue(isinstance(value, SomeComplexStructural))
         self.assertEquals(3, value.size())
