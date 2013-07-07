@@ -272,22 +272,21 @@ class TestDesign(unittest.TestCase):
         with self.assertRaises(InPUTException):
             self.design.setValue(paramId, choice)
 
-    @unittest.skip("Not implemented yet.")
     def testGetWrapper(self):
         design = self.design    # Alias to save typing.
-        parentId = customizableInputDemonstrator
-        wrapperId = parentId + "." + wrappedPrimitive
+        parentId = CUSTOMIZABLE_INPUT_DEMONSTRATOR
+        wrapperId = parentId + "." + WRAPPED_PRIMITIVE
         expected = 0.9369297592420026
         value = design.getValue(wrapperId)
-        self.assertAlmostEquals(expected, value.toValue(), PRECISION)
+        self.assertAlmostEquals(expected, value.toValue(), places=PRECISION)
         parent = design.getValue(parentId)
         self.assertEquals(value, parent.getPrimitive())
 
     @unittest.skip("Not implemented yet.")
     def testSetWrapper(self):
         design = self.design    # Alias to save typing.
-        parentId = customizableInputDemonstrator
-        wrapperId = parentId + "." + wrappedPrimitive
+        parentId = CUSTOMIZABLE_INPUT_DEMONSTRATOR
+        wrapperId = parentId + "." + WRAPPED_PRIMITIVE
         # Create a Wrapper object and set the parameter.
         value = Wrapper(.3)
         design.setValue(wrapperId, value)

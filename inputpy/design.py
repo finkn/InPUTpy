@@ -122,6 +122,14 @@ class DummyParameterStore:
         params[arrayId] = someLargePrimitiveArray[0][0][0]
         arrayId = SOME_LARGE_PRIMITIVE_ARRAY + ".1.1.42"
         params[arrayId] = someLargePrimitiveArray[0][0][41]
+        # Initialize WrappedPrimitive.
+        expected = 0.9369297592420026
+        wrapper = Wrapper(expected)
+        customizableInputDemonstrator = SomeCommonStructural()
+        customizableInputDemonstrator.setPrimitive(wrapper)
+        wrapperId = CUSTOMIZABLE_INPUT_DEMONSTRATOR + "." + WRAPPED_PRIMITIVE
+        params[wrapperId] = wrapper
+        params[CUSTOMIZABLE_INPUT_DEMONSTRATOR] = customizableInputDemonstrator
 
         self.parameters = params
 
