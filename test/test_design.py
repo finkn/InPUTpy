@@ -26,11 +26,10 @@ class TestDesign(unittest.TestCase):
         value = space.getId()
         self.assertEquals(expected, value)
 
-    @unittest.skip("Not implemented yet.")
     def testExtendScope(self):
         design = self.design    # Alias to save typing.
-        anotherDesignFile = anotherTestDesign
-        paramId = anotherInteger
+        anotherDesignFile = ANOTHER_TEST_DESIGN
+        paramId = ANOTHER_INTEGER
         expected = 42
 
         # The 'AnotherInteger' parameter should not be present in the design.

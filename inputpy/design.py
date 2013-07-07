@@ -31,11 +31,15 @@ class Design:
             except (IOError, TypeError):
                 raise InPUTException("Couldn't open file: %s" % (fileName))
 
-        self.parameters = {}
         self.fileName = fileName
         self.isReadOnly = False
         self.id = designId
         self.store = DummyParameterStore()  # Uses hard-coded test data.
+        self.otherDesigns = []
+
+        # Super dummy initialization: Pretend to be anotherDesign.
+        if fileName == "anotherTestDesign.xml":
+            self.store.parameters["AnotherInteger"] = 42
 
     def impOrt(self, importer):
         pass
@@ -46,14 +50,14 @@ class Design:
     def getSpace(self):
         return DesignSpace()
 
-    def extendSpace(self, designSpace):
-        pass
-
-    # Automatically raises KeyError if paramId is invalid. It should raise an
-    # InPUTException instead, but this is probably not the place for it, since
-    # some sort of parameter store will be used in the background.
     def getValue(self, paramId, actualParam=None):
-        return self.store.getValue(paramId)
+        value = self.store.getValue(paramId)
+        if value is not None:
+            return value
+        for design in self.otherDesigns:
+            value = design.getValue(paramId)
+            if value is not None:
+                return value
 
     # Perhaps the read-only flag check also belongs in some parameter store.
     def setValue(self, paramId, value):
@@ -71,6 +75,41 @@ class Design:
 
     def setReadOnly(self):
         self.isReadOnly = True
+
+    def extendScope(self, design):
+        """
+        Extend this design (available parameters) with another design.
+
+        After extending the scope, this design will be able to return values
+        for parameters that are defined for the other design. However, only
+        parameters native to this design can be set.
+
+        This operation will have NO EFFECT if:
+        - Adding a None design.
+        - Adding this design to itself.
+        - Adding the same design multiple times.
+        """
+        designs = self.otherDesigns
+        if design is None:
+            return  # Skip this case.
+        if self is design or design in designs:
+            return  # Skip this case.
+        # Everything checks out. Add the other design.
+        designs.append(design)
+
+    def reduceScope(self, design):
+        """
+        Reduce this design by removing another extending design.
+
+        After reducing the scope, parameters that are only defined for the
+        removed design will no longer be available.
+
+        This operation will have NO EFFECT if:
+        - Trying to remove a design that was never added. (see extendScope())
+        """
+        designs = self.otherDesigns
+        if design in designs:
+            designs.remove(design)
 
 
 # SomeLargePrimitiveArray, used in DummyParameterStore for initialization.
