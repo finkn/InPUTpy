@@ -442,5 +442,30 @@ class TestDesign(unittest.TestCase):
             with self.assertRaises(InPUTException):
                 self.design = Design(fileName)
 
+
+    # ------------------------------------------------------------------------
+    # Local tests (new and internal to InPUTpy)
+    # These will be moved to a separate location...
+    # ------------------------------------------------------------------------
+
+    # Testing an incomplete version of Design.same().
+    def testSameShouldBeTrueWhenBothDesignsWereCreatedFromTheSameFile(self):
+        thisDesign = self.design
+        otherDesign = Design(DESIGN_FILE)
+        self.assertIsNot(thisDesign, otherDesign)
+        self.assertTrue(thisDesign.same(otherDesign))
+        self.assertTrue(otherDesign.same(thisDesign))
+
+    def testSameShouldBeFalseWhenComparingDifferentDesigns(self):
+        thisDesign = self.design
+        otherDesign = Design(ANOTHER_TEST_DESIGN)
+        self.assertIsNot(thisDesign, otherDesign)
+        # anotherTestDesign.xml only defines one single parameter: the
+        # "AnotherInteger" parameter. This parameter does not exist in the
+        # standard test design. This means that none of the designs is a
+        # subset of the other, and same() should report False in both cases.
+        self.assertFalse(thisDesign.same(otherDesign))
+        self.assertFalse(otherDesign.same(thisDesign))
+
 if __name__ == '__main__':
     unittest.main()

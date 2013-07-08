@@ -81,6 +81,23 @@ class Design:
         self.store.setValue(paramId, value)
 
     def same(self, design):
+        """
+        Check whether the argument is also a design and contains the same
+        parameters (ignoring values) as this design. Note that this
+        design need only be a subset of the other design. This means that
+        d1.same(d2) and d2.same(d1) may return different values.
+
+        Expanding the scope does not affect the outcome of this method.
+
+        Note! This comparison is incomplete. InPUT4j compares the parameters
+        in detail, examining the structure and attributes of the elements that
+        define the parameters. This preliminary version only checks IDs.
+        """
+        if not isinstance(design, Design):
+            return False
+        for paramId in self.store.parameters.keys():
+            if design.getValue(paramId) is None:
+                return False
         return True
 
     # This method should be inherited.
@@ -108,6 +125,9 @@ class Design:
         - Adding a None design.
         - Adding this design to itself.
         - Adding the same design multiple times.
+
+        Extending the scope of this design also does NOT affect the result
+        of the same() method.
         """
         designs = self.otherDesigns
         if design is None:
