@@ -39,7 +39,7 @@ class Design:
 
         # Super dummy initialization: Pretend to be anotherDesign.
         if fileName == "test/anotherTestDesign.xml":
-            self.store.parameters["AnotherInteger"] = 42
+            self.store.parameters = {"AnotherInteger": 42}
 
     def impOrt(self, importer):
         pass
