@@ -24,7 +24,7 @@ class TestDesign(unittest.TestCase):
         self.assertTrue(space.isFile())
         expected = "testSpace"
         value = space.getId()
-        self.assertEquals(expected, value)
+        self.assertEqual(expected, value)
 
     def testExtendScope(self):
         design = self.design    # Alias to save typing.
@@ -39,15 +39,15 @@ class TestDesign(unittest.TestCase):
         design.extendScope(anotherDesign)
         # Now the parameter should be available.
         value = design.getValue(paramId)
-        self.assertEquals(expected, value)
+        self.assertEqual(expected, value)
         # Check that the other design contains the same parameter.
         # For good measure.
         value = anotherDesign.getValue(paramId)
-        self.assertEquals(expected, value)
+        self.assertEqual(expected, value)
 
     @unittest.skip("Not implemented yet.")
     def testGetId(self):
-        self.assertEquals("testDesign", self.design.getId())
+        self.assertEqual("testDesign", self.design.getId())
 
     def testGetPrimitive(self):
         args = {
@@ -64,7 +64,7 @@ class TestDesign(unittest.TestCase):
 
     def getAndCompare(self, paramId, expected):
         value = self.design.getValue(paramId)
-        self.assertEquals(expected, value)
+        self.assertEqual(expected, value)
 
     def testSetPrimitive(self):
         args = {
@@ -85,10 +85,10 @@ class TestDesign(unittest.TestCase):
     def setAndCompare(self, paramId, value):
         design = self.design    # Alias to save typing.
         before = design.getValue(paramId)
-        self.assertNotEquals(value, before)
+        self.assertNotEqual(value, before)
         design.setValue(paramId, value)
         after = design.getValue(paramId)
-        self.assertEquals(value, after)
+        self.assertEqual(value, after)
 
     @unittest.skip("Not implemented yet.")
     def testSettingPrimitivesOfWrongTypeShouldFail(self):
@@ -133,10 +133,10 @@ class TestDesign(unittest.TestCase):
         parent = design.getValue(paramId)
         # Get child value by implicitly using the custom getter.
         child = design.getValue(childId)
-        self.assertEquals(expected, child)
+        self.assertEqual(expected, child)
         # Get child value by explicitly using the custom getter on the parent.
         childValue = parent.getAnotherSharedPrimitiveSub()
-        self.assertEquals(childValue, child)
+        self.assertEqual(childValue, child)
 
     @unittest.skip("Not implemented yet.")
     def testSetRelativePrimitives(self):
@@ -162,7 +162,7 @@ class TestDesign(unittest.TestCase):
         child = design.getValue(childId)
         # Get child value by explicitly using the custom getter on the parent.
         childValue = parent.getSomeSharedStructuralSub()
-        self.assertEquals(child, childValue)
+        self.assertEqual(child, childValue)
 
     # The Java version has a case that is expected to fail because it tries to
     # set a parameter that was initialized by the constructor. That case is
@@ -177,12 +177,12 @@ class TestDesign(unittest.TestCase):
         # than the constructor, setting the value should work.
         design.setValue(paramId, value)
         current = design.getValue(paramId)
-        self.assertEquals(value, current)
+        self.assertEqual(value, current)
 
         # Fetch the child value explicitly from the parent.
         parent = design.getValue(parentId)
         current = parent.getSomeSharedStructuralSub()
-        self.assertEquals(value, current)
+        self.assertEqual(value, current)
 
     # Handles the case of trying to set a constructor initialized parameter,
     # which is present in testSetInjectedStructural in the Java version.
@@ -222,8 +222,8 @@ class TestDesign(unittest.TestCase):
         parent = design.getValue(parentId)
         explicit = parent.andTheCustomizableGetter()
         # Then compare. Both should return the same value.
-        self.assertAlmostEquals(value, implicit, PRECISION)
-        self.assertAlmostEquals(value, explicit, PRECISION)
+        self.assertAlmostEqual(value, implicit, PRECISION)
+        self.assertAlmostEqual(value, explicit, PRECISION)
 
     # The CustomizableInputDemonstrator parameter is defined in the code
     # mapping configuration to use a custom setter and getter method. 
@@ -239,12 +239,12 @@ class TestDesign(unittest.TestCase):
         design.setValue(mutatorId, value)
         # Get parent and check the value by manually invoking the custom getter.
         parent = design.getValue(parentId)
-        self.assertEquals(value, parent.andTheCustomizableGetter())
+        self.assertEqual(value, parent.andTheCustomizableGetter())
 
     def testGetStructural(self):
         paramId = SOME_STRUCTURAL
         value = self.design.getValue(paramId)
-        self.assertTrue(isinstance(value, SomeStructural))
+        self.assertIsInstance(value, SomeStructural)
 
     # This test is missing a case that is present in the Java version.
     # That case is handled separately in the following test.
@@ -260,7 +260,7 @@ class TestDesign(unittest.TestCase):
     def setStructural(self, paramId, expected):
         self.design.setValue(paramId, expected)
         value = self.design.getValue(paramId)
-        self.assertEquals(expected, value)
+        self.assertEqual(expected, value)
 
     # This test handles the negative case that was part of the
     # testSetStructural test in the Java version.
@@ -277,9 +277,9 @@ class TestDesign(unittest.TestCase):
         wrapperId = parentId + "." + WRAPPED_PRIMITIVE
         expected = 0.9369297592420026
         value = design.getValue(wrapperId)
-        self.assertAlmostEquals(expected, value.toValue(), places=PRECISION)
+        self.assertAlmostEqual(expected, value.toValue(), places=PRECISION)
         parent = design.getValue(parentId)
-        self.assertEquals(value, parent.getPrimitive())
+        self.assertEqual(value, parent.getPrimitive())
 
     @unittest.skip("Not implemented yet.")
     def testSetWrapper(self):
@@ -291,11 +291,11 @@ class TestDesign(unittest.TestCase):
         design.setValue(wrapperId, value)
         # Get the parameter back and compare it to the original value.
         current = design.getValue(wrapperId)
-        self.assertEquals(value, current)
+        self.assertEqual(value, current)
 
         # Check that the parent structural has the updated Wrapper as a child.
         parent = design.getValue(parentId)
-        self.assertEquals(value, parent.getPrimitive())
+        self.assertEqual(value, parent.getPrimitive())
 
     def testGetArray(self):
         design = self.design    # Alias to save typing.
@@ -309,23 +309,23 @@ class TestDesign(unittest.TestCase):
 
         # Get array and make sure it has the expected length.
         array = design.getValue(paramId)
-        self.assertEquals(length, len(array))
+        self.assertEqual(length, len(array))
         # Go through the array and check the values.
         for val in array:
-            self.assertEquals(elemValue, val)
+            self.assertEqual(elemValue, val)
         # Fetching the first element explicitly should yield the same value.
         value = design.getValue(firstId)
-        self.assertEquals(elemValue, value)
+        self.assertEqual(elemValue, value)
         # Fetching the last element explicitly should yield the same value.
         value = design.getValue(lastId)
-        self.assertEquals(elemValue, value)
+        self.assertEqual(elemValue, value)
         # Fetching an element outside the range should yield a None.
         value = design.getValue(outsideId)
         self.assertIsNone(value)
 
         largeArray = design.getValue(largeId)
-        self.assertEquals(length, len(largeArray))
-        self.assertEquals(length, len(largeArray[0][0]))
+        self.assertEqual(length, len(largeArray))
+        self.assertEqual(length, len(largeArray[0][0]))
 
     def testSetArray(self):
         design = self.design    # Alias to save typing.
@@ -334,12 +334,12 @@ class TestDesign(unittest.TestCase):
         value = 13
         design.setValue(elemId, value)
         current = design.getValue(elemId)
-        self.assertEquals(value, current)
+        self.assertEqual(value, current)
 
         values = (1,2,3)
         design.setValue(arrayId, values)
         currentValues = design.getValue(arrayId)
-        self.assertEquals(values, currentValues)
+        self.assertEqual(values, currentValues)
 
         # TODO:
         # Add a test that changes 1.1.42.2 and makes sure that the 42 array is
@@ -369,8 +369,8 @@ class TestDesign(unittest.TestCase):
         design = self.design    # Alias to save typing.
         paramId = SOME_COMPLEX_STRUCTURAL
         value = design.getValue(paramId)
-        self.assertTrue(isinstance(value, SomeComplexStructural))
-        self.assertEquals(3, value.size())
+        self.assertIsInstance(value, SomeComplexStructural)
+        self.assertEqual(3, value.size())
 
     def testSetComplex(self):
         design = self.design    # Alias to save typing.
@@ -385,9 +385,8 @@ class TestDesign(unittest.TestCase):
         design.setValue(paramId, complexStructural)
         current = design.getValue(paramId)
         # Compare the manually constructed and the returned objects.
-        # Use assertIsInstance.
-        self.assertTrue(isinstance(current, type(complexStructural)))
-        self.assertEquals(complexStructural.size(), current.size())
+        self.assertIsInstance(current, type(complexStructural))
+        self.assertEqual(complexStructural.size(), current.size())
 
     def testGetValueWithInvalidIdShouldReturnNone(self):
         # This test corresponds to testGetNegative from the Java version.

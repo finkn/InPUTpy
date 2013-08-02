@@ -3,7 +3,7 @@ import unittest
 
 class TestQ(unittest.TestCase):
     def testDesignRoot(self):
-        self.assertEquals("Design", Q.DESIGN_ROOT)
+        self.assertEqual("Design", Q.DESIGN_ROOT)
 
     # This is a very minimal test.
     def testGetSchemaLocationShouldNotReturnNone(self):

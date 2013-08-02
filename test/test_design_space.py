@@ -48,19 +48,19 @@ class TestDesignSpace(unittest.TestCase):
         )
         # Test the first parameter.
         value = space.next(paramId)
-        self.assertEquals(expected, value)
+        self.assertEqual(expected, value)
         # Test the next one. The value should be one of the alternatives.
         value = space.next(anotherParamId)
         self.assertTrue(value in expectedAlternatives)
 
         # Test an array of strings.
         values = space.next(arrayParamId)
-        self.assertEquals("Expected an array of 10 arrays.", 10, len(values))
-        self.assertEquals("Expected an array of 5 elements.", 5, len(values[0]))
+        self.assertEqual("Expected an array of 10 arrays.", 10, len(values))
+        self.assertEqual("Expected an array of 5 elements.", 5, len(values[0]))
         # Every element is expected to have the same value: same as the id.
         for array in values:
             for element in array:
-                self.assertEquals(arrayParamId, element)
+                self.assertEqual(arrayParamId, element)
 
     def testNextStructural(self):
         space = self.space      # Alias to save typing.
@@ -83,7 +83,7 @@ class TestDesignSpace(unittest.TestCase):
         paramId = "SomePrimitiveArrayOfUnspecifiedSize"
         expectedLength = 1
         array = self.space.next(paramId)
-        self.assertEquals(expectedLength, len(array))
+        self.assertEqual(expectedLength, len(array))
 
     # Replaces testNextArray.
     @unittest.skip("Not implemented yet.")
@@ -91,9 +91,9 @@ class TestDesignSpace(unittest.TestCase):
         paramId = "SomePrimitiveArrayOfSpecifiedSize"
         expectedLength = 42
         array = self.space.next(paramId)
-        self.assertEquals(expectedLength, len(array))
-        self.assertEquals(expectedLength, len(array[0]))
-        self.assertEquals(expectedLength, len(array[0][0]))
+        self.assertEqual(expectedLength, len(array))
+        self.assertEqual(expectedLength, len(array[0]))
+        self.assertEqual(expectedLength, len(array[0][0]))
 
     # Replaces testNextArray.
     @unittest.skip("Not implemented yet.")
@@ -101,7 +101,7 @@ class TestDesignSpace(unittest.TestCase):
         paramId = "SomeMultidimensionalArrayOfUnspecifiedSize"
         expectedLength = 1
         array = self.space.next(paramId)
-        self.assertEquals(expectedLength, len(array))
+        self.assertEqual(expectedLength, len(array))
 
     # Replaces testNextArray.
     @unittest.skip("Not implemented yet.")
@@ -112,10 +112,10 @@ class TestDesignSpace(unittest.TestCase):
         expectedLengthD2 = 42
         expectedLengthD3 = 1
         array = self.space.next(paramId)
-        self.assertEquals(expectedLengthD0, len(array))
-        self.assertEquals(expectedLengthD1, len(array[0]))
-        self.assertEquals(expectedLengthD2, len(array[0][0]))
-        self.assertEquals(expectedLengthD3, len(array[0][0][0]))
+        self.assertEqual(expectedLengthD0, len(array))
+        self.assertEqual(expectedLengthD1, len(array[0]))
+        self.assertEqual(expectedLengthD2, len(array[0][0]))
+        self.assertEqual(expectedLengthD3, len(array[0][0][0]))
 
     # The Java version has a single testNextNegative test.
     # That test has been split into the individual cases below.
@@ -239,7 +239,7 @@ class TestDesignSpace(unittest.TestCase):
         paramId = someFixed
         expected = 42
         value = self.space.next(paramId)
-        self.assertEquals(expected, value)
+        self.assertEqual(expected, value)
 
     # Replaces testNextFixed.
     @unittest.skip("Not implemented yet.")
@@ -248,14 +248,14 @@ class TestDesignSpace(unittest.TestCase):
         expected = 42
         value = self.space.next(paramId)
         # Expecting array length and all element values to be 42.
-        self.assertEquals(expected, len(value))
+        self.assertEqual(expected, len(value))
         for element in value:
-            self.assertEquals(expected, element)
+            self.assertEqual(expected, element)
 
     def testNextEmptyDesign(self):
         designId = "designId"
         design = self.space.nextEmptyDesign(designId)
-        self.assertEquals(designId, design.getId())
+        self.assertEqual(designId, design.getId())
 
         for paramId in self.space.getSupportedParamIds():
             self.assertIsNone(design.getValue(paramId))
@@ -270,7 +270,7 @@ class TestDesignSpace(unittest.TestCase):
             design.setValue(paramId, False)
 
     def compareLength(self, expected, data):
-        self.assertEquals(expected, len(data))
+        self.assertEqual(expected, len(data))
 
     @unittest.skip("Not implemented yet.")
     def testNextWithDimensions(self):
@@ -313,11 +313,11 @@ class TestDesignSpace(unittest.TestCase):
             # from the dictionary anyway to make sure that the dictionary
             # wasn't changed by the call to next().
             initialized = subParams[childId]
-            self.assertEquals(expected, initialized)
+            self.assertEqual(expected, initialized)
             # Now check that the child parameter was initialized to the value
             # that was set in the dictionary.
             value = parent.getAnotherSharedPrimitiveSub()
-            self.assertEquals(initialized, value)
+            self.assertEqual(initialized, value)
 
     # This test, together with the previous one above, needs to be cleaned up.
     # They essentially do the same thing, so there should be a way to reduce
@@ -341,22 +341,22 @@ class TestDesignSpace(unittest.TestCase):
             # from the dictionary anyway to make sure that the dictionary
             # wasn't changed by the call to next().
             initialized = subParams[childId]
-            self.assertEquals(expected, initialized)
+            self.assertEqual(expected, initialized)
             # Now check that the child parameter was initialized to the value
             # that was set in the dictionary.
             value = parent.getAnotherSharedPrimitiveSub()
-            self.assertEquals(initialized, value)
+            self.assertEqual(initialized, value)
 
             # This part is unique compared with the previous test.
             value = parent.getSomeSharedPrimitiveSub()
             if isinstance(parent, YetAnotherSecondChoice):
                 # This type uses a hard-coded argument to super().
                 # It should ignore any extra parameters.
-                self.assertEquals(42, value)
+                self.assertEqual(42, value)
             else:
                 # The other types use constructor arguments. They should be
                 # overwritten by the values given in actualParams.
-                self.assertEquals(actualParams[0], value)
+                self.assertEqual(actualParams[0], value)
 
     @unittest.skip("Not implemented yet.")
     def testNextInjectCustomizedParametersWithDimensions(self):
@@ -384,10 +384,10 @@ class TestDesignSpace(unittest.TestCase):
         self.assertTrue(self.space.isFile())
 
     def testGetFileName(self):
-        self.assertEquals(DESIGN_SPACE_FILE, self.space.getFileName())
+        self.assertEqual(DESIGN_SPACE_FILE, self.space.getFileName())
 
     def testGetId(self):
-        self.assertEquals("testSpace", self.space.getId())
+        self.assertEqual("testSpace", self.space.getId())
 
     @unittest.skip("Not implemented yet.")
     def testGetSupportedParamIds(self):
@@ -434,8 +434,8 @@ class TestDesignSpace(unittest.TestCase):
         cls = SecondSingleComplexChoice
         # The order of the choices has been fixed, so TheSecondSingleChoice
         # comes first, and then TheSingleChoice (which isn't the same type).
-        self.assertTrue(isinstance(value.getEntry(0), cls))
-        self.assertFalse(isinstance(value.getEntry(1), cls))
+        self.assertIsInstance(value.getEntry(0), cls)
+        self.assertNotIsInstance(value.getEntry(1), cls)
 
     @unittest.skip("Not implemented yet.")
     def testSetFixedNegative(self):
@@ -477,7 +477,7 @@ class TestDesignSpace(unittest.TestCase):
         if expected is None:
             self.assertIsNotNone(value)
         else:
-            self.assertEquals(expected, value)
+            self.assertEqual(expected, value)
 
     # The comparisons are inclusive by default.
     def compareToRange(self, value, minLimit=None, maxLimit=None, excl=False):
@@ -516,7 +516,7 @@ class TestDesignSpace(unittest.TestCase):
         else:
             length = dimensions[0]
             rest = dimensions[1:]
-            self.assertEquals(length, len(array))
+            self.assertEqual(length, len(array))
             # Check each element, not just the first one.
             for element in array:
                 self.compareDimensions(rest, element)
@@ -528,9 +528,9 @@ class TestDesignSpace(unittest.TestCase):
         # constructor argument for this parameter, so in all other cases it
         # was initialized using the first element of actualParams argument.
         if isinstance(param, YetAnotherSecondChoice):
-            self.assertEquals(42, value)
+            self.assertEqual(42, value)
         else:
-            self.assertEquals(params[0], value)
+            self.assertEqual(params[0], value)
 
     def secondParamTest(self, param, params):
         if not isinstance(param, YetAnotherThirdChoice):
@@ -538,7 +538,7 @@ class TestDesignSpace(unittest.TestCase):
         # We always expect the parameter to have been initialized by the
         # constructor using the second element of the actualParams argument.
         value = param.getSomeChoiceSpecificPrimitiveSub()
-        self.assertEquals(params[1], value)
+        self.assertEqual(params[1], value)
 
 
 if __name__ == '__main__':
