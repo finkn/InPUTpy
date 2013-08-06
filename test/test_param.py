@@ -150,6 +150,24 @@ class TestParam(unittest.TestCase):
         param = Param('A', 'integer', inclMin='B')
         self.assertTrue(param.isDependent())
 
+    def testParseDependencies(self):
+        tests = {
+            'A+B': ('A', 'B',),
+            'A + B': ('A', 'B',),
+            'A + B-C/ D *E': ('A', 'B', 'C', 'D', 'E',),
+            'Math.log(A)': ('A',),
+            'A+ Math.sqr( B / C )': ('A', 'B', 'C',),
+            ' 2 * ( (( A+B ) - (C) ) ) + A': ('A', 'B', 'C',),
+            ' SomeParam + AnotherParam ': ('SomeParam', 'AnotherParam',),
+            'A * -.3': ('A',),
+            '1 + 2 - Math.cos(0.0)': (),
+        }
+        for key in tests.keys():
+            self.checkDependencyParsing(key, tests[key])
+
+    def checkDependencyParsing(self, expression, expected):
+        self.assertCountEqual(expected, Param.parseDependencies(expression))
+
     def checkRangeErrors(self, kwargs, pa=None):
         args = pa or ('A', 'integer')
         with self.assertRaises(ValueError):

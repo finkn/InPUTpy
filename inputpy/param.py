@@ -117,6 +117,20 @@ class Param(Identifiable):
     def isMaxExclusive(self):
         return self.exclMax
 
+    @classmethod
+    def parseDependencies(cls, exp):
+        """
+        This function returns the set of parameters referenced in the
+        expression, if any.
+        """
+        skip = '+-*/()'
+        for c in skip:
+            exp = exp.replace(c, ' ')
+        return [
+            s for s in set(exp.split())
+                if not (s.startswith('Math.') or s[0].isdigit() or s[0] == '.')
+        ]
+
 class DesignSpace(Identifiable):
     def __init__(self, dId=None):
         Identifiable.__init__(self, dId)
