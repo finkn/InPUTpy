@@ -68,6 +68,19 @@ class TestDesignSpace(unittest.TestCase):
 
 
 class TestParam(unittest.TestCase):
+
+    EXPRESSION_TESTS = {
+        'A+B': ('A', 'B',),
+        'A + B': ('A', 'B',),
+        'A + B-C/ D *E': ('A', 'B', 'C', 'D', 'E',),
+        'Math.log(A)': ('A',),
+        'A+ Math.sqr( B / C )': ('A', 'B', 'C',),
+        ' 2 * ( (( A+B ) - (C) ) ) + A': ('A', 'B', 'C',),
+        ' SomeParam + AnotherParam ': ('SomeParam', 'AnotherParam',),
+        'A * -.3': ('A',),
+        '1 + 2 - Math.cos(0.0)': (),
+    }
+
     def testCreateBasicParam(self):
         param = Param('A', 'integer')
 
@@ -129,6 +142,26 @@ class TestParam(unittest.TestCase):
         param = Param('A', 'integer', inclMin=1, exclMax=3)
         self.assertFalse(param.isDependent())
 
+    def testParamWithParameterReferenceIsDependent(self):
+        param = Param('A', 'integer', inclMin='B', exclMax='B + C')
+        self.assertTrue(param.isDependent())
+
+    def testDependencies(self):
+        import random
+        # The tests map an expression to a sequence of referenced parameters.
+        # This means that the values are the expected dependees for a
+        # parameter that was created with the expression as a limit.
+        tests = self.EXPRESSION_TESTS
+        keys = tests.keys()
+        keyList = list(keys)
+        for key in keys:
+            minExp = key
+            maxExp = random.choice(keyList)
+            expected = tests[minExp] + tests[maxExp]
+            param = Param('A', 'integer', inclMin=minExp, inclMax=maxExp)
+            dependees = param.getDependees()
+            self.assertCountEqual(expected, dependees)
+
     def testIndependentParameterWithExpressionShouldBeEvaluated(self):
         param = Param('A', 'integer', inclMin='1', exclMax='1 + 2')
         self.assertFalse(param.isDependent())
@@ -151,17 +184,7 @@ class TestParam(unittest.TestCase):
         self.assertTrue(param.isDependent())
 
     def testParseDependencies(self):
-        tests = {
-            'A+B': ('A', 'B',),
-            'A + B': ('A', 'B',),
-            'A + B-C/ D *E': ('A', 'B', 'C', 'D', 'E',),
-            'Math.log(A)': ('A',),
-            'A+ Math.sqr( B / C )': ('A', 'B', 'C',),
-            ' 2 * ( (( A+B ) - (C) ) ) + A': ('A', 'B', 'C',),
-            ' SomeParam + AnotherParam ': ('SomeParam', 'AnotherParam',),
-            'A * -.3': ('A',),
-            '1 + 2 - Math.cos(0.0)': (),
-        }
+        tests = self.EXPRESSION_TESTS
         for key in tests.keys():
             self.checkDependencyParsing(key, tests[key])
 

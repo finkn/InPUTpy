@@ -37,20 +37,17 @@ class Param(Identifiable):
         # Initialize fields.
         Identifiable.__init__(self, pId)
         self.type = pType
-        self.min = minLimit
-        self.max = maxLimit
+        self.min = minLimit         # Set to preliminary min limit.
+        self.max = maxLimit         # Set to preliminary max limit.
         self.exclMin = minIsExcl
         self.exclMax = maxIsExcl
+        self.minDependees = ()      # Referenced parameters in min expression.
+        self.maxDependees = ()      # Referenced parameters in max expression.
 
 
-        # min and max have been set to some value. If this parameter is not
-        # dependent on any other parameter, then we're done. However, if it
-        # was initialized with some expression, then we don't know yet if it is
-        # dependent on another parameter or not. Either it's a simple
-        # expression, in which case it can just be evaluated, or it involves
-        # some other parameter, which will make the evaluation fail.
-        # This seems like a crude test. Perhaps the expression could be parsed
-        # so that it can be handled in a more sophisticated way.
+        # If min/max are expressions, these will be parsed to find
+        # dependencies. If the expression does not contain references to any
+        # other parameters, then the expression is evaluated immediately.
 
         # The evaluation should use an empty namespace so that parameter names
         # don't match by accident. However, we still need some functions to be
@@ -58,19 +55,15 @@ class Param(Identifiable):
         import math
         namespace = {'Math': math, '__builtins__': {}}
 
-        # Now try to evaluate. A dependency on a parameter will cause a
-        # NameError. An expression that doesn't involve any other parameters
-        # should evaluate without errors.
+        # NameErrors are not expected and indicate a real error.
         if type(self.min) is str:
-            try:
+            self.minDependees = Param.parseDependencies(self.min)
+            if len(self.minDependees) == 0:
                 self.min = eval(self.min, namespace)
-            except NameError:
-                pass
         if type(self.max) is str:
-            try:
+            self.maxDependees = Param.parseDependencies(self.max)
+            if len(self.maxDependees) == 0:
                 self.max = eval(self.max, namespace)
-            except NameError:
-                pass
 
         # Check valid ranges.
         # Depending on the type that is generated (different sizes of int
@@ -90,11 +83,7 @@ class Param(Identifiable):
 
 
     def isDependent(self):
-        minType = type(self.min)
-        maxType = type(self.max)
-        minIsPrimitive = minType is float or minType is int
-        maxIsPrimitive = maxType is float or maxType is int
-        return not (minIsPrimitive and maxIsPrimitive)
+        return len(self.minDependees) > 0 or len(self.maxDependees) > 0
 
     def getType(self):
         return self.type
@@ -117,6 +106,9 @@ class Param(Identifiable):
     def isMaxExclusive(self):
         return self.exclMax
 
+    def getDependees(self):
+        return tuple(self.minDependees + self.maxDependees)
+
     @classmethod
     def parseDependencies(cls, exp):
         """
@@ -126,10 +118,10 @@ class Param(Identifiable):
         skip = '+-*/()'
         for c in skip:
             exp = exp.replace(c, ' ')
-        return [
+        return tuple([
             s for s in set(exp.split())
                 if not (s.startswith('Math.') or s[0].isdigit() or s[0] == '.')
-        ]
+        ])
 
 class DesignSpace(Identifiable):
     def __init__(self, dId=None):
