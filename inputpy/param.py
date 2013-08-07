@@ -108,7 +108,13 @@ class Param(Identifiable):
         return self.fixed
 
     def isDependent(self):
-        return len(self.minDependees) > 0 or len(self.maxDependees) > 0
+        return self.isMinDependent() or self.isMaxDependent()
+
+    def isMinDependent(self):
+        return len(self.minDependees) > 0
+
+    def isMaxDependent(self):
+        return len(self.maxDependees) > 0
 
     def getType(self):
         return self.type
