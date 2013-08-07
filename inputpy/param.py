@@ -1,3 +1,5 @@
+from inputpy.util import Evaluator
+
 class Identifiable:
     """
     This class is a mixin. It provides all subclasses with a getId() method.
@@ -53,18 +55,16 @@ class Param(Identifiable):
         # The evaluation should use an empty namespace so that parameter names
         # don't match by accident. However, we still need some functions to be
         # available for use in the expression.
-        import math
-        namespace = {'Math': math, '__builtins__': {}}
 
         # NameErrors are not expected and indicate a real error.
         if type(self.min) is str:
-            self.minDependees = Param.parseDependencies(self.min)
+            self.minDependees = Evaluator.parseDependencies(self.min)
             if len(self.minDependees) == 0:
-                self.min = eval(self.min, namespace)
+                self.min = Evaluator.evaluate(self.min)
         if type(self.max) is str:
-            self.maxDependees = Param.parseDependencies(self.max)
+            self.maxDependees = Evaluator.parseDependencies(self.max)
             if len(self.maxDependees) == 0:
-                self.max = eval(self.max, namespace)
+                self.max = Evaluator.evaluate(self.max)
         self.setFixed(fixed)
 
         # Check valid ranges.
@@ -96,11 +96,9 @@ class Param(Identifiable):
         Currently, expressions are allowed as long as they do not reference
         other parameters. (InPUT4j supports neither)
         """
-        import math
-        namespace = {'Math': math, '__builtins__': {}}
 
         if type(value) is str:
-            self.fixed = eval(value, namespace)
+            self.fixed = Evaluator.evaluate(value)
         else:
             self.fixed = value
 
@@ -147,7 +145,7 @@ class Param(Identifiable):
         return self.maxDependees
 
     @classmethod
-    def parseDependencies(cls, exp):
+    def _parseDependencies(cls, exp):
         """
         This function returns the set of parameters referenced in the
         expression, if any.

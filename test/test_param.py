@@ -219,11 +219,6 @@ class TestParam(unittest.TestCase):
         param = Param('A', 'integer', inclMin='B')
         self.assertTrue(param.isDependent())
 
-    def testParseDependencies(self):
-        tests = self.EXPRESSION_TESTS
-        for key in tests.keys():
-            self.checkDependencyParsing(key, tests[key])
-
     def testCreatingFixedParameter(self):
         param = Param('A', 'integer', fixed=3)
         self.assertTrue(param.isFixed())
@@ -240,9 +235,6 @@ class TestParam(unittest.TestCase):
         self.assertTrue(param.isFixed())
         param.setFixed(None)
         self.assertFalse(param.isFixed())
-
-    def checkDependencyParsing(self, expression, expected):
-        self.assertCountEqual(expected, Param.parseDependencies(expression))
 
     def checkRangeErrors(self, kwargs, pa=None):
         args = pa or ('A', 'integer')
