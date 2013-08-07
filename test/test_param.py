@@ -40,23 +40,15 @@ class TestDesignSpace(unittest.TestCase):
 
     def testGetParamsForEmptyDesign(self):
         space = DesignSpace()
-        params = space.getParams()
-        self.assertEqual(0, len(params))
+        params = space.getSupportedParamIds()
+        self.assertCountEqual(params, ())
 
     def testAddParams(self):
         space = DesignSpace()
         param = Param('A', 'integer')
         space.addParam(param)
-        params = space.getParams()
-        self.assertEqual(1, len(params))
-
-    def testGetParameterFromId(self):
-        space = DesignSpace()
-        param = Param('A', 'integer')
-        space.addParam(param)
-        result = space.getParameter(param.getId())
-        # Expect the same param back.
-        self.assertIs(param, result)
+        params = space.getSupportedParamIds()
+        self.assertCountEqual(params, ('A'))
 
     def testGenerateValueForParameter(self):
         param1 = Param('A', 'integer', inclMin=1, inclMax=1)

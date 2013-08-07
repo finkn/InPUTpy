@@ -159,14 +159,11 @@ class DesignSpace(Identifiable):
         Identifiable.__init__(self, dId)
         self.params = {}
 
-    def getParams(self):
-        return self.params.items()
+    def getSupportedParamIds(self):
+        return self.params.keys()
 
     def addParam(self, param):
         self.params[param.getId()] = param
-
-    def getParameter(self, pId):
-        return self.params[pId]
 
     # This method is more "dummy" than most, since it only works with
     # 'integer' parameters.
