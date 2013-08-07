@@ -86,6 +86,15 @@ class TestDesignSpace(unittest.TestCase):
         space.setFixed(paramId, None)
         self.assertEqual(1, space.next(paramId))
 
+    def testSetFixedToExpression(self):
+        space = DesignSpace()
+        paramId = 'A'
+        space.addParam(Param(paramId, 'integer'))
+        # 2.0
+        exp = 'Math.log(Math.e * Math.cos(Math.sin(Math.pi/2)-1)) + 1'
+        space.setFixed(paramId, exp)
+        self.assertEqual(2, space.next(paramId))
+
 
 class TestParam(unittest.TestCase):
 

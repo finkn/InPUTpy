@@ -65,11 +65,7 @@ class Param(Identifiable):
             self.maxDependees = Param.parseDependencies(self.max)
             if len(self.maxDependees) == 0:
                 self.max = eval(self.max, namespace)
-        # Not supporting parameter references for fixed values yet.
-        # This is the behavior of InPUT4j anyway.
-        # However, arbitrary expressions are supported (unlike in InPUT4j).
-        if type(self.fixed) is str:
-            self.fixed = eval(self.fixed, namespace)
+        self.setFixed(fixed)
 
         # Check valid ranges.
         # Depending on the type that is generated (different sizes of int
@@ -96,8 +92,17 @@ class Param(Identifiable):
         by passing None as the value.
         Not that setting the fixed value bypasses range checks, meaning that
         whatever min/max limits have been set are ignored.
+
+        Currently, expressions are allowed as long as they do not reference
+        other parameters. (InPUT4j supports neither)
         """
-        self.fixed = value
+        import math
+        namespace = {'Math': math, '__builtins__': {}}
+
+        if type(value) is str:
+            self.fixed = eval(value, namespace)
+        else:
+            self.fixed = value
 
     def getFixedValue(self):
         return self.fixed
