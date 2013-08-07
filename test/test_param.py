@@ -87,6 +87,21 @@ class TestDesignSpace(unittest.TestCase):
         space.setFixed(paramId, exp)
         self.assertEqual(2, space.next(paramId))
 
+    def testInitializeParameters(self):
+        import random
+        space = DesignSpace()
+        param1 = Param('A', 'integer', inclMin=3, inclMax='B - C')
+        param2 = Param('B', 'integer', inclMin='C', inclMax=10)
+        param3 = Param('C', 'integer', inclMin=5, inclMax=7)
+        params = [param1, param2, param3]
+        random.shuffle(params)
+        for p in params:
+            space.addParam(p)
+        space.initParamDependencies()
+        self.assertCountEqual(param1.getMaxDependees(), (param2, param3,))
+        self.assertCountEqual(param2.getMinDependees(), (param3,))
+        self.assertCountEqual(param3.getMaxDependees(), ())
+
 
 class TestParam(unittest.TestCase):
 

@@ -138,7 +138,13 @@ class Param(Identifiable):
         return self.exclMax
 
     def getDependees(self):
-        return tuple(self.minDependees + self.maxDependees)
+        return tuple(self.getMinDependees() + self.getMaxDependees())
+
+    def getMinDependees(self):
+        return self.minDependees
+
+    def getMaxDependees(self):
+        return self.maxDependees
 
     @classmethod
     def parseDependencies(cls, exp):
@@ -191,6 +197,24 @@ class DesignSpace(Identifiable):
 
     def setFixed(self, pId, value):
         self.params[pId].setFixed(value)
+
+    def initParamDependencies(self):
+        """
+        Go through all the parameters and update their dependencies with
+        other parameter objects instead of IDs.
+        """
+        for param in self.params.values():
+            oldMin = param.getMinDependees()
+            oldMax = param.getMaxDependees()
+            param.minDependees = self.__getDependentParams(oldMin)
+            param.maxDependees = self.__getDependentParams(oldMax)
+
+    def __getDependentParams(self, dependencies):
+        """
+        Given a collection of parameter IDs, return a tuple of actual
+        parameter objects.
+        """
+        return tuple([self.params[d] for d in dependencies])
 
 class Design(Identifiable):
     def __init__(self, params, dId=None):
