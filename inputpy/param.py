@@ -13,7 +13,7 @@ class Identifiable:
 class Param(Identifiable):
     # Make the ID argument optional. If none is provided, use the id function
     # to generate an id.
-    def __init__(self, pId, pType,
+    def __init__(self, pId, pType, fixed=None,
             inclMin=None, exclMin=None, inclMax=None, exclMax=None):
 
         # Check arguments.
@@ -43,6 +43,7 @@ class Param(Identifiable):
         self.exclMax = maxIsExcl
         self.minDependees = ()      # Referenced parameters in min expression.
         self.maxDependees = ()      # Referenced parameters in max expression.
+        self.fixed = fixed          # Fixed value, if any.
 
 
         # If min/max are expressions, these will be parsed to find
@@ -64,6 +65,11 @@ class Param(Identifiable):
             self.maxDependees = Param.parseDependencies(self.max)
             if len(self.maxDependees) == 0:
                 self.max = eval(self.max, namespace)
+        # Not supporting parameter references for fixed values yet.
+        # This is the behavior of InPUT4j anyway.
+        # However, arbitrary expressions are supported (unlike in InPUT4j).
+        if type(self.fixed) is str:
+            self.fixed = eval(self.fixed, namespace)
 
         # Check valid ranges.
         # Depending on the type that is generated (different sizes of int
@@ -81,6 +87,20 @@ class Param(Identifiable):
             if valueRange <= 0:
                 raise ValueError('Empty value range')
 
+    def isFixed(self):
+        return self.fixed is not None
+
+    def setFixed(self, value):
+        """
+        Sets this parameter to a fixed value. A parameter can also be un-fixed
+        by passing None as the value.
+        Not that setting the fixed value bypasses range checks, meaning that
+        whatever min/max limits have been set are ignored.
+        """
+        self.fixed = value
+
+    def getFixedValue(self):
+        return self.fixed
 
     def isDependent(self):
         return len(self.minDependees) > 0 or len(self.maxDependees) > 0
@@ -139,7 +159,10 @@ class DesignSpace(Identifiable):
 
     # This method is more "dummy" than most, since it only works with
     # 'integer' parameters.
-    def getValue(param):
+    @classmethod
+    def getValue(cls, param):
+        if param.isFixed():
+            return param.getFixedValue()
         import random
         minLimit = param.getMin()
         maxLimit = param.getMax()
@@ -149,11 +172,17 @@ class DesignSpace(Identifiable):
             maxLimit -= 1
         return random.randint(minLimit, maxLimit)
 
+    def next(self, pId):
+        return self.getValue(self.params[pId])
+
     def nextDesign(self, dId=None):
         params = {}
         for key in self.params.keys():
             params[key] = DesignSpace.getValue(self.params[key])
         return Design(params, dId)
+
+    def setFixed(self, pId, value):
+        self.params[pId].setFixed(value)
 
 class Design(Identifiable):
     def __init__(self, params, dId=None):

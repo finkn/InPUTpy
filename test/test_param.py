@@ -66,6 +66,26 @@ class TestDesignSpace(unittest.TestCase):
         value = DesignSpace.getValue(param2)
         self.assertEqual(2, DesignSpace.getValue(param2))
 
+    def testNext(self):
+        space = DesignSpace()
+        param1 = Param('A', 'integer', inclMin=1, inclMax=1)
+        param2 = Param('B', 'integer', exclMin=1, exclMax=3)
+        space.addParam(param1)
+        space.addParam(param2)
+        self.assertEqual(1, space.next(param1.getId()))
+        self.assertEqual(2, space.next(param2.getId()))
+
+    def testGenerateValueForFixedParameter(self):
+        space = DesignSpace()
+        paramId = 'A'
+        param = Param(paramId, 'integer', inclMin=1, inclMax=1)
+        space.addParam(param)
+        self.assertEqual(1, space.next(paramId))
+        space.setFixed(paramId, 3)
+        self.assertEqual(3, space.next(paramId))
+        space.setFixed(paramId, None)
+        self.assertEqual(1, space.next(paramId))
+
 
 class TestParam(unittest.TestCase):
 
@@ -187,6 +207,23 @@ class TestParam(unittest.TestCase):
         tests = self.EXPRESSION_TESTS
         for key in tests.keys():
             self.checkDependencyParsing(key, tests[key])
+
+    def testCreatingFixedParameter(self):
+        param = Param('A', 'integer', fixed=3)
+        self.assertTrue(param.isFixed())
+
+    def testUnfixParameter(self):
+        param = Param('A', 'integer', fixed=3)
+        param.setFixed(None)
+        self.assertFalse(param.isFixed())
+
+    def testFixAndUnfixExistingParameter(self):
+        param = Param('A', 'integer')
+        self.assertFalse(param.isFixed())
+        param.setFixed(3)
+        self.assertTrue(param.isFixed())
+        param.setFixed(None)
+        self.assertFalse(param.isFixed())
 
     def checkDependencyParsing(self, expression, expected):
         self.assertCountEqual(expected, Param.parseDependencies(expression))
