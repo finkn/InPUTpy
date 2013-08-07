@@ -144,19 +144,6 @@ class Param(Identifiable):
     def getMaxDependees(self):
         return self.maxDependees
 
-    @classmethod
-    def _parseDependencies(cls, exp):
-        """
-        This function returns the set of parameters referenced in the
-        expression, if any.
-        """
-        skip = '+-*/()'
-        for c in skip:
-            exp = exp.replace(c, ' ')
-        return tuple([
-            s for s in set(exp.split())
-                if not (s.startswith('Math.') or s[0].isdigit() or s[0] == '.')
-        ])
 
 class DesignSpace(Identifiable):
     def __init__(self, dId=None):
@@ -172,7 +159,7 @@ class DesignSpace(Identifiable):
     # This method is more "dummy" than most, since it only works with
     # 'integer' parameters.
     @classmethod
-    def getValue(cls, param):
+    def __getValue(cls, param):
         if param.isFixed():
             return param.getFixedValue()
         import random
@@ -185,12 +172,12 @@ class DesignSpace(Identifiable):
         return random.randint(minLimit, maxLimit)
 
     def next(self, pId):
-        return self.getValue(self.params[pId])
+        return self.__getValue(self.params[pId])
 
     def nextDesign(self, dId=None):
         params = {}
         for key in self.params.keys():
-            params[key] = DesignSpace.getValue(self.params[key])
+            params[key] = self.next(key)
         return Design(params, dId)
 
     def setFixed(self, pId, value):

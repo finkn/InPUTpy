@@ -51,12 +51,15 @@ class TestDesignSpace(unittest.TestCase):
         self.assertCountEqual(params, ('A'))
 
     def testGenerateValueForParameter(self):
+        space = DesignSpace()
         param1 = Param('A', 'integer', inclMin=1, inclMax=1)
-        param2 = Param('A', 'integer', exclMin=1, exclMax=3)
-        value = DesignSpace.getValue(param1)
-        self.assertEqual(1, DesignSpace.getValue(param1))
-        value = DesignSpace.getValue(param2)
-        self.assertEqual(2, DesignSpace.getValue(param2))
+        param2 = Param('B', 'integer', exclMin=1, exclMax=3)
+        space.addParam(param1)
+        space.addParam(param2)
+        value = space.next(param1.getId())
+        self.assertEqual(1, value)
+        value = space.next(param2.getId())
+        self.assertEqual(2, value)
 
     def testNext(self):
         space = DesignSpace()
