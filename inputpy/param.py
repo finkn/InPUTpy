@@ -31,8 +31,6 @@ class Param(Identifiable):
 
         minLimit = inclMin or exclMin
         maxLimit = inclMax or exclMax
-        minLimit = minLimit or -2**32
-        maxLimit = maxLimit or 2**32-1
         # Are max/min exclusive?
         minIsExcl = exclMin is not None
         maxIsExcl = exclMax is not None
@@ -73,9 +71,10 @@ class Param(Identifiable):
         # for compatibility with Java), even a single limit may be out of
         # range. For example, inclMax=70000 would be out of range for a
         # short, even though it doesn't collide with the min limit.
-        minLimit = self.min
-        maxLimit = self.max
         if not self.isDependent():
+            minLimit = self.min or -2**32
+            maxLimit = self.max or 2**32-1
+
             valueRange = abs(minLimit - maxLimit) + 1
             if minIsExcl:
                 valueRange -= 1

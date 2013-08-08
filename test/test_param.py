@@ -286,10 +286,6 @@ class TestParam(unittest.TestCase):
 
         minLimit = iMin or eMin
         maxLimit = iMax or eMax
-        if minLimit is None:
-            minLimit = -2**32
-        if maxLimit is None:
-            maxLimit = 2**32-1
         self.assertEqual(minLimit, param.getMin())
         self.assertEqual(maxLimit, param.getMax())
 
