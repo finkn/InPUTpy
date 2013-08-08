@@ -107,6 +107,7 @@ class TestDesignSpace(unittest.TestCase):
         space.setFixed(paramId, exp)
         self.assertEqual(2, space.next(paramId))
 
+    @unittest.skip('DesignSpace.initParamDependencies() is deprecated')
     def testInitializeParameters(self):
         import random
         param1 = Param('A', 'integer', inclMin=3, inclMax='B - C')
@@ -130,18 +131,8 @@ class TestDesignSpace(unittest.TestCase):
         ps.addParam(Param('C', 'integer', inclMin=5, inclMax=7))
         space = DesignSpace(ps)
         self.assertTrue(3 <= space.next('A') <= 17)
-
-    def testInitParam(self):
-        ps = ParamStore()
-        ps.addParam(Param('A', 'integer', inclMin=3, inclMax='B + C'))
-        ps.addParam(Param('B', 'integer', inclMin='C', inclMax=10))
-        ps.addParam(Param('C', 'integer', inclMin=5, inclMax=7))
-        space = DesignSpace(ps)
-        init = space.initParam('C', {})
-        self.assertIsNotNone(init['C'])
-        init = space.initParam('B', {})
-        self.assertIsNotNone(init['C'])
-        self.assertIsNotNone(init['B'])
+        self.assertTrue(0 <= space.next('B') <= 10)
+        self.assertTrue(5 <= space.next('C') <= 7)
 
     def testCreateDesignFromDesignSpaceWithDependentParameters(self):
         param1 = Param('A', 'integer', inclMin=3, inclMax='B + C')

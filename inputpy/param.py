@@ -205,11 +205,23 @@ class DesignSpace(Identifiable):
             maxLimit -= 1
         return random.randint(minLimit, maxLimit)
 
-    def next(self, pId):
-        init = self.initParam(pId, {})
-        return init[pId]
+    def next(self, paramId):
+        """
+        Return a freshly generated value for the parameter ID. Any referenced
+        parameters will be initialized as well, and nothing will be cached.
+        However, each parameter is guaranteed to only be initialized once for
+        each call to next.
+
+        This method isn't used while generating a design. It exists mostly for
+        API compatibility with InPUT4j.
+        """
+        init = self.__initParam(paramId, {})
+        return init[paramId]
 
     def nextDesign(self, dId=None):
+        """
+        Return a new design with freshly initialized parameters.
+        """
         params = {}
         if self.params.initOrder is None:
             self.params.finalize()
@@ -217,23 +229,29 @@ class DesignSpace(Identifiable):
         top = self.params.initOrder[top]
 
         for paramId in top:
-            params = self.initParam(paramId, params)
+            params = self.__initParam(paramId, params)
         return Design(params, dId)
 
-    def initParam(self, paramId, init):
+    def __initParam(self, paramId, init):
+        """
+        Return a dictionary mapping parameter ID to initialized value for
+        the specified parameter and any parameters it depends on. The init
+        argument is a dictionary containing a subset of the result.
+        """
         if paramId in init:
             return init
         param = self.params.getParam(paramId)
         if param.isDependent():
             for d in param.getDependees():
-                init = self.initParam(d, init)
+                init = self.__initParam(d, init)
         init[paramId] = self.__getValue(param, init)
         return init
 
     def setFixed(self, pId, value):
         self.params.setFixed(pId, value)
 
-    def initParamDependencies(self):
+    # Deprecated.
+    def __initParamDependencies(self):
         """
         Go through all the parameters and update their dependencies with
         other parameter objects instead of IDs.
@@ -244,6 +262,7 @@ class DesignSpace(Identifiable):
             param.minDependees = self.__getDependentParams(oldMin)
             param.maxDependees = self.__getDependentParams(oldMax)
 
+    # Deprecated.
     def __getDependentParams(self, dependencies):
         """
         Given a collection of parameter IDs, return a tuple of actual
