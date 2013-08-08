@@ -30,7 +30,6 @@ class TestDesign(unittest.TestCase):
         self.assertEqual(2, design.getValue('B'))
         self.assertEqual('Design', design.getId())
 
-
 class TestDesignSpace(unittest.TestCase):
     def testCreateEmptyDesignSpaceWithoutId(self):
         space = DesignSpace(None)
@@ -317,6 +316,21 @@ class TestParam(unittest.TestCase):
             self.assertTrue(param.isMaxInclusive())
 
 class TestParamStore(unittest.TestCase):
+    def testAddMultipleParameters(self):
+        param1 = Param('A', 'integer')
+        param2 = Param('B', 'integer')
+        params = (param1, param2)
+        ps = ParamStore()
+        ps.addParam(params)
+        self.checkForParametersInParamStore(params, ps)
+
+    def testCreateParamStoreWithMultipleParameters(self):
+        param1 = Param('A', 'integer')
+        param2 = Param('B', 'integer')
+        params = (param1, param2)
+        ps = ParamStore(params)
+        self.checkForParametersInParamStore(params, ps)
+
     def testSetFixed(self):
         paramId = 'A'
         param = Param(paramId, 'integer')
@@ -327,6 +341,10 @@ class TestParamStore(unittest.TestCase):
         self.assertTrue(param.isFixed())
         ps.setFixed(paramId, None)
         self.assertFalse(param.isFixed())
+
+    def checkForParametersInParamStore(self, params, ps):
+        for p in params:
+            self.assertIs(p, ps.getParam(p.getId()))
 
 if __name__ == '__main__':
     unittest.main()

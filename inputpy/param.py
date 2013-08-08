@@ -146,14 +146,25 @@ class Param(Identifiable):
         return self.maxDependees
 
 class ParamStore:
-    def __init__(self):
+    def __init__(self, params=None):
         self.params = {}            # ID-to-Param mapping.
         self.dep = {}               # ID-to-IDs mapping.
+        if params is not None:
+            self.addParam(params)
 
-    def addParam(self, param):
-        paramId = param.getId()
-        self.params[paramId] = param
-        self.dep[paramId] = param.getDependees()
+    # Assumes that params is a sequence of parameters. If it turns out to be
+    # a single parameter it is placed in a sequence before processing.
+    def addParam(self, params):
+        """
+        Add one or more parameters to this ParamStore. The params argument
+        can be a sequence of parameters or just a single parameter.
+        """
+        if isinstance(params, Param):
+            params = (params,)
+        for p in params:
+            paramId = p.getId()
+            self.params[paramId] = p
+            self.dep[paramId] = p.getDependees()
 
     def getParam(self, paramId):
         return self.params[paramId]
