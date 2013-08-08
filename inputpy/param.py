@@ -149,7 +149,7 @@ class ParamStore:
     def __init__(self, params=None):
         self.params = {}            # ID-to-Param mapping.
         self.dep = {}               # ID-to-IDs mapping.
-        self.initOrder = None
+        self.__finalized = False
         if params is not None:
             self.addParam(params)
 
@@ -160,27 +160,57 @@ class ParamStore:
         Add one or more parameters to this ParamStore. The params argument
         can be a sequence of parameters or just a single parameter.
         """
+        if self.__finalized:
+            msg = 'Cannot add parameters to store once finalized.'
+            raise NotImplementedError(msg)
         if isinstance(params, Param):
             params = (params,)
         for p in params:
             paramId = p.getId()
             self.params[paramId] = p
+            # Update dependencies as new parameters are added.
             self.dep[paramId] = p.getDependees()
 
     def getParam(self, paramId):
+        """
+        Returns the parameter with the given ID.
+        """
         return self.params[paramId]
 
     def setFixed(self, paramId, value):
         self.params[paramId].setFixed(value)
 
     def finalize(self):
+        """
+        Do any final processing and make the parameter store effectively
+        read-only. No more parameters can be added later. Multiple calls
+        will have no effect.
+        """
         self.initOrder = initOrder(self.dep)
+        self.__finalized = True
+
+    def getInitializationOrder(self):
+        """
+        Return a dictionary that maps the initialization order to the matching
+        parameter IDs.
+
+        Example:
+        A return value of {0: ['A', 'B'], 1: ['C']} means that A and B must
+        be initialized before C (because C depends on one or more of (A,B)).
+
+        The method requires that this parameter store is finalized. Calling
+        this method will force finalization if this hasn't already been done.
+        """
+        if not self.__finalized:
+            self.finalize()
+        return self.initOrder
 
 
 class DesignSpace(Identifiable):
     def __init__(self, paramStore, dId=None):
         Identifiable.__init__(self, dId)
-        self.params = paramStore
+        self.params = paramStore or ParamStore()
+        self.params.finalize()
 
     def getSupportedParamIds(self):
         return self.params.params.keys()
@@ -223,10 +253,12 @@ class DesignSpace(Identifiable):
         Return a new design with freshly initialized parameters.
         """
         params = {}
-        if self.params.initOrder is None:
-            self.params.finalize()
-        top = sorted(self.params.initOrder.keys())[-1]
-        top = self.params.initOrder[top]
+        initOrder = self.params.getInitializationOrder()
+
+        # Initialize all the top-level parameters. Their dependencies will
+        # be resolved recursively by __initParam.
+        top = sorted(initOrder.keys())[-1]
+        top = initOrder[top]
 
         for paramId in top:
             params = self.__initParam(paramId, params)
@@ -247,8 +279,12 @@ class DesignSpace(Identifiable):
         init[paramId] = self.__getValue(param, init)
         return init
 
-    def setFixed(self, pId, value):
-        self.params.setFixed(pId, value)
+    def setFixed(self, paramId, value):
+        """
+        Set the parameter to a fixed value. The value may be any expression
+        that does not reference other parameters.
+        """
+        self.params.setFixed(paramId, value)
 
 
 class Design(Identifiable):

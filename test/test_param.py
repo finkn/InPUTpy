@@ -329,6 +329,19 @@ class TestParamStore(unittest.TestCase):
         ps.setFixed(paramId, None)
         self.assertFalse(param.isFixed())
 
+    def testGetInitializationOrderForUnfinalizedParamStore(self):
+        param1 = Param('A', 'integer')
+        param2 = Param('B', 'integer', inclMin='A')
+        ps = ParamStore((param1, param2))
+        expected = {0: ['A'], 1: ['B']}
+        self.assertEqual(expected, ps.getInitializationOrder())
+
+    def testFinalizeMakesParameterStoreReadOnly(self):
+        ps = ParamStore()
+        ps.finalize()
+        with self.assertRaises(NotImplementedError):
+            ps.addParam(Param('A', 'integer'))
+
     def checkForParametersInParamStore(self, params, ps):
         for p in params:
             self.assertIs(p, ps.getParam(p.getId()))
