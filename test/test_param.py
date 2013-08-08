@@ -336,6 +336,23 @@ class TestParamStore(unittest.TestCase):
         expected = {0: ['A'], 1: ['B']}
         self.assertEqual(expected, ps.getInitializationOrder())
 
+    def testGetInitializationOrderForEmptyParamStore(self):
+        ps = ParamStore()
+        expected = {}
+        self.assertEqual(expected, ps.getInitializationOrder())
+
+    def testMultipleFinalizeHaveNoEffect(self):
+        ps = ParamStore()
+        # Should construct initialization order data.
+        ps.finalize()
+        # Already finalized, so this call should return the same data.
+        first = ps.getInitializationOrder()
+        # Another explicit finalize should have no effect.
+        ps.finalize()
+        # Fetch data again and make sure it's still the same.
+        second = ps.getInitializationOrder()
+        self.assertIs(first, second)
+
     def testFinalizeMakesParameterStoreReadOnly(self):
         ps = ParamStore()
         ps.finalize()

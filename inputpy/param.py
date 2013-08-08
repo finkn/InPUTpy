@@ -147,6 +147,11 @@ class Param(Identifiable):
 
 class ParamStore:
     def __init__(self, params=None):
+        """
+        The params argument is optional. It can be a single parameter or a
+        sequence of multiple parameters. Parameters can be added until the
+        ParamStore is finalized.
+        """
         self.__params = {}            # ID-to-Param mapping.
         self.__dep = {}               # ID-to-IDs mapping.
         self.__finalized = False
@@ -159,6 +164,8 @@ class ParamStore:
         """
         Add one or more parameters to this ParamStore. The params argument
         can be a sequence of parameters or just a single parameter.
+
+        Raises NotImplementedError if this ParamStore has been finalized.
         """
         if self.__finalized:
             msg = 'Cannot add parameters to store once finalized.'
@@ -186,6 +193,8 @@ class ParamStore:
         read-only. No more parameters can be added later. Multiple calls
         will have no effect.
         """
+        if self.__finalized:
+            return
         self.initOrder = initOrder(self.__dep)
         self.__finalized = True
 
