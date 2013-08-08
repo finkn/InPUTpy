@@ -1,5 +1,7 @@
 import unittest
 from inputpy.util import Evaluator
+from inputpy.util import depLen
+from inputpy.util import initOrder
 
 class TestEvaluator(unittest.TestCase):
 
@@ -57,6 +59,45 @@ class TestEvaluator(unittest.TestCase):
         for (exp, value) in tests.items():
             dep = Evaluator.parseDependencies(exp)
             self.assertCountEqual(value, dep)
+
+class TestMiscUtil(unittest.TestCase):
+
+    DEPENDENCIES = (
+        (
+            {'A': (), 'B': (), 'C': (), },
+            {'A': 0, 'B': 0, 'C': 0, },
+        ),
+        (
+            {'A': ('B'), 'B': ('C'), 'C': (), },
+            {'A': 2, 'B': 1, 'C': 0, },
+        ),
+        (
+            {'A': ('B', 'C'), 'B': ('C'), 'C': (), },
+            {'A': 2, 'B': 1, 'C': 0, },
+        ),
+    )
+
+    def testCalculateDependencies(self):
+        for d in self.DEPENDENCIES:
+            self.checkDependencyLength(d)
+
+    def testInitOrder(self):
+        for d in self.DEPENDENCIES:
+            self.checkInitOrder(d)
+
+    def checkInitOrder(self, dep):
+        dependencies = dep[0]
+        lengths = dep[1]
+        order = initOrder(dependencies)
+        for (k, v) in lengths.items():
+            self.assertIn(k, order[v])
+
+    def checkDependencyLength(self, dep):
+        dependencies = dep[0]
+        lengths = dep[1]
+        for k in dependencies.keys():
+            val = depLen(dependencies, k)
+            self.assertEqual(val, lengths[k])
 
 if __name__ == '__main__':
     unittest.main()

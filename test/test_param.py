@@ -1,5 +1,6 @@
 import unittest
 from inputpy.param import Param
+from inputpy.param import ParamStore
 from inputpy.param import DesignSpace
 from inputpy.param import Design
 

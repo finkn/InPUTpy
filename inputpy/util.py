@@ -80,3 +80,31 @@ class Evaluator:
     def __checkMode(cls, mode):
         if not mode in Evaluator.MODES:
             raise ValueError('%s is not a valid mode' % (mode))
+
+def depLen(params, key):
+    """
+    Return the longest chain of dependencies for the parameter ID key using
+    the dependency information in params.
+    An independent parameter will have a dependency length of 0.
+    """
+    dep = params[key]
+    if len(dep) == 0:
+        return 0
+    return max([depLen(params, d) + 1 for d in dep])
+
+def initOrder(params):
+    """
+    Return dependency chain length mapped to a collection of parameter IDs
+    where each parameter has a matching dependency length. In other words, the
+    resulting dictionary gives the initialization order of the parameters.
+    The dependency information in the dep argument is expected to be a
+    dictionary that maps IDs to collections of IDs, where the key is a
+    parameter that depends on the parameters in the value.
+    """
+    result = {}
+    for k in params.keys():
+        l = depLen(params, k)
+        p = result.get(l, [])
+        p.append(k)
+        result[l] = p
+    return result

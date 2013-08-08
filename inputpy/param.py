@@ -1,4 +1,5 @@
 from inputpy.util import Evaluator
+from inputpy.util import initOrder
 
 class Identifiable:
     """
@@ -143,6 +144,19 @@ class Param(Identifiable):
 
     def getMaxDependees(self):
         return self.maxDependees
+
+class ParamStore:
+    def __init__(self):
+        self.params = {}            # ID-to-Param mapping.
+        self.dep = {}               # ID-to-IDs mapping.
+
+    def addParam(self, param):
+        paramId = param.getId()
+        self.params[paramId] = param
+        self.dep[paramId] = param.getDependees()
+
+    def finalize(self):
+        self.initOrder = initOrder(self.dep)
 
 
 class DesignSpace(Identifiable):
