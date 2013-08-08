@@ -149,6 +149,7 @@ class ParamStore:
     def __init__(self, params=None):
         self.params = {}            # ID-to-Param mapping.
         self.dep = {}               # ID-to-IDs mapping.
+        self.initOrder = None
         if params is not None:
             self.addParam(params)
 
@@ -210,8 +211,13 @@ class DesignSpace(Identifiable):
 
     def nextDesign(self, dId=None):
         params = {}
-        for paramId in self.params.params.keys():
-            params[paramId] = self.next(paramId)
+        if self.params.initOrder is None:
+            self.params.finalize()
+        top = sorted(self.params.initOrder.keys())[-1]
+        top = self.params.initOrder[top]
+
+        for paramId in top:
+            params = self.initParam(paramId, params)
         return Design(params, dId)
 
     def initParam(self, paramId, init):

@@ -133,7 +133,7 @@ class TestDesignSpace(unittest.TestCase):
 
     def testInitParam(self):
         ps = ParamStore()
-        ps.addParam(Param('A', 'integer', inclMin=3, inclMax='B - C'))
+        ps.addParam(Param('A', 'integer', inclMin=3, inclMax='B + C'))
         ps.addParam(Param('B', 'integer', inclMin='C', inclMax=10))
         ps.addParam(Param('C', 'integer', inclMin=5, inclMax=7))
         space = DesignSpace(ps)
@@ -142,6 +142,19 @@ class TestDesignSpace(unittest.TestCase):
         init = space.initParam('B', {})
         self.assertIsNotNone(init['C'])
         self.assertIsNotNone(init['B'])
+
+    def testCreateDesignFromDesignSpaceWithDependentParameters(self):
+        param1 = Param('A', 'integer', inclMin=3, inclMax='B + C')
+        param2 = Param('B', 'integer', inclMin='C', inclMax=10)
+        param3 = Param('C', 'integer', inclMin=5, inclMax=7)
+        space = DesignSpace(ParamStore((param1, param2, param3)))
+        design = space.nextDesign()
+        a = design.getValue('A')
+        b = design.getValue('B')
+        c = design.getValue('C')
+        self.assertTrue(3 <= design.getValue('A') <= b + c) # max 17
+        self.assertTrue(c <= design.getValue('B') <= 10)    # min 5
+        self.assertTrue(5 <= design.getValue('C') <= 7)
 
 
 class TestParam(unittest.TestCase):
