@@ -21,9 +21,10 @@ class TestDesign(unittest.TestCase):
             self.assertEqual(value, design.getValue(key))
 
     def testCreateDesignFromDesignSpace(self):
-        space = DesignSpace()
-        space.addParam(Param('A', 'integer', inclMin=1, inclMax=1))
-        space.addParam(Param('B', 'integer', exclMin=1, exclMax=3))
+        ps = ParamStore()
+        ps.addParam(Param('A', 'integer', inclMin=1, inclMax=1))
+        ps.addParam(Param('B', 'integer', exclMin=1, exclMax=3))
+        space = DesignSpace(ps)
         design = space.nextDesign('Design')
         self.assertEqual(1, design.getValue('A'))
         self.assertEqual(2, design.getValue('B'))
@@ -32,50 +33,65 @@ class TestDesign(unittest.TestCase):
 
 class TestDesignSpace(unittest.TestCase):
     def testCreateEmptyDesignSpaceWithoutId(self):
-        space = DesignSpace()
+        space = DesignSpace(None)
         self.assertIsNotNone(space.getId())
 
     def testCreateEmptyDesignWithId(self):
-        space = DesignSpace('Design Space')
+        space = DesignSpace(None, 'Design Space')
         self.assertEqual('Design Space', space.getId())
 
     def testGetParamsForEmptyDesign(self):
-        space = DesignSpace()
+        space = DesignSpace(ParamStore())
         params = space.getSupportedParamIds()
         self.assertCountEqual(params, ())
 
     def testAddParams(self):
-        space = DesignSpace()
         param = Param('A', 'integer')
-        space.addParam(param)
+        ps = ParamStore()
+        ps.addParam(param)
+        ps.addParam(param)
+        space = DesignSpace(ps)
         params = space.getSupportedParamIds()
         self.assertCountEqual(params, ('A'))
 
     def testGenerateValueForParameter(self):
-        space = DesignSpace()
         param1 = Param('A', 'integer', inclMin=1, inclMax=1)
         param2 = Param('B', 'integer', exclMin=1, exclMax=3)
-        space.addParam(param1)
-        space.addParam(param2)
+        ps = ParamStore()
+        ps.addParam(param1)
+        ps.addParam(param2)
+        space = DesignSpace(ps)
         value = space.next(param1.getId())
         self.assertEqual(1, value)
         value = space.next(param2.getId())
         self.assertEqual(2, value)
 
     def testNext(self):
-        space = DesignSpace()
         param1 = Param('A', 'integer', inclMin=1, inclMax=1)
         param2 = Param('B', 'integer', exclMin=1, exclMax=3)
-        space.addParam(param1)
-        space.addParam(param2)
+        ps = ParamStore()
+        ps.addParam(param1)
+        ps.addParam(param2)
+        space = DesignSpace(ps)
         self.assertEqual(1, space.next(param1.getId()))
         self.assertEqual(2, space.next(param2.getId()))
 
+    def testSetFixed(self):
+        paramId = 'Y'
+        param = Param(paramId, 'integer')
+        ps = ParamStore()
+        ps.addParam(param)
+        space = DesignSpace(ps)
+        self.assertFalse(param.isFixed())
+        space.setFixed(paramId, 3)
+        self.assertTrue(param.isFixed())
+
     def testGenerateValueForFixedParameter(self):
-        space = DesignSpace()
-        paramId = 'A'
+        paramId = 'Z'
         param = Param(paramId, 'integer', inclMin=1, inclMax=1)
-        space.addParam(param)
+        ps = ParamStore()
+        ps.addParam(param)
+        space = DesignSpace(ps)
         self.assertEqual(1, space.next(paramId))
         space.setFixed(paramId, 3)
         self.assertEqual(3, space.next(paramId))
@@ -83,9 +99,10 @@ class TestDesignSpace(unittest.TestCase):
         self.assertEqual(1, space.next(paramId))
 
     def testSetFixedToExpression(self):
-        space = DesignSpace()
-        paramId = 'A'
-        space.addParam(Param(paramId, 'integer'))
+        paramId = 'X'
+        ps = ParamStore()
+        ps.addParam(Param(paramId, 'integer'))
+        space = DesignSpace(ps)
         # 2.0
         exp = 'Math.log(Math.e * Math.cos(Math.sin(Math.pi/2)-1)) + 1'
         space.setFixed(paramId, exp)
@@ -93,18 +110,39 @@ class TestDesignSpace(unittest.TestCase):
 
     def testInitializeParameters(self):
         import random
-        space = DesignSpace()
         param1 = Param('A', 'integer', inclMin=3, inclMax='B - C')
         param2 = Param('B', 'integer', inclMin='C', inclMax=10)
         param3 = Param('C', 'integer', inclMin=5, inclMax=7)
         params = [param1, param2, param3]
         random.shuffle(params)
+        ps = ParamStore()
         for p in params:
-            space.addParam(p)
+            ps.addParam(p)
+        space = DesignSpace(ps)
         space.initParamDependencies()
         self.assertCountEqual(param1.getMaxDependees(), (param2, param3,))
         self.assertCountEqual(param2.getMinDependees(), (param3,))
         self.assertCountEqual(param3.getMaxDependees(), ())
+
+    def testNextValueForDependentParameter(self):
+        ps = ParamStore()
+        ps.addParam(Param('A', 'integer', inclMin=3, inclMax='B + C'))
+        ps.addParam(Param('B', 'integer', inclMin='C - 5', inclMax=10))
+        ps.addParam(Param('C', 'integer', inclMin=5, inclMax=7))
+        space = DesignSpace(ps)
+        self.assertTrue(3 <= space.next('A') <= 17)
+
+    def testInitParam(self):
+        ps = ParamStore()
+        ps.addParam(Param('A', 'integer', inclMin=3, inclMax='B - C'))
+        ps.addParam(Param('B', 'integer', inclMin='C', inclMax=10))
+        ps.addParam(Param('C', 'integer', inclMin=5, inclMax=7))
+        space = DesignSpace(ps)
+        init = space.initParam('C', {})
+        self.assertIsNotNone(init['C'])
+        init = space.initParam('B', {})
+        self.assertIsNotNone(init['C'])
+        self.assertIsNotNone(init['B'])
 
 
 class TestParam(unittest.TestCase):
@@ -277,6 +315,18 @@ class TestParam(unittest.TestCase):
             self.assertTrue(param.isMaxExclusive())
         elif iMax is not None:
             self.assertTrue(param.isMaxInclusive())
+
+class TestParamStore(unittest.TestCase):
+    def testSetFixed(self):
+        paramId = 'A'
+        param = Param(paramId, 'integer')
+        ps = ParamStore()
+        ps.addParam(param)
+        self.assertFalse(param.isFixed())
+        ps.setFixed(paramId, 3)
+        self.assertTrue(param.isFixed())
+        ps.setFixed(paramId, None)
+        self.assertFalse(param.isFixed())
 
 if __name__ == '__main__':
     unittest.main()

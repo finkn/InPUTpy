@@ -59,11 +59,11 @@ class Param(Identifiable):
 
         # NameErrors are not expected and indicate a real error.
         if type(self.min) is str:
-            self.minDependees = Evaluator.parseDependencies(self.min)
+            self.minDependees = tuple(Evaluator.parseDependencies(self.min))
             if len(self.minDependees) == 0:
                 self.min = Evaluator.evaluate(self.min)
         if type(self.max) is str:
-            self.maxDependees = Evaluator.parseDependencies(self.max)
+            self.maxDependees = tuple(Evaluator.parseDependencies(self.max))
             if len(self.maxDependees) == 0:
                 self.max = Evaluator.evaluate(self.max)
         self.setFixed(fixed)
@@ -155,30 +155,38 @@ class ParamStore:
         self.params[paramId] = param
         self.dep[paramId] = param.getDependees()
 
+    def getParam(self, paramId):
+        return self.params[paramId]
+
+    def setFixed(self, paramId, value):
+        self.params[paramId].setFixed(value)
+
     def finalize(self):
         self.initOrder = initOrder(self.dep)
 
 
 class DesignSpace(Identifiable):
-    def __init__(self, dId=None):
+    def __init__(self, paramStore, dId=None):
         Identifiable.__init__(self, dId)
-        self.params = {}
+        self.params = paramStore
 
     def getSupportedParamIds(self):
-        return self.params.keys()
-
-    def addParam(self, param):
-        self.params[param.getId()] = param
+        return self.params.params.keys()
 
     # This method is more "dummy" than most, since it only works with
     # 'integer' parameters.
     @classmethod
-    def __getValue(cls, param):
+    def __getValue(cls, param, initialized={}):
         if param.isFixed():
             return param.getFixedValue()
         import random
         minLimit = param.getMin()
+        if param.isMinDependent():
+            minLimit = Evaluator.evaluate(minLimit, initialized)
         maxLimit = param.getMax()
+        if param.isMaxDependent():
+            maxLimit = Evaluator.evaluate(maxLimit, initialized)
+
         if param.isMinExclusive():
             minLimit += 1
         if param.isMaxExclusive():
@@ -186,23 +194,34 @@ class DesignSpace(Identifiable):
         return random.randint(minLimit, maxLimit)
 
     def next(self, pId):
-        return self.__getValue(self.params[pId])
+        init = self.initParam(pId, {})
+        return init[pId]
 
     def nextDesign(self, dId=None):
         params = {}
-        for key in self.params.keys():
-            params[key] = self.next(key)
+        for paramId in self.params.params.keys():
+            params[paramId] = self.next(paramId)
         return Design(params, dId)
 
+    def initParam(self, paramId, init):
+        if paramId in init:
+            return init
+        param = self.params.getParam(paramId)
+        if param.isDependent():
+            for d in param.getDependees():
+                init = self.initParam(d, init)
+        init[paramId] = self.__getValue(param, init)
+        return init
+
     def setFixed(self, pId, value):
-        self.params[pId].setFixed(value)
+        self.params.setFixed(pId, value)
 
     def initParamDependencies(self):
         """
         Go through all the parameters and update their dependencies with
         other parameter objects instead of IDs.
         """
-        for param in self.params.values():
+        for param in self.params.params.values():
             oldMin = param.getMinDependees()
             oldMax = param.getMaxDependees()
             param.minDependees = self.__getDependentParams(oldMin)
@@ -213,7 +232,7 @@ class DesignSpace(Identifiable):
         Given a collection of parameter IDs, return a tuple of actual
         parameter objects.
         """
-        return tuple([self.params[d] for d in dependencies])
+        return tuple([self.params.params[d] for d in dependencies])
 
 class Design(Identifiable):
     def __init__(self, params, dId=None):
