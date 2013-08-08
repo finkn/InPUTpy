@@ -147,8 +147,8 @@ class Param(Identifiable):
 
 class ParamStore:
     def __init__(self, params=None):
-        self.params = {}            # ID-to-Param mapping.
-        self.dep = {}               # ID-to-IDs mapping.
+        self.__params = {}            # ID-to-Param mapping.
+        self.__dep = {}               # ID-to-IDs mapping.
         self.__finalized = False
         if params is not None:
             self.addParam(params)
@@ -167,18 +167,18 @@ class ParamStore:
             params = (params,)
         for p in params:
             paramId = p.getId()
-            self.params[paramId] = p
+            self.__params[paramId] = p
             # Update dependencies as new parameters are added.
-            self.dep[paramId] = p.getDependees()
+            self.__dep[paramId] = p.getDependees()
 
     def getParam(self, paramId):
         """
         Returns the parameter with the given ID.
         """
-        return self.params[paramId]
+        return self.__params[paramId]
 
     def setFixed(self, paramId, value):
-        self.params[paramId].setFixed(value)
+        self.__params[paramId].setFixed(value)
 
     def finalize(self):
         """
@@ -186,7 +186,7 @@ class ParamStore:
         read-only. No more parameters can be added later. Multiple calls
         will have no effect.
         """
-        self.initOrder = initOrder(self.dep)
+        self.initOrder = initOrder(self.__dep)
         self.__finalized = True
 
     def getInitializationOrder(self):
@@ -205,6 +205,18 @@ class ParamStore:
             self.finalize()
         return self.initOrder
 
+    def getParameters(self):
+        """
+        Return a dictionary mapping parameter IDs to Param objects.
+        """
+        return self.__params
+
+    def getSupportedParamIds(self):
+        """
+        Return the parameter IDs for all parameters stored here.
+        """
+        return self.__params.keys()
+
 
 class DesignSpace(Identifiable):
     def __init__(self, paramStore, dId=None):
@@ -213,7 +225,7 @@ class DesignSpace(Identifiable):
         self.params.finalize()
 
     def getSupportedParamIds(self):
-        return self.params.params.keys()
+        return self.params.getSupportedParamIds()
 
     # This method is more "dummy" than most, since it only works with
     # 'integer' parameters.
