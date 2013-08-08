@@ -250,25 +250,6 @@ class DesignSpace(Identifiable):
     def setFixed(self, pId, value):
         self.params.setFixed(pId, value)
 
-    # Deprecated.
-    def __initParamDependencies(self):
-        """
-        Go through all the parameters and update their dependencies with
-        other parameter objects instead of IDs.
-        """
-        for param in self.params.params.values():
-            oldMin = param.getMinDependees()
-            oldMax = param.getMaxDependees()
-            param.minDependees = self.__getDependentParams(oldMin)
-            param.maxDependees = self.__getDependentParams(oldMax)
-
-    # Deprecated.
-    def __getDependentParams(self, dependencies):
-        """
-        Given a collection of parameter IDs, return a tuple of actual
-        parameter objects.
-        """
-        return tuple([self.params.params[d] for d in dependencies])
 
 class Design(Identifiable):
     def __init__(self, params, dId=None):

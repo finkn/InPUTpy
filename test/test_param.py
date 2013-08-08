@@ -107,23 +107,6 @@ class TestDesignSpace(unittest.TestCase):
         space.setFixed(paramId, exp)
         self.assertEqual(2, space.next(paramId))
 
-    @unittest.skip('DesignSpace.initParamDependencies() is deprecated')
-    def testInitializeParameters(self):
-        import random
-        param1 = Param('A', 'integer', inclMin=3, inclMax='B - C')
-        param2 = Param('B', 'integer', inclMin='C', inclMax=10)
-        param3 = Param('C', 'integer', inclMin=5, inclMax=7)
-        params = [param1, param2, param3]
-        random.shuffle(params)
-        ps = ParamStore()
-        for p in params:
-            ps.addParam(p)
-        space = DesignSpace(ps)
-        space.initParamDependencies()
-        self.assertCountEqual(param1.getMaxDependees(), (param2, param3,))
-        self.assertCountEqual(param2.getMinDependees(), (param3,))
-        self.assertCountEqual(param3.getMaxDependees(), ())
-
     def testNextValueForDependentParameter(self):
         ps = ParamStore()
         ps.addParam(Param('A', 'integer', inclMin=3, inclMax='B + C'))
