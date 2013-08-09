@@ -14,8 +14,13 @@ class Identifiable:
         return self.__id
 
 class Param(Identifiable):
-    # Make the ID argument optional. If none is provided, use the id function
-    # to generate an id.
+    """
+    The parameter class is pretty dumb. It represents the definition of a
+    parameter as opposed to an actual parameter. This means that it knows
+    only the information that was used to define it. It will never have a
+    value (with the exception of fixed values), and does not know how to
+    generate appropriate values or even which ones would be valid.
+    """
     def __init__(self, paramId, paramType, fixed=None,
             inclMin=None, exclMin=None, inclMax=None, exclMax=None):
 
@@ -46,14 +51,9 @@ class Param(Identifiable):
         self.maxDependees = ()      # Referenced parameters in max expression.
         self.fixed = fixed          # Fixed value, if any.
 
-
         # If min/max are expressions, these will be parsed to find
         # dependencies. If the expression does not contain references to any
         # other parameters, then the expression is evaluated immediately.
-
-        # The evaluation should use an empty namespace so that parameter names
-        # don't match by accident. However, we still need some functions to be
-        # available for use in the expression.
 
         # NameErrors are not expected and indicate a real error.
         if type(self.min) is str:
@@ -67,34 +67,50 @@ class Param(Identifiable):
         self.setFixed(fixed)
 
     def isFixed(self):
+        """
+        Return whether this parameter has been set to a fixed value.
+        """
         return self.fixed is not None
 
     def setFixed(self, value):
         """
         Sets this parameter to a fixed value. A parameter can also be un-fixed
         by passing None as the value.
-        Not that setting the fixed value bypasses range checks, meaning that
-        whatever min/max limits have been set are ignored.
+        Note that setting the fixed value bypasses range checks, meaning that
+        whatever min/max limits have been set are completely ignored.
 
         Currently, expressions are allowed as long as they do not reference
         other parameters. (InPUT4j supports neither)
         """
-
         if type(value) is str:
             self.fixed = Evaluator.evaluate(value)
         else:
             self.fixed = value
 
     def getFixedValue(self):
+        """
+        Return the value this parameter was fixed to, if any.
+        """
         return self.fixed
 
     def isDependent(self):
+        """
+        Return whether this parameter depends on any others.
+        """
         return self.isMinDependent() or self.isMaxDependent()
 
     def isMinDependent(self):
+        """
+        Return whether this parameter depends on any others for defining its
+        minimum value.
+        """
         return len(self.minDependees) > 0
 
     def isMaxDependent(self):
+        """
+        Return whether this parameter depends on any others for defining its
+        maximum value.
+        """
         return len(self.maxDependees) > 0
 
     def getType(self):
