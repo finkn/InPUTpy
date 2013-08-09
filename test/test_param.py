@@ -188,15 +188,6 @@ class TestParam(unittest.TestCase):
         with self.assertRaises(ValueError):
             param = Param('A', 'integer', inclMax=1, exclMax=10)
 
-    def testNonEmptyRangeShouldSucceed(self):
-        Param('A', 'integer', inclMin=1, inclMax=1)
-        Param('A', 'integer', exclMin=1, exclMax=3)
-
-    def testEmptyRangeShouldRaiseError(self):
-        self.checkRangeErrors({'inclMin':1, 'exclMax':1})
-        self.checkRangeErrors({'exclMin':1, 'inclMax':1})
-        self.checkRangeErrors({'exclMin':1, 'exclMax':2})
-        self.checkRangeErrors({'exclMin':1, 'exclMax':2})
 
     def testParamWithoutLimitsIsNotDependent(self):
         param = Param('A', 'integer')
@@ -263,11 +254,6 @@ class TestParam(unittest.TestCase):
         self.assertTrue(param.isFixed())
         param.setFixed(None)
         self.assertFalse(param.isFixed())
-
-    def checkRangeErrors(self, kwargs, pa=None):
-        args = pa or ('A', 'integer')
-        with self.assertRaises(ValueError):
-            Param(*args, **kwargs)
 
     def checkLimits(self, pa=None, iMin=None, eMin=None, iMax=None, eMax=None):
         args = pa or ('A', 'integer')
@@ -354,6 +340,27 @@ class TestParamStore(unittest.TestCase):
         ps.finalize()
         with self.assertRaises(NotImplementedError):
             ps.addParam(Param('A', 'integer'))
+
+    def testParameterWithUnmetDependencies(self):
+        ps = ParamStore(Param('A', 'integer', inclMin='B + 1'))
+        with self.assertRaises(ValueError):
+            ps.finalize()
+
+    def testNonEmptyRangeShouldSucceed(self):
+        Param('A', 'integer', inclMin=1, inclMax=1)
+        Param('A', 'integer', exclMin=1, exclMax=3)
+
+    def testEmptyRangeShouldRaiseError(self):
+        self.checkRangeErrors({'inclMin':1, 'exclMax':1})
+        self.checkRangeErrors({'exclMin':1, 'inclMax':1})
+        self.checkRangeErrors({'exclMin':1, 'exclMax':2})
+        self.checkRangeErrors({'exclMin':1, 'exclMax':2})
+
+    def checkRangeErrors(self, kwargs, pa=None):
+        args = pa or ('A', 'integer')
+        ps = ParamStore(Param(*args, **kwargs))
+        with self.assertRaises(ValueError):
+            ps.finalize()
 
     def checkForParametersInParamStore(self, params, ps):
         for p in params:

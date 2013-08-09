@@ -66,23 +66,6 @@ class Param(Identifiable):
                 self.max = Evaluator.evaluate(self.max)
         self.setFixed(fixed)
 
-        # Check valid ranges.
-        # Depending on the type that is generated (different sizes of int
-        # for compatibility with Java), even a single limit may be out of
-        # range. For example, inclMax=70000 would be out of range for a
-        # short, even though it doesn't collide with the min limit.
-        if not self.isDependent():
-            minLimit = self.min or -2**32
-            maxLimit = self.max or 2**32-1
-
-            valueRange = abs(minLimit - maxLimit) + 1
-            if minIsExcl:
-                valueRange -= 1
-            if maxIsExcl:
-                valueRange -= 1
-            if valueRange <= 0:
-                raise ValueError('Empty value range')
-
     def isFixed(self):
         return self.fixed is not None
 
@@ -194,6 +177,7 @@ class ParamStore:
         """
         if self.__finalized:
             return
+        self.__validateParameters()
         self.initOrder = initOrder(self.__dep)
         self.__finalized = True
 
@@ -224,6 +208,54 @@ class ParamStore:
         Return the parameter IDs for all parameters stored here.
         """
         return self.__params.keys()
+
+    def __validateParameters(self):
+        """
+        Check that all parameters are valid.
+        - All independent ranges are valid.
+        - All dependencies can be met (referenced parameters exist).
+        - TODO: No circular dependencies.
+        """
+        # Check ranges.
+        for (paramId, param) in self.__params.items():
+            if not self.__validRange(param):
+                raise ValueError('Empty value range')
+
+        # Check for unmet dependencies.
+        for (paramId, param) in self.__params.items():
+            if not param.isDependent():
+                continue
+            d = self.__missingDep(param)
+            if d:
+                msg = '%s referencing nonexistent parameter %s' % (paramId, d)
+                raise ValueError(msg)
+
+    # TODO: This test is only preliminary. It should be more sophisticated.
+    # Possibly outsource this to the generator.
+    def __validRange(self, param):
+        if param.isDependent():
+            return True     # Well, we don't really know, but it's not invalid.
+
+        minLimit = param.getMin() or -2**32     # eek
+        maxLimit = param.getMax() or 2**32-1    # eek
+        valueRange = maxLimit - minLimit + 1
+
+        if param.isMinExclusive():
+            valueRange -= 1
+        if param.isMaxExclusive():
+            valueRange -= 1
+        return valueRange > 0
+
+    def __missingDep(self, param):
+        """
+        Return any unmet dependency. That is, any referenced parameter that
+        doesn't exist.
+        """
+        dependees = param.getDependees()
+        for d in dependees:
+            if not d in self.__params:
+                return d
+        return False
 
 
 class DesignSpace(Identifiable):
