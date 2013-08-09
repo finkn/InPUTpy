@@ -25,8 +25,6 @@ class Param(Identifiable):
             inclMin=None, exclMin=None, inclMax=None, exclMax=None):
 
         # Check arguments.
-        if paramId is None:
-            raise ValueError('The parameter id was None')
         if paramType is None:
             raise ValueError('The parameter type was None')
         if inclMin is not None and exclMin is not None:

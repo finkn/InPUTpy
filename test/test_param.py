@@ -172,9 +172,9 @@ class TestParam(unittest.TestCase):
         self.checkLimits(iMax=1, eMin=10)
         self.checkLimits(eMax=1, iMin=10)
 
-    def testNoneIdShouldRaiseError(self):
-        with self.assertRaises(ValueError):
-            param = Param(None, 'integer')
+    def testNoneIdShouldNotRaiseError(self):
+        param = Param(None, 'integer')
+        self.assertIsNotNone(param.getId())
 
     def testNoneTypeShouldRaiseError(self):
         with self.assertRaises(ValueError):
