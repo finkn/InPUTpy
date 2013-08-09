@@ -16,13 +16,13 @@ class Identifiable:
 class Param(Identifiable):
     # Make the ID argument optional. If none is provided, use the id function
     # to generate an id.
-    def __init__(self, pId, pType, fixed=None,
+    def __init__(self, paramId, paramType, fixed=None,
             inclMin=None, exclMin=None, inclMax=None, exclMax=None):
 
         # Check arguments.
-        if pId is None:
+        if paramId is None:
             raise ValueError('The parameter id was None')
-        if pType is None:
+        if paramType is None:
             raise ValueError('The parameter type was None')
         if inclMin is not None and exclMin is not None:
             raise ValueError('Defined both inclusive and exclusive limits')
@@ -36,8 +36,8 @@ class Param(Identifiable):
         maxIsExcl = exclMax is not None
 
         # Initialize fields.
-        Identifiable.__init__(self, pId)
-        self.type = pType
+        Identifiable.__init__(self, paramId)
+        self.type = paramType
         self.min = minLimit         # Set to preliminary min limit.
         self.max = maxLimit         # Set to preliminary max limit.
         self.exclMin = minIsExcl
@@ -227,8 +227,8 @@ class ParamStore:
 
 
 class DesignSpace(Identifiable):
-    def __init__(self, paramStore, dId=None):
-        Identifiable.__init__(self, dId)
+    def __init__(self, paramStore, spaceId=None):
+        Identifiable.__init__(self, spaceId)
         self.params = paramStore or ParamStore()
         self.params.finalize()
 
@@ -268,7 +268,7 @@ class DesignSpace(Identifiable):
         init = self.__initParam(paramId, {})
         return init[paramId]
 
-    def nextDesign(self, dId=None):
+    def nextDesign(self, designId=None):
         """
         Return a new design with freshly initialized parameters.
         """
@@ -282,7 +282,7 @@ class DesignSpace(Identifiable):
 
         for paramId in top:
             params = self.__initParam(paramId, params)
-        return Design(params, dId)
+        return Design(params, designId)
 
     def __initParam(self, paramId, init):
         """
@@ -308,10 +308,10 @@ class DesignSpace(Identifiable):
 
 
 class Design(Identifiable):
-    def __init__(self, params, dId=None):
-        Identifiable.__init__(self, dId)
+    def __init__(self, params, designId=None):
+        Identifiable.__init__(self, designId)
         self.params = params
 
-    def getValue(self, pId):
-        return self.params[pId]
+    def getValue(self, paramId):
+        return self.params[paramId]
 
