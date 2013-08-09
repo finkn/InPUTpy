@@ -112,32 +112,57 @@ class Param(Identifiable):
         return len(self.maxDependees) > 0
 
     def getType(self):
+        """
+        Return a string containing the type this parameter was defined with.
+        For example, for an integer parameter (defined with type='integer')
+        the return value will be 'integer'.
+        """
         return self.type
 
     def getMin(self):
+        """
+        Return the value or expression that is the lower limit.
+        If this parameter depends on others, then the returned value will be
+        an expression. Otherwise it will be a concrete value.
+        """
         return self.min
 
     def getMax(self):
+        """
+        Return the value or expression that is the upper limit.
+        If this parameter depends on others, then the returned value will be
+        an expression. Otherwise it will be a concrete value.
+        """
         return self.max
 
+    # Deprecate?
     def isMinInclusive(self):
         return not self.exclMin
 
     def isMinExclusive(self):
+        """
+        Returns whether the lower limit is exclusive.
+        """
         return self.exclMin
 
+    # Deprecate?
     def isMaxInclusive(self):
         return not self.exclMax
 
     def isMaxExclusive(self):
+        """
+        Returns whether the upper limit is exclusive.
+        """
         return self.exclMax
 
     def getDependees(self):
         return tuple(self.getMinDependees() + self.getMaxDependees())
 
+    # Deprecate?
     def getMinDependees(self):
         return self.minDependees
 
+    # Deprecate?
     def getMaxDependees(self):
         return self.maxDependees
 
@@ -273,6 +298,23 @@ class ParamStore:
 
 
 class DesignSpace(Identifiable):
+    """
+    The design space contains a set of parameters and is capable of generating
+    designs by initializing these parameters.
+
+    A design space is mostly immutable(*):
+    - No parameters can be added to an existing design space.
+    - Parameters cannot be removed from the design space.
+    - Parameters cannot be modified(*).
+    - No internal state exists, apart from the set of parameters.
+      This means that, initializing parameters (whether single parameters,
+      using next(), or the full set, using nextDesign()), does not have side
+      effects.
+
+    * Parameters can be set to a fixed value though. That's the only mutability
+      exception.
+    """
+
     def __init__(self, paramStore, spaceId=None):
         Identifiable.__init__(self, spaceId)
         self.params = paramStore or ParamStore()
