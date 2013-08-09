@@ -356,6 +356,21 @@ class TestParamStore(unittest.TestCase):
         self.checkRangeErrors({'exclMin':1, 'exclMax':2})
         self.checkRangeErrors({'exclMin':1, 'exclMax':2})
 
+    def testAddingParamWithCircularDependencyRaisesError(self):
+        ps = ParamStore()
+        with self.assertRaises(ValueError):
+            ps.addParam(Param('A', 'integer', inclMin='B'))
+            ps.addParam(Param('B', 'integer', inclMin='A'))
+            ps.finalize()
+
+    def testAddingParamWithIndirectCircularDependencyRaisesError(self):
+        ps = ParamStore()
+        with self.assertRaises(ValueError):
+            ps.addParam(Param('A', 'integer', inclMin='B'))
+            ps.addParam(Param('B', 'integer', inclMin='C'))
+            ps.addParam(Param('C', 'integer', inclMin='A'))
+            ps.finalize()
+
     def checkRangeErrors(self, kwargs, pa=None):
         args = pa or ('A', 'integer')
         ps = ParamStore(Param(*args, **kwargs))

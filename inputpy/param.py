@@ -213,6 +213,11 @@ class ParamStore:
         Do any final processing and make the parameter store effectively
         read-only. No more parameters can be added later. Multiple calls
         will have no effect.
+
+        Raises ValueError if:
+        - There are unmet dependencies. (A referenced parameter is missing.)
+        - There are circular dependencies.
+        - Any independent parameters have invalid ranges.
         """
         if self.__finalized:
             return
@@ -253,7 +258,6 @@ class ParamStore:
         Check that all parameters are valid.
         - All independent ranges are valid.
         - All dependencies can be met (referenced parameters exist).
-        - TODO: No circular dependencies.
         """
         # Check ranges.
         for (paramId, param) in self.__params.items():

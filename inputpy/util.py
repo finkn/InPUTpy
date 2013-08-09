@@ -81,16 +81,28 @@ class Evaluator:
         if not mode in Evaluator.MODES:
             raise ValueError('%s is not a valid mode' % (mode))
 
-def depLen(params, key):
+def depLen(params, key, dependents=None):
     """
     Return the longest chain of dependencies for the parameter ID key using
     the dependency information in params.
     An independent parameter will have a dependency length of 0.
+
+    This function assumes that there are no missing dependencies.
+
+    Raises ValueError if a circular dependency is found.
     """
+    # These are the parameters that directly or indirectly depend on the
+    # current parameter. If this parameter is one of them, then it depends
+    # on itself, which means that we've found a circular dependency.
+    dependents = list(dependents or [])
+    if key in dependents:
+        raise ValueError('Detected circular dependency')
+    dependents.append(key)
+
     dep = params[key]
     if len(dep) == 0:
         return 0
-    return max([depLen(params, d) + 1 for d in dep])
+    return max([depLen(params, d, dependents) + 1 for d in dep])
 
 def initOrder(params):
     """
