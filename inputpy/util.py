@@ -40,7 +40,7 @@ class Evaluator:
         """
         cls.__checkMode(mode)
         skip = '+-*/()'
-        m = Evaluator.MATH_NAME[mode] + '.'
+        m = cls.MATH_NAME[mode] + '.'
         for c in skip:
             exp = exp.replace(c, ' ')
         return [
@@ -59,7 +59,7 @@ class Evaluator:
         mode    -- the evaluation mode (default 'js')
         """
         cls.__checkMode(mode)
-        return {Evaluator.MATH_NAME[mode]: math, '__builtins__': {}}
+        return {cls.MATH_NAME[mode]: math, '__builtins__': {}}
 
     @classmethod
     def evaluate(cls, exp, params={}, mode=JS):
@@ -78,12 +78,12 @@ class Evaluator:
 
     @classmethod
     def __checkMode(cls, mode):
-        if not mode in Evaluator.MODES:
+        if not mode in cls.MODES:
             raise ValueError('%s is not a valid mode' % (mode))
 
-def depLen(params, key, dependents=None):
+def depLen(params, paramId, dependents=None):
     """
-    Return the longest chain of dependencies for the parameter ID key using
+    Return the longest chain of dependencies for the parameter ID using
     the dependency information in params.
     An independent parameter will have a dependency length of 0.
 
@@ -95,11 +95,11 @@ def depLen(params, key, dependents=None):
     # current parameter. If this parameter is one of them, then it depends
     # on itself, which means that we've found a circular dependency.
     dependents = list(dependents or [])
-    if key in dependents:
+    if paramId in dependents:
         raise ValueError('Detected circular dependency')
-    dependents.append(key)
+    dependents.append(paramId)
 
-    dep = params[key]
+    dep = params[paramId]
     if len(dep) == 0:
         return 0
     return max([depLen(params, d, dependents) + 1 for d in dep])
