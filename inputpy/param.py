@@ -135,19 +135,11 @@ class Param(Identifiable):
         """
         return self.max
 
-    # Deprecate?
-    def isMinInclusive(self):
-        return not self.exclMin
-
     def isMinExclusive(self):
         """
         Returns whether the lower limit is exclusive.
         """
         return self.exclMin
-
-    # Deprecate?
-    def isMaxInclusive(self):
-        return not self.exclMax
 
     def isMaxExclusive(self):
         """
@@ -156,15 +148,7 @@ class Param(Identifiable):
         return self.exclMax
 
     def getDependees(self):
-        return tuple(self.getMinDependees() + self.getMaxDependees())
-
-    # Deprecate?
-    def getMinDependees(self):
-        return self.minDependees
-
-    # Deprecate?
-    def getMaxDependees(self):
-        return self.maxDependees
+        return tuple(self.minDependees + self.maxDependees)
 
 class ParamStore:
     def __init__(self, params=None):
@@ -221,6 +205,8 @@ class ParamStore:
         """
         if self.__finalized:
             return
+        # The order of these two calls (__validateParamters and initOrder)
+        # is significant.
         self.__validateParameters()
         self.initOrder = initOrder(self.__dep)
         self.__finalized = True

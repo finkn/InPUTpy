@@ -277,12 +277,8 @@ class TestParam(unittest.TestCase):
 
         if eMin is not None:
             self.assertTrue(param.isMinExclusive())
-        elif iMin is not None:
-            self.assertTrue(param.isMinInclusive())
         if eMax is not None:
             self.assertTrue(param.isMaxExclusive())
-        elif iMax is not None:
-            self.assertTrue(param.isMaxInclusive())
 
 class TestParamStore(unittest.TestCase):
     def testAddMultipleParameters(self):
