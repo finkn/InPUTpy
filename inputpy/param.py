@@ -4,8 +4,8 @@ from inputpy.util import initOrder
 class Identifiable:
     """
     This class is a mixin. It provides all subclasses with a getId() method.
-    An instance can be initialized using an id argument. If none is provided,
-    then a unique id will be constructed automatically.
+    An instance can be initialized using an id argument. If none is
+    provided, then a unique id will be constructed automatically.
     """
     def __init__(self, objId=None):
         self.__id = objId or str(id(self))
@@ -72,10 +72,10 @@ class Param(Identifiable):
 
     def setFixed(self, value):
         """
-        Sets this parameter to a fixed value. A parameter can also be un-fixed
-        by passing None as the value.
-        Note that setting the fixed value bypasses range checks, meaning that
-        whatever min/max limits have been set are completely ignored.
+        Sets this parameter to a fixed value. A parameter can also be
+        un-fixed by passing None as the value.
+        Note that setting the fixed value bypasses range checks, meaning
+        that whatever min/max limits have been set are completely ignored.
 
         Currently, expressions are allowed as long as they do not reference
         other parameters. (InPUT4j supports neither)
@@ -137,17 +137,21 @@ class Param(Identifiable):
 
     def isMinExclusive(self):
         """
-        Returns whether the lower limit is exclusive.
+        Return whether the lower limit is exclusive.
         """
         return self.exclMin
 
     def isMaxExclusive(self):
         """
-        Returns whether the upper limit is exclusive.
+        Return whether the upper limit is exclusive.
         """
         return self.exclMax
 
     def getDependees(self):
+        """
+        Return a tuple containing the IDs of any parameters that this
+        parameter depends on.
+        """
         return tuple(self.minDependees + self.maxDependees)
 
 class ParamStore:
@@ -213,15 +217,15 @@ class ParamStore:
 
     def getInitializationOrder(self):
         """
-        Return a dictionary that maps the initialization order to the matching
-        parameter IDs.
+        Return a dictionary that maps the initialization order to the
+        matching parameter IDs.
 
         Example:
         A return value of {0: ['A', 'B'], 1: ['C']} means that A and B must
         be initialized before C (because C depends on one or more of (A,B)).
 
         The method requires that this parameter store is finalized. Calling
-        this method will force finalization if this hasn't already been done.
+        this method will force finalization if not already done.
         """
         if not self.__finalized:
             self.finalize()
@@ -289,8 +293,8 @@ class ParamStore:
 
 class DesignSpace(Identifiable):
     """
-    The design space contains a set of parameters and is capable of generating
-    designs by initializing these parameters.
+    The design space contains a set of parameters and is capable of
+    generating designs by initializing these parameters.
 
     A design space is mostly immutable(*):
     - No parameters can be added to an existing design space.
@@ -301,8 +305,8 @@ class DesignSpace(Identifiable):
       using next(), or the full set, using nextDesign()), does not have side
       effects.
 
-    * Parameters can be set to a fixed value though. That's the only mutability
-      exception.
+    * Parameters can be set to a fixed value though. That's the only
+      mutability exception.
     """
 
     def __init__(self, paramStore, spaceId=None):
@@ -335,13 +339,13 @@ class DesignSpace(Identifiable):
 
     def next(self, paramId):
         """
-        Return a freshly generated value for the parameter ID. Any referenced
-        parameters will be initialized as well, and nothing will be cached.
-        However, each parameter is guaranteed to only be initialized once for
-        each call to next.
+        Return a freshly generated value for the parameter ID. Any
+        referenced parameters will be initialized as well, and nothing will
+        be cached. However, each parameter is guaranteed to only be
+        initialized once for each call to next.
 
-        This method isn't used while generating a design. It exists mostly for
-        API compatibility with InPUT4j.
+        This method isn't used while generating a design. It exists mostly
+        for API compatibility with InPUT4j.
         """
         init = self.__initParam(paramId, {})
         return init[paramId]
