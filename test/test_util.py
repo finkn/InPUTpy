@@ -15,6 +15,7 @@ class TestEvaluator(unittest.TestCase):
         ' SomeParam + AnotherParam ': ('SomeParam', 'AnotherParam',),
         'A * -.3': ('A',),
         '1 + 2 - Math.cos(0.0)': (),
+        'A.1.2+B.C.1.D': ('A.1.2', 'B.C.1.D',),
     }
 
     PARAMS = {'A': 2, 'B': 1, 'C': 3}
