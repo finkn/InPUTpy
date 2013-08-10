@@ -1,5 +1,6 @@
 from inputpy.util import Evaluator
 from inputpy.util import initOrder
+import inputpy.generators as generator
 
 class Identifiable:
     """
@@ -47,7 +48,6 @@ class Param(Identifiable):
         self.exclMax = maxIsExcl
         self.minDependees = ()      # Referenced parameters in min expression.
         self.maxDependees = ()      # Referenced parameters in max expression.
-        self.fixed = fixed          # Fixed value, if any.
 
         # If min/max are expressions, these will be parsed to find
         # dependencies. If the expression does not contain references to any
@@ -62,6 +62,8 @@ class Param(Identifiable):
             self.maxDependees = tuple(Evaluator.parseDependencies(self.max))
             if len(self.maxDependees) == 0:
                 self.max = Evaluator.evaluate(self.max)
+
+        # Set fixed value, if any.
         self.setFixed(fixed)
 
     def isFixed(self):
@@ -263,21 +265,12 @@ class ParamStore:
                 msg = '%s referencing nonexistent parameter %s' % (paramId, d)
                 raise ValueError(msg)
 
-    # TODO: This test is only preliminary. It should be more sophisticated.
-    # Possibly outsource this to the generator.
+    # This test isn't as thorough as it could be. It only checks completely
+    # independent parameters.
     def __validRange(self, param):
         if param.isDependent():
-            return True     # Well, we don't really know, but it's not invalid.
-
-        minLimit = param.getMin() or -2**32     # eek
-        maxLimit = param.getMax() or 2**32-1    # eek
-        valueRange = maxLimit - minLimit + 1
-
-        if param.isMinExclusive():
-            valueRange -= 1
-        if param.isMaxExclusive():
-            valueRange -= 1
-        return valueRange > 0
+            return True     # Don't know that it's invalid at least.
+        return generator.isValid(param)
 
     def __missingDep(self, param):
         """
@@ -323,19 +316,7 @@ class DesignSpace(Identifiable):
     def __getValue(cls, param, initialized={}):
         if param.isFixed():
             return param.getFixedValue()
-        import random
-        minLimit = param.getMin()
-        if param.isMinDependent():
-            minLimit = Evaluator.evaluate(minLimit, initialized)
-        maxLimit = param.getMax()
-        if param.isMaxDependent():
-            maxLimit = Evaluator.evaluate(maxLimit, initialized)
-
-        if param.isMinExclusive():
-            minLimit += 1
-        if param.isMaxExclusive():
-            maxLimit -= 1
-        return random.randint(minLimit, maxLimit)
+        return generator.nextValue(param, initialized)
 
     def next(self, paramId):
         """
@@ -347,8 +328,7 @@ class DesignSpace(Identifiable):
         This method isn't used while generating a design. It exists mostly
         for API compatibility with InPUT4j.
         """
-        init = self.__initParam(paramId, {})
-        return init[paramId]
+        return self.__initParam(paramId, {})[paramId]
 
     def nextDesign(self, designId=None):
         """
