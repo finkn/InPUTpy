@@ -51,10 +51,13 @@ class ValueGenerator:
     @classmethod
     def __getMinMax__(cls, param, dep={}):
         minVal = param.getMin()
-        if param.isMinDependent():
-            minVal = Evaluator.evaluate(minVal, dep)
         maxVal = param.getMax()
-        if param.isMaxDependent():
+        minMaxPairs = list(zip(minVal, maxVal))
+        (minVal, maxVal) = cls.rng.choice(minMaxPairs)
+
+        if param.isMinDependent() and isinstance(minVal, str):
+            minVal = Evaluator.evaluate(minVal, dep)
+        if param.isMaxDependent() and isinstance(maxVal, str):
             maxVal = Evaluator.evaluate(maxVal, dep)
         if minVal is None:
             minVal = RANGE_MAP[param.getType()][0]

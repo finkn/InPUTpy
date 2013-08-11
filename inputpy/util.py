@@ -81,6 +81,15 @@ class Evaluator:
         if not mode in cls.MODES:
             raise ValueError('%s is not a valid mode' % (mode))
 
+    # This is a naive implementation.
+    # It should work for all simple, literal ranges, but it does not
+    # enforce this limitation. It almost works for arbitrary expressions.
+    # The problem is that function calls can contain commas, which would
+    # be a problem. Arbitrary expressions need regexp matching.
+    @staticmethod
+    def parseRange(exp):
+        return [s.strip() for s in exp.split(',')]
+
 def depLen(params, paramId, dependents=None):
     """
     Return the longest chain of dependencies for the parameter ID using

@@ -33,19 +33,30 @@ class TestGenerators(unittest.TestCase):
         tests = (
             {
                 'param': Param('A', 'short', inclMin=-2, inclMax=0),
-                'inclMin': -2, 'inclMax': 0,
+                'inclMin': (-2,), 'inclMax': (0,),
             },
             {
                 'param': Param('A', 'long', exclMin=1, exclMax=4),
-                'inclMin': 2, 'inclMax': 3,
+                'inclMin': (2,), 'inclMax': (3,),
+            },
+            {
+                'param': Param('A', 'integer', inclMin=(1,2,), exclMax=(2,4,)),
+                'inclMin': (1,2,), 'inclMax': (1,3,),
             },
             {
                 'param': Param('A', 'float', inclMin=0.5, inclMax=0.6),
-                'inclMin': 0.5, 'inclMax': 0.6,
+                'inclMin': (0.5,), 'inclMax': (0.6,),
             },
             {
                 'param': Param('A', 'boolean'),
-                'inclMin': 0, 'inclMax': 1,
+                'inclMin': (0,), 'inclMax': (1,),
+            },
+            {
+                'param': Param('A', 'double',
+                            inclMin=('Math.cos(Math.pi)','.5/2 + B'),
+                            inclMax=(.9,'Math.sqrt(16) + B')),
+                'dep': {'B': 3},
+                'inclMin': (-1.0,3.25,), 'inclMax': (.9,7,),
             },
         )
         for kwarg in tests:
@@ -68,7 +79,12 @@ class TestGenerators(unittest.TestCase):
         self.assertTrue(iterations > 1, msg='1 iteration makes no sense!')
         for i in range(iterations):
             value = generator.nextValue(param, dep)
-            self.assertTrue(inclMin <= inclMax)
+            result = [
+                minLimit <= value <= maxLimit
+                for (minLimit, maxLimit) in list(zip(inclMin, inclMax))
+            ]
+            msg='%s did not match any of the ranges' % (value,)
+            self.assertTrue(any(result), msg=msg)
 
 
 if __name__ == '__main__':

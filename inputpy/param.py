@@ -33,8 +33,17 @@ class Param(Identifiable):
         if inclMax is not None and exclMax is not None:
             raise ValueError('Defined both inclusive and exclusive limits')
 
-        minLimit = inclMin or exclMin
-        maxLimit = inclMax or exclMax
+        if inclMin is None:
+            minTmp = exclMin
+        else:
+            minTmp = inclMin
+        if inclMax is None:
+            maxTmp = exclMax
+        else:
+            maxTmp = inclMax
+
+        minTmp = self.__transformLimit(minTmp)
+        maxTmp = self.__transformLimit(maxTmp)
         # Are max/min exclusive?
         minIsExcl = exclMin is not None
         maxIsExcl = exclMax is not None
@@ -42,29 +51,65 @@ class Param(Identifiable):
         # Initialize fields.
         Identifiable.__init__(self, paramId)
         self.type = paramType
-        self.min = minLimit         # Set to preliminary min limit.
-        self.max = maxLimit         # Set to preliminary max limit.
         self.exclMin = minIsExcl
         self.exclMax = maxIsExcl
-        self.minDependees = ()      # Referenced parameters in min expression.
-        self.maxDependees = ()      # Referenced parameters in max expression.
+        self.minDependees = []      # Referenced parameters in min expression.
+        self.maxDependees = []      # Referenced parameters in max expression.
+        self.min = []
+        self.max = []
 
-        # If min/max are expressions, these will be parsed to find
-        # dependencies. If the expression does not contain references to any
-        # other parameters, then the expression is evaluated immediately.
+        for minLimit in minTmp:
+            self.__initMinMax(self.min, self.minDependees, minLimit)
+        for maxLimit in maxTmp:
+            self.__initMinMax(self.max, self.maxDependees, maxLimit)
 
-        # NameErrors are not expected and indicate a real error.
-        if type(self.min) is str:
-            self.minDependees = tuple(Evaluator.parseDependencies(self.min))
-            if len(self.minDependees) == 0:
-                self.min = Evaluator.evaluate(self.min)
-        if type(self.max) is str:
-            self.maxDependees = tuple(Evaluator.parseDependencies(self.max))
-            if len(self.maxDependees) == 0:
-                self.max = Evaluator.evaluate(self.max)
+        self.__padLimits(self.min, self.max)
+        self.min = tuple(self.min)
+        self.max = tuple(self.max)
+        self.minDependees = tuple(self.minDependees)
+        self.maxDependees = tuple(self.maxDependees)
 
         # Set fixed value, if any.
         self.setFixed(fixed)
+
+    @staticmethod
+    def __padLimits(minLimits, maxLimits):
+        minLen = len(minLimits)
+        maxLen = len(maxLimits)
+        if minLen < maxLen:
+            limits = minLimits
+        else:
+            limits = maxLimits
+        for i in range(abs(minLen - maxLen)):
+            limits.append(None)
+
+    # Is this the best way to check whether limit is already a sequence?
+    @staticmethod
+    def __transformLimit(limit):
+        if limit is None:
+            return (None,)
+        # A string is also a sequence, but it always represents a single limit.
+        if isinstance(limit, str):
+            return (limit,)
+        try:
+            iter(limit)
+        except TypeError:
+            return (limit,)
+        else:
+            return limit
+
+    @staticmethod
+    def __initMinMax(limits, dependees, limit):
+        # If min/max are expressions, these will be parsed to find
+        # dependencies. If the expression does not contain references to any
+        # other parameters, then the expression is evaluated immediately.
+        # Any dependencies are recorded.
+
+        if type(limit) is str:
+            dependees.extend(Evaluator.parseDependencies(limit))
+            if len(dependees) == 0:
+                limit = Evaluator.evaluate(limit)
+        limits.append(limit)
 
     def isFixed(self):
         """

@@ -18,6 +18,11 @@ class TestEvaluator(unittest.TestCase):
         'A.1.2+B.C.1.D': ('A.1.2', 'B.C.1.D',),
     }
 
+    RANGE_TESTS = {
+        # Looks trivial now, but might want to support arbitrary expressions.
+        '1,5,-3': ('1', '5', '-3',),
+    }
+
     PARAMS = {'A': 2, 'B': 1, 'C': 3}
     EXPRESSION_TESTS_WITHOUT_PARAMS = {
         'Math.log(Math.e * Math.cos(Math.sin(Math.pi/2)-1)) + 1': 2.0,
@@ -60,6 +65,16 @@ class TestEvaluator(unittest.TestCase):
         for (exp, value) in tests.items():
             dep = Evaluator.parseDependencies(exp)
             self.assertCountEqual(value, dep)
+
+    def testParseRange(self):
+        tests = self.DEPENDENCY_TESTS
+        for (exp, value) in tests.items():
+            self.assertEqual(1, len(Evaluator.parseRange(exp)))
+
+        tests = self.RANGE_TESTS
+        for (exp, value) in tests.items():
+            self.assertCountEqual(value, Evaluator.parseRange(exp))
+
 
 class TestMiscUtil(unittest.TestCase):
 

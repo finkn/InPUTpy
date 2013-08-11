@@ -53,18 +53,6 @@ class TestDesignSpace(unittest.TestCase):
         params = space.getSupportedParamIds()
         self.assertCountEqual(params, ('A'))
 
-    def testGenerateValueForParameter(self):
-        param1 = Param('A', 'integer', inclMin=1, inclMax=1)
-        param2 = Param('B', 'integer', exclMin=1, exclMax=3)
-        ps = ParamStore()
-        ps.addParam(param1)
-        ps.addParam(param2)
-        space = DesignSpace(ps)
-        value = space.next(param1.getId())
-        self.assertEqual(1, value)
-        value = space.next(param2.getId())
-        self.assertEqual(2, value)
-
     def testNext(self):
         param1 = Param('A', 'integer', inclMin=1, inclMax=1)
         param2 = Param('B', 'integer', exclMin=1, exclMax=3)
@@ -158,6 +146,14 @@ class TestParam(unittest.TestCase):
         pType = param.getType()
         self.assertEqual('integer', pType, msg='Parameter should be "integer"')
 
+    def testCreateParamWithMultipleRanges(self):
+        Param('A', 'integer', inclMin=(1,5), inclMax=(2,7))
+        Param('A', 'integer', inclMin=('1','5','-5'), inclMax=(2,7,5))
+        Param('A', 'float', exclMin=('.5','5.0','-5'), exclMax=(.9,7,5))
+        Param('A', 'float',
+            inclMin=('Math.cos(Math.pi)','.5/2 + B'),
+            inclMax=(.9,'Math.sqrt(16) + B'))
+
     def testParamLimits(self):
         # No limits.
         self.checkLimits()
@@ -169,8 +165,18 @@ class TestParam(unittest.TestCase):
         # Try setting both limits, using all combinations of incl/excl.
         self.checkLimits(iMin=1, iMax=10)
         self.checkLimits(eMin=1, eMax=10)
-        self.checkLimits(iMax=1, eMin=10)
-        self.checkLimits(eMax=1, iMin=10)
+        self.checkLimits(iMin=1, eMax=10)
+        self.checkLimits(eMin=1, iMax=10)
+        # Setting multiple ranges.
+        self.checkLimits(iMin=(1), eMax=(10))
+        self.checkLimits(eMin=(1,2), iMax=(3,10))
+        # Multiple ranges with mismatching end points.
+        self.checkLimits(eMin=(1,2), iMax=(3,10,5))
+        self.checkLimits(eMin=(1,2,-5), iMax=(3,10))
+
+    def testCreatingParamWithSingleLimitStillReturnsMultiLimit(self):
+        param = Param('A', 'integer', inclMin=1, inclMax=2)
+        self.assertIsNotNone(iter(param.getMin()))
 
     def testNoneIdShouldNotRaiseError(self):
         param = Param(None, 'integer')
@@ -187,7 +193,6 @@ class TestParam(unittest.TestCase):
     def testMultipleMaxLimitsShouldRaiseError(self):
         with self.assertRaises(ValueError):
             param = Param('A', 'integer', inclMax=1, exclMax=10)
-
 
     def testParamWithoutLimitsIsNotDependent(self):
         param = Param('A', 'integer')
@@ -220,8 +225,8 @@ class TestParam(unittest.TestCase):
     def testIndependentParameterWithExpressionShouldBeEvaluated(self):
         param = Param('A', 'integer', inclMin='1', exclMax='1 + 2')
         self.assertFalse(param.isDependent())
-        self.assertEqual(1, param.getMin())
-        self.assertEqual(3, param.getMax())
+        self.assertEqual((1,), param.getMin())
+        self.assertEqual((3,), param.getMax())
 
     def testIdenpendentParameterWithMoreComplexExpression(self):
         # 2.0
@@ -231,8 +236,8 @@ class TestParam(unittest.TestCase):
         param = Param('A', 'integer', exclMin=eMin, inclMax=iMax)
         self.assertFalse(param.isDependent())
         # Should probably really expect 2 and 5 here.
-        self.assertEqual(2.0, param.getMin())
-        self.assertEqual(5.0, param.getMax())
+        self.assertEqual((2.0,), param.getMin())
+        self.assertEqual((5.0,), param.getMax())
 
     def testDependentParameterWithSimpleDependency(self):
         param = Param('A', 'integer', inclMin='B')
@@ -270,15 +275,14 @@ class TestParam(unittest.TestCase):
         # Create the parameter based on the arguments.
         param = Param(*args, **kwargs)
 
-        minLimit = iMin or eMin
-        maxLimit = iMax or eMax
-        self.assertEqual(minLimit, param.getMin())
-        self.assertEqual(maxLimit, param.getMax())
+        # Check that the ranges were padded.
+        self.assertEqual(len(param.getMin()), len(param.getMax()))
 
         if eMin is not None:
             self.assertTrue(param.isMinExclusive())
         if eMax is not None:
             self.assertTrue(param.isMaxExclusive())
+
 
 class TestParamStore(unittest.TestCase):
     def testAddMultipleParameters(self):
