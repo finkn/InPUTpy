@@ -176,17 +176,27 @@ class Param(Identifiable):
 
     def getMin(self):
         """
-        Return the value or expression that is the lower limit.
-        If this parameter depends on others, then the returned value will be
-        an expression. Otherwise it will be a concrete value.
+        Return a sequence of values and/or expressions that define the lower
+        limits. For any limit that depends on other parameters, the value
+        will be an expression. Otherwise it will be a concrete value.
+        The sequence is guaranteed to always contain at least one item. If
+        the parameter does not define any lower limits at all, then the
+        one and only item will be None.
+        The sequence of min and max limits are guaranteed to be the same
+        length. In other words, min and max are always paired up.
         """
         return self.min
 
     def getMax(self):
         """
-        Return the value or expression that is the upper limit.
-        If this parameter depends on others, then the returned value will be
-        an expression. Otherwise it will be a concrete value.
+        Return a sequence of values and/or expressions that define the upper
+        limits. For any limit that depends on other parameters, the value
+        will be an expression. Otherwise it will be a concrete value.
+        The sequence is guaranteed to always contain at least one item. If
+        the parameter does not define any upper limits at all, then the
+        one and only item will be None.
+        The sequence of min and max limits are guaranteed to be the same
+        length. In other words, min and max are always paired up.
         """
         return self.max
 
