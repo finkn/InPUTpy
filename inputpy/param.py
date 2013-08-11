@@ -124,10 +124,18 @@ class Param(Identifiable):
         Note that setting the fixed value bypasses range checks, meaning
         that whatever min/max limits have been set are completely ignored.
 
-        Currently, expressions are allowed as long as they do not reference
-        other parameters. (InPUT4j supports neither)
+        Currently, expressions are allowed for numeric parameters as long
+        as they do not reference other parameters.
+        (InPUT4j supports neither)
+
+        Boolean parameters do not evaluate expressions. When set to a
+        string value, only 'true' (ignoring case) is True. Any other string
+        is interpreted as False.
         """
         if type(value) is str:
+            if self.type == 'boolean':
+                self.fixed = value.lower() == 'true'
+                return
             self.fixed = Evaluator.evaluate(value)
         else:
             self.fixed = value

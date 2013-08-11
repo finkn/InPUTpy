@@ -63,7 +63,7 @@ class TestDesignSpace(unittest.TestCase):
         self.assertEqual(1, space.next(param1.getId()))
         self.assertEqual(2, space.next(param2.getId()))
 
-    def testSetFixed(self):
+    def testSetFixedInteger(self):
         paramId = 'Y'
         param = Param(paramId, 'integer')
         ps = ParamStore()
@@ -72,6 +72,19 @@ class TestDesignSpace(unittest.TestCase):
         self.assertFalse(param.isFixed())
         space.setFixed(paramId, 3)
         self.assertTrue(param.isFixed())
+
+    def testSetFixedBoolean(self):
+        paramId = 'A'
+        param = Param(paramId, 'boolean')
+        space = DesignSpace(ParamStore(param))
+        self.assertFalse(param.isFixed())
+        space.setFixed(paramId, 'true')
+        self.assertTrue(param.isFixed())
+        self.assertTrue(param.getFixedValue())
+        space.setFixed(paramId, 'hello')
+        self.assertFalse(param.getFixedValue())
+        space.setFixed(paramId, 'false')
+        self.assertFalse(param.getFixedValue())
 
     def testGenerateValueForFixedParameter(self):
         paramId = 'Z'
