@@ -8,6 +8,9 @@ only has one int and one float type, capable of representing arbitrary
 precision, Java has 4 integer types (3 of which are supported by InPUT)
 and 3 floating point types. Therefore, this module exports constants
 defining the min and max ranges for those types.
+
+:copyright: (c) 2013 by Christoffer Fink.
+:license: MIT. See LICENSE for details.
 """
 import random
 from inputpy.exceptions import InPUTException

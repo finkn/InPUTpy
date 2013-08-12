@@ -1,3 +1,16 @@
+"""
+inputpy.param
+
+This module exports two classes:
+    - Param
+    - ParamStore
+
+The Design and DesignSpace classes will probably be moved (probably merged
+with the existing classes in inputpy.design).
+
+:copyright: (c) 2013 by Christoffer Fink.
+:license: MIT. See LICENSE for details.
+"""
 from inputpy.util import Evaluator
 from inputpy.util import initOrder
 import inputpy.generators as generator
