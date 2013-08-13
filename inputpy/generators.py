@@ -152,6 +152,8 @@ def nextValue(param, dep={}):
     Return a value for the parameter. Optionally, a dictionary of
     parameter ID to value mappings can be supplied to resolve dependencies.
     """
+    if param.isFixed():
+        return param.getFixedValue()
     return GENERATORS[param.getType()].nextValue(param, dep)
 
 def isValid(param, dep={}):

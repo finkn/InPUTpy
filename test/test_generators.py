@@ -78,10 +78,23 @@ class TestGenerators(unittest.TestCase):
         self.checkDimensions(result, sizes)
         self.assertEqual(expected, result)
 
+    def testNextArrayWithFixedParameter(self):
+        param = Param('A', 'integer', inclMin=1, inclMax=1, fixed=2)
+        sizes = (2, 3)
+        expected = [
+            [2, 2, 2],
+            [2, 2, 2],
+        ]
+        result = generator.nextArray(param, sizes)
+        self.checkDimensions(result, sizes)
+        self.assertEqual(expected, result)
+
     def testNextValueWithArrayParameter(self):
         params = (
             getParameter('A', 'short[2][3]', inclMin=1, inclMax=1),
             getParameter('A', 'integer[2][3]', inclMin=2, inclMax=2),
+            getParameter('A', 'float[2][3]', inclMin=1, inclMax=1, fixed=3.5),
+            getParameter('A', 'boolean[2][3]', fixed='true'),
         )
         sizes = (2, 3)
         for p in params:
