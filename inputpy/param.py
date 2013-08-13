@@ -439,14 +439,6 @@ class DesignSpace(Identifiable):
     def getSupportedParamIds(self):
         return self.params.getSupportedParamIds()
 
-    # This method is more "dummy" than most, since it only works with
-    # 'integer' parameters.
-    @classmethod
-    def __getValue(cls, param, initialized={}):
-        if param.isFixed():
-            return param.getFixedValue()
-        return generator.nextValue(param, initialized)
-
     def next(self, paramId):
         """
         Return a freshly generated value for the parameter ID. Any
@@ -487,7 +479,7 @@ class DesignSpace(Identifiable):
         if param.isDependent():
             for d in param.getDependees():
                 init = self.__initParam(d, init)
-        init[paramId] = self.__getValue(param, init)
+        init[paramId] = generator.nextValue(param, init)
         return init
 
     def setFixed(self, paramId, value):
