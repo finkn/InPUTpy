@@ -145,7 +145,7 @@ class BoolGenerator(ValueGenerator):
 class ArrayGenerator(ValueGenerator):
     @classmethod
     def nextValue(cls, param, dep={}):
-        size = param.getSize()
+        size = param.getSize() or 1
         param = param.getParameter()
         return [nextValue(param, dep) for i in range(size)]
 

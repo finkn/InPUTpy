@@ -14,6 +14,7 @@ with the existing classes in inputpy.design).
 from inputpy.util import Evaluator
 from inputpy.util import initOrder
 import inputpy.generators as generator
+import inputpy.util as util
 
 class Identifiable:
     """
@@ -250,7 +251,7 @@ class ParamArray():
     This is a special kind of parameter. It is a kind of wrapper that
     adds the quality of being an array to any parameter.
     Multidimensional arrays are handled by wrapping multiple parameters
-    recursively.    
+    recursively.
 
     Almost all method calls end up at the actual parameter. This class
     only adds two new methods:
@@ -499,5 +500,5 @@ class Design(Identifiable):
         self.params = params
 
     def getValue(self, paramId):
-        return self.params[paramId]
+        return util.getValue(paramId, self.params)
 

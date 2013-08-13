@@ -31,6 +31,22 @@ class TestDesign(unittest.TestCase):
         self.assertEqual(2, design.getValue('B'))
         self.assertEqual('Design', design.getId())
 
+    def testCreateDesignWithArray(self):
+        param = getParameter('A', 'integer[2][][3]', inclMin=2, inclMax=2)
+        param2 = getParameter('A.1', 'float', inclMin=2, inclMax=2, fixed=0.5)
+        space = DesignSpace(ParamStore((param, param2)))
+        design = space.nextDesign('Design')
+        expected = [
+            [[2, 2, 2]],
+            [[2, 2, 2]],
+        ]
+        result = design.getValue('A')
+        self.assertEqual(expected, result)
+        result[0][0][2] = 3     # Do we want this?
+        self.assertEqual([[2, 2, 3]], design.getValue('A.1'))
+        self.assertEqual([2, 2, 2], design.getValue('A.2.1'))
+        self.assertEqual(2, design.getValue('A.2.1.3'))
+
 class TestDesignSpace(unittest.TestCase):
     def testCreateEmptyDesignSpaceWithoutId(self):
         space = DesignSpace(None)
