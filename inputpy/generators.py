@@ -146,3 +146,19 @@ def isValid(param, dep={}):
     parameter ID to value mappings can be supplied to resolve dependencies.
     """
     return GENERATORS[param.getType()].isValid(param, dep)
+
+def nextArray(param, sizes=(0,), dep={}):
+    """
+    Return an array of values initialized using the parameter.
+    The default size of the array is 1. By passing in a list of sizes, the
+    array can have any dimensions. Any size that is 0 will default back
+    to 1.
+    A dictionary of parameter ID to value mappings can be supplied to
+    resolve dependencies.
+    """
+    values = sizes[0] or 1
+    sizes = sizes[1:]
+    if len(sizes) > 0:
+        return [nextArray(param, sizes, dep) for i in range(values)]
+    else:
+        return [nextValue(param, dep) for i in range(values)]

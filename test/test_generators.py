@@ -62,6 +62,29 @@ class TestGenerators(unittest.TestCase):
         for kwarg in tests:
             self.checkRange(**kwarg)
 
+    def testNextArray(self):
+        param = Param('A', 'integer', inclMin=1, inclMax=1)
+        sizes = (2, 3, 4)
+        expected = [
+            [
+                [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1],
+            ],
+            [
+                [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1],
+            ],
+        ]
+        result = generator.nextArray(param, sizes)
+        self.checkDimensions(result, sizes)
+        self.assertEqual(expected, result)
+
+    def checkDimensions(self, array, sizes):
+        size = sizes[0]
+        self.assertEqual(size, len(array))
+        if len(sizes) == 1:
+            return
+        for element in array:
+            self.checkDimensions(element, sizes[1:])
+
     def checkGeneratorRandomness(self, param, dep={}, iterations=10):
         self.assertTrue(iterations > 1, msg='1 iteration makes no sense!')
         values = []
