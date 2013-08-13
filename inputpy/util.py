@@ -129,3 +129,31 @@ def initOrder(params):
         p.append(k)
         result[l] = p
     return result
+
+def getValue(paramId, params):
+    """
+    Return the value of the parameter with the given ID.
+    Can handle four cases:
+    - An ID that does not contain dots, which may be:
+        - A regular parameter.
+        - An array parameter.
+    - An ID that contains one or more dots, which may be:
+        - A regular parameter.
+        - An array parameter element.
+
+    If there should exist a parameter that has the same ID as the element
+    of an array parameter, then the array element takes precedent.
+    """
+    # Handle regular parameter ID without any dots.
+    if paramId.find('.') == -1:
+        return params.get(paramId, None)
+    # Handle parameter ID with one or more dots.
+    # This may be a regular parameter after all, or it may be an array element.
+    parts = paramId.split('.')
+    result = params.get(parts[0], None)
+    if result is None:
+        return params.get(paramId, None)
+    indexes = [int(i)-1 for i in parts[1:]]
+    for i in indexes:
+        result = result[i]
+    return result

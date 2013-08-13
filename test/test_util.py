@@ -2,6 +2,7 @@ import unittest
 from inputpy.util import Evaluator
 from inputpy.util import depLen
 from inputpy.util import initOrder
+import inputpy.util as util
 
 class TestEvaluator(unittest.TestCase):
 
@@ -100,6 +101,44 @@ class TestMiscUtil(unittest.TestCase):
     def testInitOrder(self):
         for d in self.DEPENDENCIES:
             self.checkInitOrder(d)
+
+    def testGetValue(self):
+        tests = (
+            (
+                {'A': 'a', 'B': 43, },          # Parameters.
+                {'A': 'a', 'B': 43, },          # Expected key-value mappings.
+            ),
+            (
+                {'A.1': 'a', 'B.2.3': 43, },    # Parameters.
+                {'A.1': 'a', 'B.2.3': 43, },    # Expected key-value mappings.
+            ),
+            (
+                {'A': ['a', 'b', 'c', ], },     # Parameters.
+                {
+                    'A': ['a', 'b', 'c', ],     # Expected key-value mappings.
+                    'A.1': 'a',
+                    'A.3': 'c',
+                },
+            ),
+            (
+                {'A': [[1, 2, 3], ['a', 'b', 'c']], 'A.1.1': 'ignored',},
+                {
+                    'A': [[1, 2, 3], ['a', 'b', 'c']],
+                    'A.1': [1, 2, 3],
+                    'A.2': ['a', 'b', 'c'],
+                    'A.1.1': 1,
+                    'A.2.3': 'c',
+                },
+            ),
+        )
+
+        # Check that a missing parameter is None.
+        self.assertIsNone(util.getValue('NonExistent', tests[0][0]))
+
+        for (params, expected) in tests:
+            for (key, value) in expected.items():
+                self.assertEqual(value, util.getValue(key, params))
+
 
     def checkInitOrder(self, dep):
         dependencies = dep[0]
