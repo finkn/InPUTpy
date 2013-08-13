@@ -157,3 +157,20 @@ def getValue(paramId, params):
     for i in indexes:
         result = result[i]
     return result
+
+def parseDimensions(typeString):
+    """
+    Return the array dimensions this type string encodes.
+    Expects a string of the form 'type[n1][n2]...[nm]' where type can be
+    anything and any n can be absent.
+    The result is a list containing all dimensions in order. For any missing
+    size ('[]'), the resulting list will contain 0.
+    """
+    parts = typeString.split('[')[1:]   # Strip the regular type away.
+    result = []
+    for p in parts:
+        p = p.replace(']', ' ').strip()
+        if p == '':
+            p = '0'
+        result.append(int(p))
+    return result

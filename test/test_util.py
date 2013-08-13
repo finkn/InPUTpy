@@ -139,6 +139,22 @@ class TestMiscUtil(unittest.TestCase):
             for (key, value) in expected.items():
                 self.assertEqual(value, util.getValue(key, params))
 
+    def testParseDimensions(self):
+        tests = (
+            {'integer': []},
+            {'integer[2]': [2,]},
+            {'integer[]': [0,]},
+            {'integer[1][2]': [1, 2,]},
+            {'integer[][]': [0, 0,]},
+            {'integer[1][][1]': [1, 0, 1]},
+            {'integer[][1][]': [0, 1, 0]},
+            {'boolean[][][]': [0, 0, 0]},
+        )
+        for t in tests:
+            for (key, expected) in t.items():
+                result = util.parseDimensions(key)
+                self.assertEqual(expected, result)
+
 
     def checkInitOrder(self, dep):
         dependencies = dep[0]
