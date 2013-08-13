@@ -24,6 +24,8 @@ FLOAT = 'float'
 DOUBLE = 'double'
 NUMERIC = 'numeric'
 BOOLEAN = 'boolean'
+# Not a defined type in InPUT. This is used internally in InPUTpy.
+ARRAY = 'array'
 
 # Maps the string description to a range.
 RANGE_MAP = {
@@ -125,6 +127,17 @@ class BoolGenerator(ValueGenerator):
     def isValid(cls, param, dep={}):
         return True
 
+class ArrayGenerator(ValueGenerator):
+    @classmethod
+    def nextValue(cls, param, dep={}):
+        size = param.getSize()
+        param = param.getParameter()
+        return [nextValue(param, dep) for i in range(size)]
+
+    @classmethod
+    def isValid(cls, param, dep={}):
+        return True
+
 
 GENERATORS = {}
 for k in INT_TYPES:
@@ -132,6 +145,7 @@ for k in INT_TYPES:
 for k in FLOAT_TYPES:
     GENERATORS[k] = FloatGenerator
 GENERATORS[BOOLEAN] = BoolGenerator
+GENERATORS[ARRAY] = ArrayGenerator
 
 def nextValue(param, dep={}):
     """

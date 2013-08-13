@@ -1,6 +1,7 @@
 import unittest
 import inputpy.generators as generator
 from inputpy.param import Param
+from inputpy.param import getParameter
 
 class TestGenerators(unittest.TestCase):
 
@@ -76,6 +77,16 @@ class TestGenerators(unittest.TestCase):
         result = generator.nextArray(param, sizes)
         self.checkDimensions(result, sizes)
         self.assertEqual(expected, result)
+
+    def testNextValueWithArrayParameter(self):
+        params = (
+            getParameter('A', 'short[2][3]', inclMin=1, inclMax=1),
+            getParameter('A', 'integer[2][3]', inclMin=2, inclMax=2),
+        )
+        sizes = (2, 3)
+        for p in params:
+            result = generator.nextValue(p)
+            self.checkDimensions(result, sizes)
 
     def checkDimensions(self, array, sizes):
         size = sizes[0]
