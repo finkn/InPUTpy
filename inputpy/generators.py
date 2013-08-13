@@ -47,7 +47,10 @@ class ValueGenerator:
 
     @classmethod
     def nextValue(cls, param, dep={}):
-        raise NotImplementedError
+        if param.isFixed():
+            return param.getFixedValue()
+        else:
+            return None
 
     @classmethod
     def isValid(cls, param, dep={}):
@@ -73,6 +76,10 @@ class ValueGenerator:
 class IntGenerator(ValueGenerator):
     @classmethod
     def nextValue(cls, param, dep={}):
+        result = ValueGenerator.nextValue(param, dep)
+        if result is not None:
+            return result
+
         (minVal, maxVal) = cls.__getMinMax__(param, dep)
         if not cls.__isValid(minVal, maxVal):
             raise ValueError('Invalid range')
@@ -101,6 +108,10 @@ class IntGenerator(ValueGenerator):
 class FloatGenerator(ValueGenerator):
     @classmethod
     def nextValue(cls, param, dep={}):
+        result = ValueGenerator.nextValue(param, dep)
+        if result is not None:
+            return result
+
         (minVal, maxVal) = cls.__getMinMax__(param, dep)
         if not cls.isValid(param, dep):
             raise ValueError('Invalid range')
@@ -121,6 +132,10 @@ class FloatGenerator(ValueGenerator):
 class BoolGenerator(ValueGenerator):
     @classmethod
     def nextValue(cls, param, dep={}):
+        result = ValueGenerator.nextValue(param, dep)
+        if result is not None:
+            return result
+
         return bool(cls.rng.randint(0, 1))
 
     @classmethod
@@ -152,8 +167,6 @@ def nextValue(param, dep={}):
     Return a value for the parameter. Optionally, a dictionary of
     parameter ID to value mappings can be supplied to resolve dependencies.
     """
-    if param.isFixed():
-        return param.getFixedValue()
     return GENERATORS[param.getType()].nextValue(param, dep)
 
 def isValid(param, dep={}):

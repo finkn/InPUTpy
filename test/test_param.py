@@ -132,6 +132,14 @@ class TestDesignSpace(unittest.TestCase):
         self.assertTrue(c <= design.getValue('B') <= 10)    # min 5
         self.assertTrue(5 <= design.getValue('C') <= 7)
 
+    def testCreateDesignWithArray(self):
+        param = getParameter('A', 'integer[2][2]', fixed=1)
+        self.assertEqual('array', param.getType())
+        space = DesignSpace(ParamStore(param))
+        expected = [[1,1], [1,1]]
+        result = space.next('A')
+        self.assertEqual(expected, result)
+
 
 class TestParam(unittest.TestCase):
 

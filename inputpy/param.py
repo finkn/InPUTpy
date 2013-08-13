@@ -245,7 +245,7 @@ def getParameter(paramId, paramType, **kwargs):
     paramType = paramType[:startIndex] + paramType[endIndex+1:]
     return ParamArray(paramId, paramType, size, **kwargs)
 
-class ParamArray(Param):
+class ParamArray():
     """
     This is a special kind of parameter. It is a kind of wrapper that
     adds the quality of being an array to any parameter.
@@ -262,9 +262,10 @@ class ParamArray(Param):
     def __init__(self, paramId, paramType, size, **kwargs):
         self.__param = getParameter(paramId, paramType, **kwargs)
         self.__size = size
+        assert self.__param is not None
 
     def __getattr__(self, attr):
-        getattr(self.__param, attr)
+        return getattr(self.__param, attr)
 
     def getType(self):
         """
@@ -300,7 +301,7 @@ class ParamStore:
 
     # Assumes that params is a sequence of parameters. If it turns out to be
     # a single parameter it is placed in a sequence before processing.
-    def addParam(self, params):
+    def addParam(self, param):
         """
         Add one or more parameters to this ParamStore. The params argument
         can be a sequence of parameters or just a single parameter.
@@ -310,13 +311,15 @@ class ParamStore:
         if self.__finalized:
             msg = 'Cannot add parameters to store once finalized.'
             raise NotImplementedError(msg)
-        if isinstance(params, Param):
-            params = (params,)
-        for p in params:
-            paramId = p.getId()
-            self.__params[paramId] = p
+
+        try:
+            for p in param:
+                self.addParam(p)
+        except TypeError:
+            paramId = param.getId()
+            self.__params[paramId] = param
             # Update dependencies as new parameters are added.
-            self.__dep[paramId] = p.getDependees()
+            self.__dep[paramId] = param.getDependees()
 
     def getParam(self, paramId):
         """
