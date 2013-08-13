@@ -232,6 +232,59 @@ class Param(Identifiable):
         """
         return tuple(self.minDependees + self.maxDependees)
 
+# Factory.
+def getParameter(paramId, paramType, **kwargs):
+    # This is not an array parameter.
+    if paramType.find('[') == -1:
+        return Param(paramId, paramType, **kwargs)
+
+    # 'integer[2][3]' should become size: 2, paramType: 'integer[3]'
+    startIndex = paramType.index('[')
+    endIndex = paramType.index(']')
+    size = int(paramType[startIndex+1:endIndex] or 0)
+    paramType = paramType[:startIndex] + paramType[endIndex+1:]
+    return ParamArray(paramId, paramType, size, **kwargs)
+
+class ParamArray(Param):
+    """
+    This is a special kind of parameter. It is a kind of wrapper that
+    adds the quality of being an array to any parameter.
+    Multidimensional arrays are handled by wrapping multiple parameters
+    recursively.    
+
+    Almost all method calls end up at the actual parameter. This class
+    only adds two new methods:
+    - getSize
+    - getParameter
+    And overrides one method:
+    - getType
+    """
+    def __init__(self, paramId, paramType, size, **kwargs):
+        self.__param = getParameter(paramId, paramType, **kwargs)
+        self.__size = size
+
+    def __getattr__(self, attr):
+        getattr(self.__param, attr)
+
+    def getType(self):
+        """
+        Always returns 'array'.
+        """
+        return 'array'
+
+    def getSize(self):
+        """
+        Return the size of this array. A size of 0 means that the size is
+        unspecified.
+        """
+        return self.__size
+
+    def getParameter(self):
+        """
+        Return the parameter that this array should have elements of.
+        """
+        return self.__param
+
 class ParamStore:
     def __init__(self, params=None):
         """

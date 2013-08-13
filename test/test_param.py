@@ -3,6 +3,7 @@ from inputpy.param import Param
 from inputpy.param import ParamStore
 from inputpy.param import DesignSpace
 from inputpy.param import Design
+from inputpy.param import getParameter
 
 class TestDesign(unittest.TestCase):
     def testCreateEmptyDesignWithoutId(self):
@@ -272,6 +273,50 @@ class TestParam(unittest.TestCase):
         self.assertTrue(param.isFixed())
         param.setFixed(None)
         self.assertFalse(param.isFixed())
+
+    def testIsArray(self):
+        params = (
+            getParameter('A', 'short'),
+            getParameter('A', 'integer'),
+            getParameter('A', 'boolean'),
+            getParameter('A', 'float'),
+        )
+        arrays = (
+            getParameter('A', 'short[]'),
+            getParameter('A', 'integer[2]'),
+            getParameter('A', 'boolean[][2]'),
+            getParameter('A', 'float[2][]'),
+            getParameter('A', 'long[2][1][3]'),
+        )
+        for p in params:
+            self.assertNotEqual('array', p.getType())
+        for p in arrays:
+            self.assertEqual('array', p.getType())
+            self.assertIsNotNone((), p.getParameter())
+            self.assertIsNotNone((), p.getSize())
+
+    def testGetParam(self):
+        reference = Param('A', 'integer', inclMin=3, fixed=4)
+        param = getParameter('A', 'integer', inclMin=3, fixed=4)
+        self.compareParameters(reference, param)
+
+        arrayParam = getParameter('A', 'integer[2]', inclMin=3, fixed=4)
+        self.assertEqual(2, arrayParam.getSize())
+        self.compareParameters(param, arrayParam.getParameter())
+
+        arrayParam2 = getParameter('A', 'integer[2][2]', inclMin=3, fixed=4)
+        self.compareParameters(arrayParam, arrayParam2.getParameter())
+
+    def compareParameters(self, reference, param):
+        self.assertEqual(reference.getId(), param.getId())
+        self.assertEqual(reference.getType(), param.getType())
+        self.assertEqual(reference.getMin(), param.getMin())
+        self.assertEqual(reference.getMax(), param.getMax())
+        self.assertEqual(reference.getFixedValue(), param.getFixedValue())
+        if param.getType() == 'array':
+            refChild = reference.getParameter()
+            paramChild = param.getParameter()
+            self.compareParameters(refChild, paramChild)
 
     def checkLimits(self, pa=None, iMin=None, eMin=None, iMax=None, eMax=None):
         args = pa or ('A', 'integer')
