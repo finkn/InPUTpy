@@ -502,3 +502,5 @@ class Design(Identifiable):
     def getValue(self, paramId):
         return util.getValue(paramId, self.params)
 
+    def setValue(self, paramId, value):
+        util.setValue(paramId, self.params, value)

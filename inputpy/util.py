@@ -153,10 +153,44 @@ def getValue(paramId, params):
     result = params.get(parts[0], None)
     if result is None:
         return params.get(paramId, None)
+    # Assumes an array.
     indexes = [int(i)-1 for i in parts[1:]]
     for i in indexes:
         result = result[i]
     return result
+
+# This function needs cleaning up!
+def setValue(paramId, params, value):
+    # Handle regular parameter ID without any dots.
+    if paramId.find('.') == -1:
+        if paramId in params:
+            params[paramId] = value
+            return
+        else:
+            raise KeyError('No parameter with ID %s exists.' % (paramId))
+    # Handle parameter ID with one or more dots.
+    # This may be a regular parameter after all, or it may be an array element.
+    parts = paramId.split('.')
+    result = params.get(parts[0], None)
+    if result is None:
+        if paramId in params:
+            params[paramId] = value
+            return
+        else:
+            raise KeyError('No parameter with ID %s exists.' % (paramId))
+
+    indexes = [int(i)-1 for i in parts[1:]]
+
+    target = result
+    for i in range(len(indexes) - 1):
+        index = indexes[0]
+        indexes = indexes[1:]
+        target = target[index]
+
+    try:
+        target[indexes[0]] = value
+    except TypeError:
+        raise KeyError('No parameter with ID %s exists.' % (paramId))
 
 def parseDimensions(typeString):
     """

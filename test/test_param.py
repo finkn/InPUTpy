@@ -47,6 +47,28 @@ class TestDesign(unittest.TestCase):
         self.assertEqual([2, 2, 2], design.getValue('A.2.1'))
         self.assertEqual(2, design.getValue('A.2.1.3'))
 
+    def testSetValue(self):
+        param1 = getParameter('A', 'integer[2][3]')
+        param2 = getParameter('B', 'float', inclMin=-1, inclMax=1)
+        space = DesignSpace(ParamStore((param1, param2)))
+        design = space.nextDesign('Design')
+
+        oldB = design.getValue('B')
+        design.setValue('B', 0)
+        newB = design.getValue('B')
+        self.assertNotEqual(oldB, newB) # Can fail, but extremely unlikely.
+        self.assertEqual(0, newB)
+
+        design.setValue('A.1', [0, 0, 0])
+        design.setValue('A.2', [1, 1, 1])
+        a = design.getValue('A')
+        self.assertEqual([0,0,0], a[0])
+        self.assertEqual([1,1,1], a[1])
+        design.setValue('A.2.3', 2)
+        a = design.getValue('A')
+        self.assertEqual([1,1,2], a[1])
+        self.assertEqual(2, a[1][2])
+
 class TestDesignSpace(unittest.TestCase):
     def testCreateEmptyDesignSpaceWithoutId(self):
         space = DesignSpace(None)

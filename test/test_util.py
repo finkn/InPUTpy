@@ -139,6 +139,47 @@ class TestMiscUtil(unittest.TestCase):
             for (key, value) in expected.items():
                 self.assertEqual(value, util.getValue(key, params))
 
+    def testSetValue(self):
+        tests = (
+            (
+                {'A': 'a', 'B': 43, },          # Parameters.
+                {'A': -99, 'B': 43, },          # Expected key-value mappings.
+            ),
+            (
+                {'A.1': 'a', 'B.2.3': 43, },    # Parameters.
+                {'A.1': -99, 'B.2.3': 43, },    # Expected key-value mappings.
+            ),
+            (
+                {'A': ['a', 'b', 'c', ], },     # Parameters.
+                {
+                    'A': [1, 2, 3],     # Expected key-value mappings.
+                    'A.1': -99,
+                    'A.3': 99,
+                },
+            ),
+            (
+                {'A': [[1, 2, 3], ['a', 'b', 'c']], 'A.1.1': 'ignored',},
+                {
+                    'A': [[1, 2, 3], ['a', 'b', 'c']],
+                    'A.1': [1, 2, 3],
+                    'A.2': ['c', 'b', 'a'],
+                    'A.1.1': 0,
+                    'A.2.3': 'z',
+                },
+            ),
+        )
+        with self.assertRaises(KeyError):
+            util.setValue('NonExistent', {}, 3)
+        with self.assertRaises(KeyError):
+            util.setValue('A.1', {}, 3)
+        with self.assertRaises(KeyError):
+            util.setValue('A.1.1', {'A': [1,2,3]}, 3)
+
+        for (params, expected) in tests:
+            for (key, value) in expected.items():
+                util.setValue(key, params, value)
+                self.assertEqual(value, util.getValue(key, params))
+
     def testParseDimensions(self):
         tests = (
             {'integer': []},
