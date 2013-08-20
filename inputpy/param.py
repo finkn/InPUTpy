@@ -457,7 +457,16 @@ class DesignSpace(Identifiable):
       mutability exception.
     """
 
-    def __init__(self, paramStore, spaceId=None):
+    # fileName is currently ignored.
+    def __init__(self, paramStore, spaceId=None, fileName=None):
+        """
+        An instance is always created using a ParamStore. A file name (if
+        specified) only indicates which file the DesignSpace is based on.
+        It will not be processed in any way.
+
+        To import a DesignSpace from a file, use the getDesignSpace
+        function.
+        """
         Identifiable.__init__(self, spaceId)
         self.params = paramStore or ParamStore()
         self.params.finalize()
@@ -465,7 +474,8 @@ class DesignSpace(Identifiable):
     def getSupportedParamIds(self):
         return self.params.getSupportedParamIds()
 
-    def next(self, paramId):
+    # All three keyword arguments are currently ignored.
+    def next(self, paramId, dimensions=None, subParams=None, actualParams=None):
         """
         Return a freshly generated value for the parameter ID. Any
         referenced parameters will be initialized as well, and nothing will
@@ -477,7 +487,8 @@ class DesignSpace(Identifiable):
         """
         return self.__initParam(paramId, {})[paramId]
 
-    def nextDesign(self, designId=None):
+    # readOnly is currently ignored.
+    def nextDesign(self, designId=None, readOnly=False):
         """
         Return a new design with freshly initialized parameters.
         """
@@ -514,6 +525,24 @@ class DesignSpace(Identifiable):
         that does not reference other parameters.
         """
         self.params.setFixed(paramId, value)
+
+
+    # -------------------------------------------------------------------------
+    # These are dummy implementations, taken from the first version of
+    # DesignSpace.
+    # -------------------------------------------------------------------------
+    def impOrt(self, importer):
+        return Design({})
+
+    def isFile(self):
+        return self.fileName is not None
+
+    def getFileName(self):
+        return self.fileName
+
+    def nextEmptyDesign(self, designId):
+        return Design({}, designId)
+    # -------------------------------------------------------------------------
 
 
 class Design(Identifiable):
