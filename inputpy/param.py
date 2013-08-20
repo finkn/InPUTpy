@@ -233,6 +233,22 @@ class Param(Identifiable):
         """
         return tuple(self.minDependees + self.maxDependees)
 
+    def __eq__(self, other):
+        if self.getId() != other.getId():
+            return False
+        if self.getType() != other.getType():
+            return False
+        if self.min != other.min:
+            return False
+        if self.max != other.max:
+            return False
+        if self.minDependees != other.minDependees:
+            return False
+        if self.maxDependees != other.maxDependees:
+            return False
+
+        return True
+
 # Factory.
 def getParameter(id, type, **kwargs):
     # This is not an array parameter.
@@ -286,6 +302,12 @@ class ParamArray():
         Return the parameter that this array should have elements of.
         """
         return self.__param
+
+    def __eq__(self, other):
+        if self.getSize() != other.getSize():
+            return False
+        return self.getParameter() == other.getParameter()
+
 
 class ParamStore:
     def __init__(self, params=None):

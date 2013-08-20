@@ -179,6 +179,26 @@ class TestParam(unittest.TestCase):
         arrayParam2 = getParameter('A', 'integer[2][2]', inclMin=3, fixed=4)
         self.compareParameters(arrayParam, arrayParam2.getParameter())
 
+    def testEqual(self):
+        param1 = getParameter('A', 'integer')
+        param2 = getParameter('A', 'integer')
+        self.assertEqual(param1, param2)
+        param2 = getParameter('A', 'integer', inclMin=3)
+        self.assertNotEqual(param1, param2)
+        param1 = getParameter('A', 'integer', inclMin=3)
+        self.assertEqual(param1, param2)
+
+    def testEqualArrays(self):
+        param1 = getParameter('A', 'integer[2]')
+        param2 = getParameter('A', 'integer[2]')
+        self.assertEqual(param1, param2)
+        param2 = getParameter('A', 'integer[3]')
+        self.assertNotEqual(param1, param2)
+        param1 = getParameter('A', 'integer[3]', inclMax=3)
+        self.assertNotEqual(param1, param2)
+        param2 = getParameter('A', 'integer[3]', inclMax=3)
+        self.assertEqual(param1, param2)
+
     def compareParameters(self, reference, param):
         self.assertEqual(reference.getId(), param.getId())
         self.assertEqual(reference.getType(), param.getType())
