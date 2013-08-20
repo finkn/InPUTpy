@@ -1,8 +1,8 @@
 import unittest
 from inputpy.param import Param
 from inputpy.param import ParamStore
-from inputpy.param import DesignSpace
 from inputpy.param import getParameter
+from inputpy.designspace import DesignSpace
 
 class TestDesignSpace(unittest.TestCase):
     def testCreateEmptyDesignSpaceWithoutId(self):
