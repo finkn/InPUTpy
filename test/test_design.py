@@ -12,7 +12,7 @@ class TestDesign(unittest.TestCase):
         self.assertIsNotNone(design.getId())
 
     def testCreateEmptyDesignWithId(self):
-        design = Design({}, 'Design')
+        design = Design({}, designId='Design')
         self.assertEqual('Design', design.getId())
 
     def testGetParameterValue(self):
@@ -105,6 +105,13 @@ class TestDesign(unittest.TestCase):
         with self.assertRaises(InPUTException):
             design.extendScope(design)
 
+    def testGetSpace(self):
+        ps = ParamStore()
+        ps.addParam(Param('A', 'integer', inclMin=1, inclMax=1))
+        ps.addParam(Param('B', 'integer', exclMin=1, exclMax=3))
+        space = DesignSpace(ps)
+        design = Design({}, space, 'Design')
+        self.assertEqual(space, design.getSpace())
 
 if __name__ == '__main__':
     unittest.main()

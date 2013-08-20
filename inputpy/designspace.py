@@ -73,7 +73,7 @@ class DesignSpace(Identifiable):
 
         for paramId in top:
             params = self.__initParam(paramId, params)
-        return Design(params, designId)
+        return Design(params, self, designId)
 
     def __initParam(self, paramId, init):
         """
@@ -104,7 +104,7 @@ class DesignSpace(Identifiable):
         return self.fileName
 
     def nextEmptyDesign(self, designId=None):
-        return Design({}, designId)
+        return Design({}, self, designId)
 
     # -------------------------------------------------------------------------
     # This is a dummy implementation, taken from the first version of

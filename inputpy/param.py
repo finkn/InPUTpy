@@ -442,11 +442,12 @@ class ParamStore:
 
 
 class Design(Identifiable):
-    def __init__(self, params, designId=None, readOnly=False):
+    def __init__(self, params, designSpace=None, designId=None, readOnly=False):
         Identifiable.__init__(self, designId)
         self.params = params
         self.__readOnly = readOnly
         self.__ext = [self]
+        self.space = designSpace
 
     def getValue(self, paramId):
         result = None
@@ -476,13 +477,13 @@ class Design(Identifiable):
             raise InPUTException('The design is already extending this design')
         self.__ext.append(design)
 
+    def getSpace(self):
+        return self.space
+
     # -------------------------------------------------------------------------
     # These are dummy implementations, taken from the first version of Design.
     # -------------------------------------------------------------------------
     def export(self, exporter):
-        pass
-
-    def getSpace(self):
         pass
 
     # Unsure of what exactly same does.
