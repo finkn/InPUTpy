@@ -38,6 +38,7 @@ class DesignSpace(Identifiable):
         function.
         """
         Identifiable.__init__(self, spaceId)
+        self.fileName = fileName
         self.params = paramStore or ParamStore()
         self.params.finalize()
 
@@ -96,22 +97,21 @@ class DesignSpace(Identifiable):
         """
         self.params.setFixed(paramId, value)
 
-
-    # -------------------------------------------------------------------------
-    # These are dummy implementations, taken from the first version of
-    # DesignSpace.
-    # -------------------------------------------------------------------------
-    def impOrt(self, importer):
-        return Design({})
-
     def isFile(self):
         return self.fileName is not None
 
     def getFileName(self):
         return self.fileName
 
-    def nextEmptyDesign(self, designId):
+    def nextEmptyDesign(self, designId=None):
         return Design({}, designId)
+
+    # -------------------------------------------------------------------------
+    # This is a dummy implementation, taken from the first version of
+    # DesignSpace.
+    # -------------------------------------------------------------------------
+    def impOrt(self, importer):
+        return Design({})
     # -------------------------------------------------------------------------
 
     def __eq__(self, other):

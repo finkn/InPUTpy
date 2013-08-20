@@ -156,6 +156,32 @@ class TestDesignSpace(unittest.TestCase):
         space2 = factory(fileName)
         self.assertEqual(space1, space2)
 
+    def testIsFileShouldBeFalseWhenNoFileWasGiven(self):
+        space = DesignSpace(ParamStore())
+        self.assertFalse(space.isFile())
+
+    def testIsFileShouldBeTrueWhenFileWasGiven(self):
+        space = DesignSpace(ParamStore(), fileName='something.xml')
+        self.assertTrue(space.isFile())
+
+    def testIsFileShouldBeTrueWhenImportingFromAFile(self):
+        factory = PresetDesignSpaceFactory.getDesignSpace
+        space = factory('simpleIntegerParameterSpace.xml')
+        self.assertTrue(space.isFile())
+
+    def testGetFile(self):
+        space = DesignSpace(ParamStore(), fileName='something.xml')
+        self.assertEqual(space.getFileName(), 'something.xml')
+
+    def testNextEmptyDesign(self):
+        factory = PresetDesignSpaceFactory.getDesignSpace
+        space = factory('simpleIntegerParameterSpace.xml')
+        design = space.nextEmptyDesign('some design ID')
+        self.assertEqual(design.getId(), 'some design ID')
+        # Trying to fetch parameter values doesn't make sense since there
+        # is no way of distinguishing between an uninitialized and a
+        # nonexistent parameter.
+
 
 if __name__ == '__main__':
     unittest.main()
