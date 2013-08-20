@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<i:DesignSpace
+    id="advancedInteger"
+    xmlns:i="http://TheInPUT.org/DesignSpace"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://TheInPUT.org/DesignSpace http://theinput.org/DesignSpace.xsd" >
+
+    <!--
+        Trying out parameters with simple and complex expressions, with and
+        without dependencies to other parameters.
+        Ranges with and without matching min/max limits.
+        Fixed values can also be expressions with or without dependencies.
+
+        Note that InPUTpy is expected to work slightly differently compared to
+        InPUT4j:
+        - Fixed values cannot be expressions in InPUT4j.
+        - Simple parameter references "Z" are problematic in InPUT4j.
+        - Simple arithmetic expressions "1 + 2" are problematic in InPUT4j.
+    -->
+
+    <!--
+        Only using literal constants.
+    -->
+    <!-- 3 -->
+    <i:NParam type="integer" id="A" inclMin="1 + 2" />
+    <!-- 6 -->
+    <i:NParam type="integer" id="B" inclMin="(1 + 2) + 3" />
+    <!-- 2.0 -->
+    <i:NParam type="integer" id="C" inclMin="4 * 3 / 2 + 1 - (2 + 3)" />
+    <!-- 5.0 -->
+    <i:NParam type="integer" id="D" inclMin="4 * (3 / (2 + 1)) - 2 + 3" />
+    <!-- 4.0 -->
+    <i:NParam type="integer" id="E" inclMin="(4 * 3) / (2 + (-1 - (1 - 3)))" />
+    <!-- 4.0 -->
+    <i:NParam type="integer" id="F" inclMin="(4*3)/(2+(-1-(1-3)))" />
+
+    <!--
+        Using math library functions and constants.
+        These are adapted to be compatible with the Python math library by
+        using lower case letters for constants (pi and e). Currently, only
+        the upper case "Math" to "math" translation is handled.
+    -->
+    <!-- -1.0 -->
+    <i:NParam type="integer" id="G" inclMin="Math.cos(Math.pi)" />
+    <!-- 0.5 -->
+    <i:NParam type="integer" id="H" inclMin="Math.exp(Math.cos(Math.pi*2)) / (Math.e * 2)" />
+
+
+    <!--
+        Expressions involving other parameters.
+    -->
+    <!-- 2 -->
+    <i:NParam type="integer" id="I" inclMin="Y" />
+    <!-- 2 -->
+    <i:NParam type="integer" id="J" inclMin="Z" />
+    <!-- 4 -->
+    <i:NParam type="integer" id="K" inclMin="Z + Y" />
+    <!-- 2.0 -->
+    <i:NParam type="integer" id="L" inclMin="(Z + Y) * Z / ((4 + Y) - Z)" />
+    <!-- 0.5 -->
+    <i:NParam type="integer" id="M" inclMin="Math.exp(Math.cos(Z*2)) / (Math.e * Y)" />
+
+
+    <!--
+        Fixed parameters with expressions.
+    -->
+    <!-- 3 -->
+    <i:NParam type="integer" id="N" fixed="1 + 2" />
+    <!-- 4.0 -->
+    <i:NParam type="integer" id="O" inclMin="(4 * 3) / (2 + (-1 - (1 - 3)))" />
+    <!-- 0.5 -->
+    <i:NParam type="integer" id="P" inclMin="Math.exp(Math.cos(Math.pi*2)) / (Math.e * 2)" />
+
+    <!-- Two different parameters "fixed" to 2. -->
+    <i:NParam type="integer" id="Y" inclMin="2" inclMax="2" />
+    <i:NParam type="integer" id="Z" fixed="2" />
+
+</i:DesignSpace>

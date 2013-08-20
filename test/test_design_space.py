@@ -3,6 +3,8 @@ from inputpy.param import Param
 from inputpy.param import ParamStore
 from inputpy.param import getParameter
 from inputpy.designspace import DesignSpace
+from inputpy.factories import XMLFactory
+from test.tools import PresetDesignSpaceFactory
 
 class TestDesignSpace(unittest.TestCase):
     def testCreateEmptyDesignSpaceWithoutId(self):
@@ -130,6 +132,29 @@ class TestDesignSpace(unittest.TestCase):
         space6 = DesignSpace(ps3, 'space')
         self.assertNotEqual(space4, space5)
         self.assertEqual(space5, space6)
+
+    def testFakeFactory(self):
+        fileName = 'simpleIntegerParameterSpace.xml'
+        factory = PresetDesignSpaceFactory.getDesignSpace
+        space = factory(fileName)
+        self.assertEqual('simpleInteger', space.getId())
+        self.assertEqual(17, len(space.getSupportedParamIds()))
+
+    def testImportSimpleIntegerParameterSpace(self):
+        fileName = 'simpleIntegerParameterSpace.xml'
+        factory = XMLFactory.getDesignSpace
+        space1 = factory(fileName)
+        factory = PresetDesignSpaceFactory.getDesignSpace
+        space2 = factory(fileName)
+        self.assertEqual(space1, space2)
+
+    def testImportAdvancedIntegerParameterSpace(self):
+        fileName = 'advancedIntegerParameterSpace.xml'
+        factory = XMLFactory.getDesignSpace
+        space1 = factory(fileName)
+        factory = PresetDesignSpaceFactory.getDesignSpace
+        space2 = factory(fileName)
+        self.assertEqual(space1, space2)
 
 
 if __name__ == '__main__':

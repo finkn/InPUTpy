@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<i:DesignSpace
+    id="simpleInteger"
+    xmlns:i="http://TheInPUT.org/DesignSpace"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://TheInPUT.org/DesignSpace http://theinput.org/DesignSpace.xsd" >
+
+    <!--
+        Various combinations of limits.
+        We want to mix incl/excl min/max limits and no limits.
+        0 is also an important limit because it could be interpreted as
+        False, and therefore "no limit".
+        Floating point values are also allowed. These will be truncated.
+    -->
+    <i:NParam type="integer" id="A" />
+    <i:NParam type="integer" id="B" inclMin="1" />
+    <i:NParam type="integer" id="C" inclMax="1" />
+    <i:NParam type="integer" id="D" exclMin="1" />
+    <i:NParam type="integer" id="E" exclMax="1" />
+    <i:NParam type="integer" id="F" inclMin="1" inclMax="3" />
+    <i:NParam type="integer" id="G" exclMin="1" exclMax="3" />
+    <i:NParam type="integer" id="H" inclMin="1" exclMax="3" />
+    <i:NParam type="integer" id="I" exclMin="1" inclMax="3" />
+    <i:NParam type="integer" id="J" exclMin="0" inclMax="3" />
+    <i:NParam type="integer" id="K" exclMin="-1" inclMax="0" />
+    <i:NParam type="integer" id="L" inclMin="0" inclMax="0" />
+
+    <!-- Fixed values. -->
+    <i:NParam type="integer" id="M" fixed="43" />
+    <i:NParam type="integer" id="N" inclMin="1" fixed="43" />
+    <i:NParam type="integer" id="O" inclMin="1" inclMax="3" fixed="43" />
+
+    <!-- Truncating float values. -->
+    <i:NParam type="integer" id="P" fixed="2.9" />
+    <i:NParam type="integer" id="Q" inclMin="0.1" inclMax="1.9" />
+
+</i:DesignSpace>
