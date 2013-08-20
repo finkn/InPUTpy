@@ -15,6 +15,8 @@ from inputpy.util import Evaluator
 from inputpy.util import initOrder
 import inputpy.generators as generator
 import inputpy.util as util
+# Only needed by Design.
+from inputpy.exceptions import InPUTException
 
 class Identifiable:
     """
@@ -440,12 +442,18 @@ class ParamStore:
 
 
 class Design(Identifiable):
-    def __init__(self, params, designId=None):
+    def __init__(self, params, designId=None, readOnly=False):
         Identifiable.__init__(self, designId)
         self.params = params
+        self.__readOnly = readOnly
 
     def getValue(self, paramId):
         return util.getValue(paramId, self.params)
 
     def setValue(self, paramId, value):
+        if self.__readOnly:
+            raise InPUTException('Cannot set value on a read-only Design')
         util.setValue(paramId, self.params, value)
+
+    def setReadOnly(self):
+        self.__readOnly = True

@@ -4,6 +4,7 @@ from inputpy.param import ParamStore
 from inputpy.param import Design
 from inputpy.param import getParameter
 from inputpy.designspace import DesignSpace
+from inputpy.exceptions import InPUTException
 
 class TestDesign(unittest.TestCase):
     def testCreateEmptyDesignWithoutId(self):
@@ -68,6 +69,13 @@ class TestDesign(unittest.TestCase):
         a = design.getValue('A')
         self.assertEqual([1,1,2], a[1])
         self.assertEqual(2, a[1][2])
+
+    def testSetReadOnly(self):
+        design = Design({'A': 1})
+        design.setValue('A', 2)
+        design.setReadOnly()
+        with self.assertRaises(InPUTException):
+            design.setValue('A', 1)
 
 
 if __name__ == '__main__':
