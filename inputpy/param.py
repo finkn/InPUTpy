@@ -234,17 +234,17 @@ class Param(Identifiable):
         return tuple(self.minDependees + self.maxDependees)
 
 # Factory.
-def getParameter(paramId, paramType, **kwargs):
+def getParameter(id, type, **kwargs):
     # This is not an array parameter.
-    if paramType.find('[') == -1:
-        return Param(paramId, paramType, **kwargs)
+    if type.find('[') == -1:
+        return Param(id, type, **kwargs)
 
     # 'integer[2][3]' should become size: 2, paramType: 'integer[3]'
-    startIndex = paramType.index('[')
-    endIndex = paramType.index(']')
-    size = int(paramType[startIndex+1:endIndex] or 0)
-    paramType = paramType[:startIndex] + paramType[endIndex+1:]
-    return ParamArray(paramId, paramType, size, **kwargs)
+    startIndex = type.index('[')
+    endIndex = type.index(']')
+    size = int(type[startIndex+1:endIndex] or 0)
+    type = type[:startIndex] + type[endIndex+1:]
+    return ParamArray(id, type, size, **kwargs)
 
 class ParamArray():
     """
