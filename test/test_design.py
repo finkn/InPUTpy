@@ -77,6 +77,11 @@ class TestDesign(unittest.TestCase):
         with self.assertRaises(InPUTException):
             design.setValue('A', 1)
 
+    def testSetReadOnlyInConstructor(self):
+        design = Design({'A': 1}, readOnly=True)
+        with self.assertRaises(InPUTException):
+            design.setValue('A', 2)
+
     def testExtendScope(self):
         design = Design({'A': 1})
         extending = Design({'B': 2})
