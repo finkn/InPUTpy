@@ -446,9 +446,14 @@ class Design(Identifiable):
         Identifiable.__init__(self, designId)
         self.params = params
         self.__readOnly = readOnly
+        self.__ext = [self]
 
     def getValue(self, paramId):
-        return util.getValue(paramId, self.params)
+        result = None
+        for d in self.__ext:
+            result = util.getValue(paramId, d.params)
+            if result is not None:
+                return result
 
     def setValue(self, paramId, value):
         if self.__readOnly:
@@ -457,3 +462,14 @@ class Design(Identifiable):
 
     def setReadOnly(self):
         self.__readOnly = True
+
+    def extendScope(self, design):
+        if design is None:
+            raise InPUTException('Cannot extend design with None')
+        # This case is automatically handled by the next one, but checking
+        # this explicitly allows for a more informative error message.
+        if design is self:
+            raise InPUTException('Cannot extend design with itself')
+        if design in self.__ext:
+            raise InPUTException('The design is already extending this design')
+        self.__ext.append(design)

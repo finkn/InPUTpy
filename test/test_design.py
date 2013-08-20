@@ -77,6 +77,29 @@ class TestDesign(unittest.TestCase):
         with self.assertRaises(InPUTException):
             design.setValue('A', 1)
 
+    def testExtendScope(self):
+        design = Design({'A': 1})
+        extending = Design({'B': 2})
+        design.extendScope(extending)
+        self.assertEqual(design.getValue('B'), extending.getValue('B'))
+
+    def testExtendScopeWithNoneDesignShouldFail(self):
+        design = Design({'A': 1})
+        with self.assertRaises(InPUTException):
+            design.extendScope(None)
+
+    def testExtendScopeWithExistingDesignShouldFail(self):
+        design = Design({'A': 1})
+        extending = Design({'B': 2})
+        design.extendScope(extending)
+        with self.assertRaises(InPUTException):
+            design.extendScope(extending)
+
+    def testExtendScopeWithSelfShouldFail(self):
+        design = Design({'A': 1})
+        with self.assertRaises(InPUTException):
+            design.extendScope(design)
+
 
 if __name__ == '__main__':
     unittest.main()
