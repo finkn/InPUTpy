@@ -113,6 +113,24 @@ class TestDesignSpace(unittest.TestCase):
         result = space.next('A')
         self.assertEqual(expected, result)
 
+    def testEqual(self):
+        param1 = getParameter('A', 'integer')
+        param2 = getParameter('B', 'integer')
+        param3 = getParameter('A', 'integer', inclMin=1)
+        ps1 = ParamStore((param1, param2))
+        ps2 = ParamStore((param1, param2, param3))
+        ps3 = ParamStore((param1, param2, param3))  # Same as ps2
+        space1 = DesignSpace(ps1, 'space 1')
+        space2 = DesignSpace(ps1, 'space 2')
+        space3 = DesignSpace(ps1, 'space 1')
+        self.assertNotEqual(space1, space2)
+        self.assertEqual(space1, space3)
+        space4 = DesignSpace(ps1, 'space')
+        space5 = DesignSpace(ps2, 'space')
+        space6 = DesignSpace(ps3, 'space')
+        self.assertNotEqual(space4, space5)
+        self.assertEqual(space5, space6)
+
 
 if __name__ == '__main__':
     unittest.main()

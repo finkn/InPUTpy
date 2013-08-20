@@ -544,6 +544,18 @@ class DesignSpace(Identifiable):
         return Design({}, designId)
     # -------------------------------------------------------------------------
 
+    def __eq__(self, other):
+        if self.getId() != other.getId():
+            return False
+        paramKeys1 = self.getSupportedParamIds()
+        paramKeys2 = other.getSupportedParamIds()
+        if paramKeys1 != paramKeys2:
+            return False
+        for key in paramKeys1:
+            if self.params.getParam(key) != other.params.getParam(key):
+                return False
+        return True
+
 
 class Design(Identifiable):
     def __init__(self, params, designId=None):
