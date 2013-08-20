@@ -463,6 +463,8 @@ class Design(Identifiable):
     def setReadOnly(self):
         self.__readOnly = True
 
+    # Not sure if these special cases should raise an exception or if the
+    # operation should simply be ignored.
     def extendScope(self, design):
         if design is None:
             raise InPUTException('Cannot extend design with None')
@@ -473,3 +475,17 @@ class Design(Identifiable):
         if design in self.__ext:
             raise InPUTException('The design is already extending this design')
         self.__ext.append(design)
+
+    # -------------------------------------------------------------------------
+    # These are dummy implementations, taken from the first version of Design.
+    # -------------------------------------------------------------------------
+    def export(self, exporter):
+        pass
+
+    def getSpace(self):
+        pass
+
+    # Unsure of what exactly same does.
+    def same(self, design):
+        pass
+    # -------------------------------------------------------------------------
