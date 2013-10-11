@@ -113,5 +113,29 @@ class TestDesign(unittest.TestCase):
         design = Design({}, space, 'Design')
         self.assertEqual(space, design.getSpace())
 
+    def testEmptySParamDesign(self):
+        from inputpy.mapping import Mapping
+        ps = ParamStore()
+        emptyMapping = Mapping('Empty', 'test.types.simple.EmptyClass')
+        emptyParam = getParameter('Empty', 'SParam', mapping=emptyMapping)
+        ps.addParam(emptyParam)
+        space = DesignSpace(ps)
+        design = space.nextDesign('Design')
+        self.assertIsNotNone(design.getValue('Empty'))
+
+    def testPointSParamDesign(self):
+        from inputpy.mapping import Mapping
+        x = getParameter('X', 'integer', inclMin=2, inclMax=2)
+        y = getParameter('Y', 'integer', inclMin=3, inclMax=3)
+        ps = ParamStore([x, y])
+        pointMapping = Mapping('Point', 'test.types.geo.Point', 'X Y')
+        pointParam = getParameter('Point', 'SParam', nested=[x, y], mapping=pointMapping)
+        ps.addParam(pointParam)
+        space = DesignSpace(ps)
+        design = space.nextDesign('Design')
+        p = design.getValue('Point')
+        self.assertEqual(2, p.getX())
+        self.assertEqual(3, p.getY())
+
 if __name__ == '__main__':
     unittest.main()

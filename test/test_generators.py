@@ -2,6 +2,10 @@ import unittest
 import inputpy.generators as generator
 from inputpy.param import Param
 from inputpy.param import getParameter
+from test.types.simple import EmptyClass
+from test.types.geo import Point
+from inputpy.mapping import Mapping
+#from inputpy.mapping import CodeMapping
 
 class TestGenerators(unittest.TestCase):
 
@@ -100,6 +104,28 @@ class TestGenerators(unittest.TestCase):
         for p in params:
             result = generator.nextValue(p)
             self.checkDimensions(result, sizes)
+
+    def testSParamGenerator(self):
+        dep = {'X': 2, 'Y': 3}
+        nested = [
+            getParameter('X', 'integer', inclMin=2, inclMax=2),
+            getParameter('Y', 'integer', inclMin=3, inclMax=3),
+        ]
+        pointMapping = Mapping('Point', 'test.types.geo.Point', 'X Y')
+        emptyMapping = Mapping('Empty', 'test.types.simple.EmptyClass')
+        pointParam = getParameter('Point', 'SParam', nested=nested, mapping=pointMapping)
+        emptyParam = getParameter('Empty', 'SParam', nested=[], mapping=emptyMapping)
+        self.assertIsNotNone(emptyParam.getMapping())
+        self.assertIsNotNone(pointParam.getMapping())
+
+        expectedPoint = Point(2, 3)
+        expectedEmpty = EmptyClass()
+        empty = generator.nextValue(emptyParam)
+        point = generator.nextValue(pointParam, dep)
+        self.assertIsInstance(empty, EmptyClass)
+        self.assertIsInstance(point, Point)
+        self.assertEqual(2, point.getX())
+        self.assertEqual(3, point.getY())
 
     def checkDimensions(self, array, sizes):
         size = sizes[0]

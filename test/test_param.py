@@ -199,6 +199,30 @@ class TestParam(unittest.TestCase):
         param2 = getParameter('A', 'integer[3]', inclMax=3)
         self.assertEqual(param1, param2)
 
+    def testSParamWithoutNestedParameters(self):
+        param = getParameter('A', 'SParam', nested=())
+        self.assertEqual('A', param.getId())
+        self.assertEqual('SParam', param.getType())
+        self.assertEqual((), param.getNestedParameters())
+
+    def testSParamWithNestedParameters(self):
+        # A could be a Point object for example, with X and Y
+        # NParam nested parameters.
+        x = getParameter('X', 'integer')
+        y = getParameter('Y', 'integer')
+        param = getParameter('A', 'SParam', nested=(x, y))
+        self.assertEqual('A', param.getId())
+        self.assertEqual('SParam', param.getType())
+        self.assertEqual((x, y), param.getNestedParameters())
+        self.assertCountEqual(('X', 'Y'), param.getDependees())
+
+    def testSParamWithMultipleNestingLevels(self):
+        x = getParameter('X', 'integer')
+        y = getParameter('Y', 'integer')
+        a = getParameter('A', 'SParam', nested=(x, y))
+        b = getParameter('B', 'SParam', nested=(a, y))
+        self.assertCountEqual(('A', 'Y'), b.getDependees())
+
     def compareParameters(self, reference, param):
         self.assertEqual(reference.getId(), param.getId())
         self.assertEqual(reference.getType(), param.getType())

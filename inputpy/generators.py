@@ -15,6 +15,7 @@ defining the min and max ranges for those types.
 import random
 from inputpy.exceptions import InPUTException
 from inputpy.util import Evaluator
+from inputpy import mapping
 
 # Constants for type names.
 SHORT = 'short'
@@ -26,6 +27,7 @@ NUMERIC = 'numeric'
 BOOLEAN = 'boolean'
 # Not a defined type in InPUT. This is used internally in InPUTpy.
 ARRAY = 'array'
+SPARAM = 'SParam'
 
 # Maps the string description to a range.
 RANGE_MAP = {
@@ -153,6 +155,30 @@ class ArrayGenerator(ValueGenerator):
     def isValid(cls, param, dep={}):
         return True
 
+class SParamGenerator(ValueGenerator):
+    @classmethod
+    def nextValue(cls, param, dep={}):
+        args = []
+        paramMapping = param.getMapping()
+        for d in paramMapping.getDependencies():
+            args.append(dep[d])
+
+        # Update Mapping to make getType return the actual type.
+        t = mapping.getType(paramMapping.getTypeName())
+        # TODO:
+        # Go through nested parameters, looking for any setters.
+        # Invoke the setter with the nested parameter value as an argument
+        # in order to initialize the corresponding field.
+        # All nested parameters must be set, either using the constructor
+        # or using a setter method.
+
+        # This works as long as all nested parameters are set by constructor.
+        return t(*args)
+
+    @classmethod
+    def isValid(cls, param, dep={}):
+        return True    # Is it?
+
 
 GENERATORS = {}
 for k in INT_TYPES:
@@ -161,6 +187,7 @@ for k in FLOAT_TYPES:
     GENERATORS[k] = FloatGenerator
 GENERATORS[BOOLEAN] = BoolGenerator
 GENERATORS[ARRAY] = ArrayGenerator
+GENERATORS[SPARAM] = SParamGenerator
 
 def nextValue(param, dep={}):
     """

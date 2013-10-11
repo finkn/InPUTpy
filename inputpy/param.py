@@ -254,7 +254,9 @@ class Param(Identifiable):
 # Factory.
 def getParameter(id, type, **kwargs):
     # This is not an array parameter.
-    if type.find('[') == -1:
+    if type == 'SParam':
+        return SParam(id, type, **kwargs)
+    elif type.find('[') == -1:
         return Param(id, type, **kwargs)
 
     # 'integer[2][3]' should become size: 2, paramType: 'integer[3]'
@@ -263,6 +265,30 @@ def getParameter(id, type, **kwargs):
     size = int(type[startIndex+1:endIndex] or 0)
     type = type[:startIndex] + type[endIndex+1:]
     return ParamArray(id, type, size, **kwargs)
+
+class SParam(Identifiable):
+    def __init__(self, id, type, nested=[], mapping=None):
+        Identifiable.__init__(self, id)
+        self.id = id
+        self.type = type
+        self.nested = nested
+        self.mapping = mapping
+        self.dependees = [p.getId() for p in self.nested]
+
+    def getType(self):
+        return self.type
+
+    def getNestedParameters(self):
+        return self.nested
+
+    def getDependees(self):
+        return self.dependees
+
+    def getMapping(self):
+        return self.mapping
+
+    def isDependent(self):
+        return len(self.nested) > 0
 
 class ParamArray():
     """
