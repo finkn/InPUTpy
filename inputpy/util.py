@@ -72,8 +72,7 @@ class Evaluator:
         mode    -- the evaluation mode (default 'js')
         """
         ns = dict(params)
-        for (k, v) in cls.getSafeNamespace(mode).items():
-            ns[k] = v
+        ns.update(cls.getSafeNamespace(mode))
         return eval(exp, ns)
 
     @classmethod
@@ -105,7 +104,7 @@ def depLen(params, paramId, dependents=None):
     # on itself, which means that we've found a circular dependency.
     dependents = list(dependents or [])
     if paramId in dependents:
-        raise ValueError('Detected circular dependency')
+        raise ValueError('Detected circular dependency for ' + paramId)
     dependents.append(paramId)
 
     dep = params[paramId]
@@ -146,13 +145,13 @@ def getValue(paramId, params):
     """
     # Handle regular parameter ID without any dots.
     if paramId.find('.') == -1:
-        return params.get(paramId, None)
+        return params.get(paramId)
     # Handle parameter ID with one or more dots.
     # This may be a regular parameter after all, or it may be an array element.
     parts = paramId.split('.')
-    result = params.get(parts[0], None)
+    result = params.get(parts[0])
     if result is None:
-        return params.get(paramId, None)
+        return params.get(paramId)
     # Assumes an array.
     indexes = [int(i)-1 for i in parts[1:]]
     for i in indexes:
@@ -171,7 +170,7 @@ def setValue(paramId, params, value):
     # Handle parameter ID with one or more dots.
     # This may be a regular parameter after all, or it may be an array element.
     parts = paramId.split('.')
-    result = params.get(parts[0], None)
+    result = params.get(parts[0])
     if result is None:
         if paramId in params:
             params[paramId] = value
