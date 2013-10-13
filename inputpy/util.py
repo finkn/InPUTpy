@@ -207,3 +207,40 @@ def parseDimensions(typeString):
             p = '0'
         result.append(int(p))
     return result
+
+def expandParameterScope(contextId):
+    """
+    Return a parameter ID that represents an outer scope, or None if the
+    scope cannot be expanded further (the context is already at the root).
+    See info on findAbsoluteParameter for more details.
+    This function basically does a '$ cd ..'.
+    """
+    index = contextId.rfind('.')
+    if index == -1:
+        return None
+    else:
+        return contextId[:index]
+
+def findAbsoluteParameter(contextId, paramId, ids):
+    """
+    Return the absolute name of a parameter, relative to a context.
+    The contextId parameter specifies a scope by naming a parameter
+    relative to which some other parameter might be located.
+    The scope is expanded more and more until the absolute path matches
+    one of the given valid IDs.
+
+    The contextId is always absolute. IDs in the ids collection are
+    always absolute. The paramId may be absolute or relative.
+    """
+    if contextId is None:
+        param = paramId
+    else:
+        param = contextId + '.' + paramId
+
+    if param in ids:
+        return param
+    elif contextId is None:
+        return None
+    else:
+        contextId = expandParameterScope(contextId)
+        return findAbsoluteParameter(contextId, paramId, ids)

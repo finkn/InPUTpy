@@ -196,6 +196,42 @@ class TestMiscUtil(unittest.TestCase):
                 result = util.parseDimensions(key)
                 self.assertEqual(expected, result)
 
+    def testExpandParameterScope(self):
+        tests = (
+            ('T1.P1.X', 'T1.P1'),
+            ('P1.X', 'P1'),
+            ('P1', None),
+        )
+        for t in tests:
+            self.assertEqual(t[1], util.expandParameterScope(t[0]))
+
+    def testFindAbsoluteParameter(self):
+        ids = [
+            'X', 'Y', 'P1', 'P4', 'T1', 'T2',
+            'P1.X', 'P1.Y', 'P4.X', 'P4.Y',
+            'T1.P1', 'T1.P2', 'T1.P3', 'T2.P1', 'T2.P2', 'T2.P3',
+            'T1.P1.X', 'T1.P1.Y', 'T1.P2.X', 'T1.P2.Y', 'T1.P3.X', 'T1.P3.Y',
+            'T2.P1.X', 'T2.P1.Y', 'T2.P2.X', 'T2.P2.Y', 'T2.P3.X', 'T2.P3.Y',
+        ]
+        tests = (
+            # Using relative names when possible.
+            (('P1', 'X'), 'P1.X'),
+            (('T1.P1', 'X'), 'T1.P1.X'),
+            (('T1', 'P1'), 'T1.P1'),
+            (('T1', 'P4'), 'P4'),
+            (('T1', 'T2.P1'), 'T2.P1'), # Relative name not possible here.
+            (('T1', 'X'), 'X'),
+            # Using absolute names even when not required.
+            (('T1', 'T1.P1.X'), 'T1.P1.X'),
+            # Referring to a nested scope.
+            (('T1.P1', 'P2'), 'T1.P2'),
+            (('T1.P1.Y', 'P2.X'), 'T1.P2.X'),
+            (('T1.P1.Y', 'X'), 'T1.P1.X'),
+        )
+        for t in tests:
+            args = (t[0][0], t[0][1], ids)
+            self.assertEqual(t[1], util.findAbsoluteParameter(*args))
+
 
     def checkInitOrder(self, dep):
         dependencies = dep[0]
