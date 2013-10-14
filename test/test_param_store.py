@@ -1,6 +1,7 @@
 import unittest
 from inputpy.param import Param
 from inputpy.param import ParamStore
+from inputpy.param import getParameter
 
 class TestParamStore(unittest.TestCase):
     def testAddMultipleParameters(self):
@@ -88,6 +89,15 @@ class TestParamStore(unittest.TestCase):
             ps.addParam(Param('B', 'integer', inclMin='C'))
             ps.addParam(Param('C', 'integer', inclMin='A'))
             ps.finalize()
+
+    def testAddSParams(self):
+        x = getParameter('X', 'integer', parentId='A.B')
+        y = getParameter('Y', 'integer', parentId='A.B')
+        b = getParameter('B', 'SParam', nested=(x, y), parentId='A')
+        a = getParameter('A', 'SParam', nested=(b,))
+        ps = ParamStore([a, b])
+        initOrder = ps.getInitializationOrder()
+        self.assertCountEqual(('A.B.X', 'A.B.Y'), initOrder[0])
 
     def checkRangeErrors(self, kwargs, pa=None):
         args = pa or ('A', 'integer')

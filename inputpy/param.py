@@ -401,10 +401,12 @@ class ParamStore:
             for p in param:
                 self.addParam(p)
         except TypeError:
-            paramId = param.getId()
-            self.__params[paramId] = param
+            self.__params[param.getAbsoluteId()] = param
             # Update dependencies as new parameters are added.
-            self.__dep[paramId] = param.getDependees()
+            self.__dep[param.getAbsoluteId()] = param.getDependees()
+
+            if param.getType() == 'SParam':
+                self.addParam(param.getNestedParameters())
 
     def getParam(self, paramId):
         """
@@ -428,6 +430,20 @@ class ParamStore:
         """
         if self.__finalized:
             return
+        # Update dependencies so that all are absolute.
+        absoluteDependencies = {}
+        ids = self.__params.keys()
+        for (k, v) in self.__dep.items():
+            l = []
+            for p in v:
+                absolute = util.findAbsoluteParameter(k, p, ids)
+                l.append(absolute)
+                if absolute is None:
+                    msg = '%s referencing nonexistent parameter %s' % (k, p)
+                    raise ValueError(msg)
+            absoluteDependencies[k] = l
+        self.__dep = absoluteDependencies
+
         # The order of these two calls (__validateParamters and initOrder)
         # is significant.
         self.__validateParameters()
@@ -495,10 +511,13 @@ class ParamStore:
         doesn't exist.
         """
         dependees = param.getDependees()
+        context = param.getAbsoluteId()
+        ids = self.__params.keys()
         for d in dependees:
-            if not d in self.__params:
+            d = util.findAbsoluteParameter(context, d, ids)
+            if d is None:
                 return d
-        return False
+        return None
 
 
 class Design(Identifiable):
