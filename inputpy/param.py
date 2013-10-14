@@ -323,31 +323,6 @@ class SParam(Identifiable):
     # If absolute id replaces plain "id", then this will take over that role.
     def getRelativeId(self):
         return self.getId()
-"""
-class SParam(Identifiable):
-    def __init__(self, id, type, nested=[], mapping=None):
-        Identifiable.__init__(self, id)
-        self.id = id
-        self.type = type
-        self.nested = nested
-        self.mapping = mapping
-        self.dependees = [p.getId() for p in self.nested]
-
-    def getType(self):
-        return self.type
-
-    def getNestedParameters(self):
-        return self.nested
-
-    def getDependees(self):
-        return self.dependees
-
-    def getMapping(self):
-        return self.mapping
-
-    def isDependent(self):
-        return len(self.nested) > 0
-"""
 
 class ParamArray():
     """
