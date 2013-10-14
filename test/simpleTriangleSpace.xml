@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<i:DesignSpace
+    id="triangle"
+    mapping="triangleMapping.xml"
+    xmlns:i="http://TheInPUT.org/DesignSpace"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://TheInPUT.org/DesignSpace http://theinput.org/DesignSpace.xsd">
+
+    <!--
+        This design space is "simple", because it doesn't include any
+        dependencies. The only dependencies are nested parameters, but
+        no parameter references any other parameter.
+    -->
+
+    <!--
+        Outer X and Y.
+        These can be referenced by other NParams, but they cannot be used
+        to satisfy any SParam dependencies. They cannot be used as
+        constructor arguments when initializing a SParam, for example.
+    -->
+    <i:NParam id="X" type="integer" inclMin="0" inclMax="0" />
+    <i:NParam id="Y" type="integer" inclMin="1" inclMax="1" />
+
+    <!--
+        Outer P1.
+        As in the case of the outer X and Y parameters, this parameter
+        cannot be used as a constructor argument when initializing Triangle.
+    -->
+    <i:SParam id="P1">
+        <i:NParam id="X" type="integer" inclMin="2" inclMax="2" />
+        <i:NParam id="Y" type="integer" inclMin="3" inclMax="3" />
+    </i:SParam>
+    <!--
+        Similar to P1.
+        This parameter exists so that there is a Point that does not also
+        exist inside a triangle.
+    -->
+    <i:SParam id="P4">
+        <i:NParam id="X" type="integer" inclMin="4" inclMax="4" />
+        <i:NParam id="Y" type="integer" inclMin="8" inclMax="8" />
+    </i:SParam>
+
+    <i:SParam id="T1">
+        <i:SParam id="P1">
+            <i:NParam id="X" type="integer" inclMin="1" inclMax="1" />
+            <i:NParam id="Y" type="integer" inclMin="1" inclMax="1" />
+        </i:SParam>
+        <i:SParam id="P2">
+            <i:NParam id="X" type="integer" inclMin="3" inclMax="3" />
+            <i:NParam id="Y" type="integer" inclMin="2" inclMax="2" />
+        </i:SParam>
+        <i:SParam id="P3">
+            <i:NParam id="X" type="integer" inclMin="5" inclMax="5" />
+            <i:NParam id="Y" type="integer" inclMin="1" inclMax="1" />
+        </i:SParam>
+    </i:SParam>
+    <i:SParam id="T2">
+        <i:SParam id="P1">
+            <i:NParam id="X" type="integer" inclMin="1" inclMax="1" />
+            <i:NParam id="Y" type="integer" inclMin="1" inclMax="1" />
+        </i:SParam>
+        <i:SParam id="P2">
+            <i:NParam id="X" type="integer" inclMin="3" inclMax="3" />
+            <i:NParam id="Y" type="integer" inclMin="2" inclMax="2" />
+        </i:SParam>
+        <i:SParam id="P3">
+            <i:NParam id="X" type="integer" inclMin="5" inclMax="5" />
+            <i:NParam id="Y" type="integer" inclMin="1" inclMax="1" />
+        </i:SParam>
+    </i:SParam>
+
+</i:DesignSpace>

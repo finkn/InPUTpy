@@ -8,11 +8,12 @@ from test.test_util import TestMiscUtil
 from test.test_generators import TestGenerators
 from test.test_mapping import TestMapping
 from test.test_types import TestTypes
+from test.test_factories import TestFactories
 
 __all__ = (
     'TestDesign', 'TestDesignSpace', 'TestParam', 'TestParamStore',
     'TestEvaluator', 'TestMiscUtil', 'TestGenerators', 'TestMapping',
-    'TestTypes',
+    'TestTypes', 'TestFactories',
 )
 
 if __name__ == '__main__':
