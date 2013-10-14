@@ -38,11 +38,11 @@ class Param(Identifiable):
     value (with the exception of fixed values), and does not know how to
     generate appropriate values or even which ones would be valid.
     """
-    def __init__(self, paramId, paramType, fixed=None,
+    def __init__(self, id, type, fixed=None, parentId=None,
             inclMin=None, exclMin=None, inclMax=None, exclMax=None):
 
         # Check arguments.
-        if paramType is None:
+        if type is None:
             raise ValueError('The parameter type was None')
         if inclMin is not None and exclMin is not None:
             raise ValueError('Defined both inclusive and exclusive limits')
@@ -65,8 +65,8 @@ class Param(Identifiable):
         maxIsExcl = exclMax is not None
 
         # Initialize fields.
-        Identifiable.__init__(self, paramId)
-        self.type = paramType
+        Identifiable.__init__(self, id)
+        self.type = type
         self.exclMin = minIsExcl
         self.exclMax = maxIsExcl
         self.minDependees = []      # Referenced parameters in min expression.
@@ -87,6 +87,12 @@ class Param(Identifiable):
 
         # Set fixed value, if any.
         self.setFixed(fixed)
+
+        # Possibly deprecated. SParam does exactly the same thing.
+        if parentId is None:
+            self.absoluteId = id
+        else:
+            self.absoluteId = parentId + '.' + id
 
     @staticmethod
     def __padLimits(minLimits, maxLimits):
@@ -235,6 +241,13 @@ class Param(Identifiable):
         """
         return tuple(self.minDependees + self.maxDependees)
 
+    # Possibly deprecated.
+    def getAbsoluteId(self):
+        return self.absoluteId
+
+    def getRelativeId(self):
+        return self.getId()
+
     def __eq__(self, other):
         if self.getId() != other.getId():
             return False
@@ -253,12 +266,14 @@ class Param(Identifiable):
 
 # Factory.
 def getParameter(id, type, **kwargs):
-    # This is not an array parameter.
+    # This is a structured parameter.
     if type == 'SParam':
         return SParam(id, type, **kwargs)
+    # This is a numeric parameter.
     elif type.find('[') == -1:
         return Param(id, type, **kwargs)
 
+    # This is an array parameter.
     # 'integer[2][3]' should become size: 2, paramType: 'integer[3]'
     startIndex = type.index('[')
     endIndex = type.index(']')
@@ -266,6 +281,49 @@ def getParameter(id, type, **kwargs):
     type = type[:startIndex] + type[endIndex+1:]
     return ParamArray(id, type, size, **kwargs)
 
+class SParam(Identifiable):
+    def __init__(self, id, type, nested=[], mapping=None, parentId=None):
+        Identifiable.__init__(self, id)
+        self.type = type
+        self.nested = nested
+        self.mapping = mapping
+        # Can I use absolute ID here?
+        self.dependees = [p.getId() for p in self.nested]
+        # If an absolute ID is going to remain (in addition to the "regular"
+        # ID), then this should be moved to a common base class, since Param
+        # (what would then become NParam) has to do exactly the same thing.
+        if parentId is None:
+            self.absoluteId = id
+        else:
+            self.absoluteId = parentId + '.' + id
+
+    def getType(self):
+        return self.type
+
+    def getNestedParameters(self):
+        return self.nested
+
+    def getDependees(self):
+        return self.dependees
+
+    def getMapping(self):
+        return self.mapping
+
+    def isDependent(self):
+        return len(self.nested) > 0
+
+    def getContext(self):
+        return self.absoluteId
+
+    # Absolute ID may be redundant. It should be possible to only always
+    # deal with absolute IDs.
+    def getAbsoluteId(self):
+        return self.absoluteId
+
+    # If absolute id replaces plain "id", then this will take over that role.
+    def getRelativeId(self):
+        return self.getId()
+"""
 class SParam(Identifiable):
     def __init__(self, id, type, nested=[], mapping=None):
         Identifiable.__init__(self, id)
@@ -289,6 +347,7 @@ class SParam(Identifiable):
 
     def isDependent(self):
         return len(self.nested) > 0
+"""
 
 class ParamArray():
     """

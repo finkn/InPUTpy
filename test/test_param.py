@@ -208,8 +208,8 @@ class TestParam(unittest.TestCase):
     def testSParamWithNestedParameters(self):
         # A could be a Point object for example, with X and Y
         # NParam nested parameters.
-        x = getParameter('X', 'integer')
-        y = getParameter('Y', 'integer')
+        x = getParameter('X', 'integer', parentId='A')
+        y = getParameter('Y', 'integer', parentId='A')
         param = getParameter('A', 'SParam', nested=(x, y))
         self.assertEqual('A', param.getId())
         self.assertEqual('SParam', param.getType())
@@ -217,11 +217,22 @@ class TestParam(unittest.TestCase):
         self.assertCountEqual(('X', 'Y'), param.getDependees())
 
     def testSParamWithMultipleNestingLevels(self):
-        x = getParameter('X', 'integer')
-        y = getParameter('Y', 'integer')
-        a = getParameter('A', 'SParam', nested=(x, y))
-        b = getParameter('B', 'SParam', nested=(a, y))
+        x = getParameter('X', 'integer', parentId='B.A')
+        y1 = getParameter('Y', 'integer', parentId='B.A')
+        y2 = getParameter('Y', 'integer', parentId='B')
+        a = getParameter('A', 'SParam', nested=(x, y1), parentId='B')
+        b = getParameter('B', 'SParam', nested=(a, y2))
         self.assertCountEqual(('A', 'Y'), b.getDependees())
+
+    def testAbsolutePath(self):
+        x = getParameter('X', 'integer', parentId='A.B')
+        y = getParameter('Y', 'integer', parentId='A.B')
+        a = getParameter('A', 'SParam', nested=(x, y))
+        b = getParameter('B', 'SParam', nested=(a,), parentId='A')
+        self.assertEqual('A.B.X', x.getAbsoluteId())
+        self.assertEqual('A.B.Y', y.getAbsoluteId())
+        self.assertEqual('A.B', b.getAbsoluteId())
+        self.assertEqual('A', a.getAbsoluteId())
 
     def compareParameters(self, reference, param):
         self.assertEqual(reference.getId(), param.getId())
