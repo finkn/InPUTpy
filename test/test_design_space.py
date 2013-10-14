@@ -3,7 +3,6 @@ from inputpy.param import Param
 from inputpy.param import ParamStore
 from inputpy.param import getParameter
 from inputpy.designspace import DesignSpace
-from inputpy.factories import XMLFactory
 from test.tools import PresetDesignSpaceFactory
 
 class TestDesignSpace(unittest.TestCase):
@@ -142,7 +141,7 @@ class TestDesignSpace(unittest.TestCase):
 
     def testImportSimpleIntegerParameterSpace(self):
         fileName = 'simpleIntegerParameterSpace.xml'
-        factory = XMLFactory.getDesignSpace
+        factory = PresetDesignSpaceFactory.getDesignSpace
         space1 = factory(fileName)
         factory = PresetDesignSpaceFactory.getDesignSpace
         space2 = factory(fileName)
@@ -150,7 +149,7 @@ class TestDesignSpace(unittest.TestCase):
 
     def testImportAdvancedIntegerParameterSpace(self):
         fileName = 'advancedIntegerParameterSpace.xml'
-        factory = XMLFactory.getDesignSpace
+        factory = PresetDesignSpaceFactory.getDesignSpace
         space1 = factory(fileName)
         factory = PresetDesignSpaceFactory.getDesignSpace
         space2 = factory(fileName)
