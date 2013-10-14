@@ -62,6 +62,81 @@ class Evaluator:
         return {cls.MATH_NAME[mode]: math, '__builtins__': {}}
 
     @classmethod
+    def findUniqueSuffix(cls, paramId, paramIds, n=0):
+        """
+        Return the parameter ID with a unique number suffix (the ID does
+        not occur in the given list of IDs.
+        The function name may be slightly misleading since not the suffix
+        but the whole parameter is returned.
+
+        Keyword arguments:
+        n       -- can be used to start looking for suffixes at n.
+        """
+        suggestion = '%s%i' % (paramId, n)
+        if suggestion not in paramIds:
+            return suggestion
+        else:
+            return cls.findUniqueSuffix(paramId, paramIds, n+1)
+
+    @classmethod
+    def convertToNonDot(cls, paramId, paramIds, prefix='__', n=0):
+        """
+        Return the parameter ID with dots replaced by underscores.
+        The resulting ID is guaranteed to be unique relative to the
+        given list of IDs.
+        The resulting ID will be of the form: prefixIDsuffix, where
+        suffix is of the form prefixN.
+
+        Keyword arguments:
+        prefix  -- the prefix to place before the ID and the number.
+        n       -- can be used to start looking for suffixes at n.
+        """
+        paramId = paramId.replace('.', '_')
+        paramId = '%s%s%s' % (prefix, paramId, prefix)
+        return cls.findUniqueSuffix(paramId, paramIds, n)
+
+    @classmethod
+    def getRemapping(cls, dependencies, paramIds):
+        """
+        Returns a dictionary, mapping any parameter IDs containing dots
+        to suitable dot-free alternatives.
+        When resolving dependencies during evaluation, dots are fatal.
+        This function allows for the simple dependency dictionary to be
+        used by re-mapping those dependencies to new names.
+
+        Dots are replaced by underscores. In order to prevent name
+        collisions caused by this translation, the IDs are further mangled
+        and guaranteed to be unique.
+        """
+        n = 0
+        prefix = '__' # <-- He he, look how eager he is!
+        # Slight performance optimization. We only have to avoid collisions
+        # with any parameters that at least begin with the prefix.
+        paramIds = [p for p in paramIds if p.startswith(prefix)]
+        # And no need to remap IDs without dots.
+        dependencies = [d for d in dependencies if d.find('.') != -1]
+        result = {}
+        for d in dependencies:
+            converted = cls.convertToNonDot(d, paramIds, prefix, n)
+            paramIds.append(converted)
+            result[d] = converted
+            n = n + 1
+
+        return result
+
+    @classmethod
+    def remapExpression(cls, exp, remapping):
+        """
+        Returns the expression with the parameter references remapped to
+        the dot-free parameter IDs.
+        """
+        # Necessary to perform greedy replacement.
+        keys = sorted(remapping.keys(), key=len, reverse=True)
+        for k in keys:
+            exp = exp.replace(k, remapping[k])
+        return exp
+
+    @classmethod
     def evaluate(cls, exp, params={}, mode=JS):
         """
         Evaluate the expression inside a safe namespace, optionally including
@@ -71,8 +146,18 @@ class Evaluator:
         params  -- any parameters referenced in the expression (default {})
         mode    -- the evaluation mode (default 'js')
         """
+        # This function should probably not do the remapping internally.
+        # The expression and the parameters should probably already have been
+        # remapped before this function is called.
         ns = dict(params)
         ns.update(cls.getSafeNamespace(mode))
+        parameters = cls.parseDependencies(exp, mode)
+        paramIds = params.keys()
+        remapping = cls.getRemapping(parameters, paramIds)
+        for (k,v) in remapping.items():
+            ns[v] = ns[k]
+            del ns[k]
+        exp = cls.remapExpression(exp, remapping)
         return eval(exp, ns)
 
     @classmethod

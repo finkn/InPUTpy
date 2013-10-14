@@ -76,6 +76,29 @@ class TestEvaluator(unittest.TestCase):
         for (exp, value) in tests.items():
             self.assertCountEqual(value, Evaluator.parseRange(exp))
 
+    def testGetRemapping(self):
+        tests = (
+            ((('A',), ('A',)), {}),
+            ((('A.B',), ('A.B',)), {'A.B': '__A_B__0'}),
+            ((('A.B',), ('A.B', '__A_B__1')), {'A.B': '__A_B__0'}),
+            ((('A.B',), ('A.B', '__A_B__0')), {'A.B': '__A_B__1'}),
+        )
+
+        for (args, expected) in tests:
+            self.assertEqual(expected, Evaluator.getRemapping(*args))
+
+    def testRemapExpression(self):
+        tests = (
+            (('A + B', {}), 'A + B'),
+            (('A + B', {'A': 'C'}), 'C + B'),
+            (('A.X + B.X', {'A.X': 'A', 'B.X': 'B'}), 'A + B'),
+            (('A.B.X + B.X', {'A.B.X': 'A', 'B.X': 'B'}), 'A + B'),
+            (('A.X + B.A.X', {'A.X': 'A', 'B.A.X': 'B'}), 'A + B'),
+        )
+
+        for (args, expected) in tests:
+            self.assertEqual(expected, Evaluator.remapExpression(*args))
+
 
 class TestMiscUtil(unittest.TestCase):
 
