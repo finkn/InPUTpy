@@ -5,6 +5,7 @@ inputpy.designspace
 :license: MIT. See LICENSE for details.
 """
 import inputpy.generators as generator
+import inputpy.util as util
 from inputpy.param import Identifiable
 from inputpy.param import Design
 from inputpy.param import ParamStore
@@ -68,11 +69,10 @@ class DesignSpace(Identifiable):
 
         # Initialize all the top-level parameters. Their dependencies will
         # be resolved recursively by __initParam.
-        top = sorted(initOrder.keys())[-1]
-        top = initOrder[top]
-
-        for paramId in top:
-            params = self.__initParam(paramId, params)
+        initList = sorted(initOrder.keys(), reverse=True)
+        for order in initList:
+            for paramId in initOrder[order]:
+                params = self.__initParam(paramId, params)
         return Design(params, self, designId)
 
     def __initParam(self, paramId, init):
@@ -84,10 +84,19 @@ class DesignSpace(Identifiable):
         if paramId in init:
             return init
         param = self.params.getParam(paramId)
+
+        # When initializing dependent parameters, find the absolute ID of the
+        # dependencies. Then use the appropriate values for those IDs when
+        # resolving dependencies. (map the relative ID to the proper value)
+        dependencies = {}
         if param.isDependent():
+            ids = self.params.getSupportedParamIds()
             for d in param.getDependees():
-                init = self.__initParam(d, init)
-        init[paramId] = generator.nextValue(param, init)
+                absolute = util.findAbsoluteParameter(paramId, d, ids)
+                init = self.__initParam(absolute, init)
+                dependencies[d] = init[absolute]
+
+        init[paramId] = generator.nextValue(param, dependencies)
         return init
 
     def setFixed(self, paramId, value):
