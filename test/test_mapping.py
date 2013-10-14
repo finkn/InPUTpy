@@ -79,5 +79,41 @@ class TestMapping(unittest.TestCase):
         self.assertEqual('Point', point.getId())
         self.assertEqual('test.types.geo.Point', point.getTypeName())
 
+    def testGetDefaultAccessor(self):
+        getter = {
+            'abc': 'getabc',
+            'Abc': 'getAbc',
+            'ABC': 'getABC',
+            'A.B.C': 'getC',
+        }
+        setter = {
+            'abc': 'setabc',
+            'Abc': 'setAbc',
+            'ABC': 'setABC',
+            'A.B.C': 'setC',
+        }
+
+        # I've done this quite a few times. It should be placed in a helper.
+        for (k,v) in getter.items():
+            self.assertEqual(v, mapping.getDefaultGetter(k))
+        for (k,v) in setter.items():
+            self.assertEqual(v, mapping.getDefaultSetter(k))
+
+    def testAccessor(self):
+        getter = {
+            Mapping('X', 'builtin.str'): 'getX',
+            Mapping('A.B.X', 'builtin.str'): 'getX',
+            Mapping('X', 'builtin.str', get='customGetter'): 'customGetter',
+        }
+        setter = {
+            Mapping('X', 'builtin.str'): 'setX',
+            Mapping('A.B.X', 'builtin.str'): 'setX',
+            Mapping('X', 'builtin.str', set='customSetter'): 'customSetter',
+        }
+        for (k,v) in getter.items():
+            self.assertEqual(v, k.getGetter())
+        for (k,v) in setter.items():
+            self.assertEqual(v, k.getSetter())
+
 if __name__ == '__main__':
     unittest.main()

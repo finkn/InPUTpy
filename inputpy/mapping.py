@@ -46,13 +46,41 @@ def getType(typeString):
         types[typeString] = __load(typeString)
     return types[typeString]
 
+# If we're serious about supporting parameter names with spaces, then
+# they should be removed or replaced here. Otherwise the accessor will be
+# absolutely illegal and useless.
+def getAccessor(paramId, prefix):
+    """
+    Returns the parameter ID with a prefix attached. This function is
+    almost silly, but it does strip the parameter ID to the relative
+    part, which means that this function can handle absolute IDs.
+    """
+    # TODO:
+    # Pull this out and make a general utility function out of it.
+    index = paramId.rfind('.')
+    if index != -1:
+        paramId = paramId[index + 1:]
+    return prefix + paramId
+
+def getDefaultSetter(paramId, prefix='set'):
+    """
+    Uses getAccessor with a default prefix of 'set'.
+    """
+    return getAccessor(paramId, prefix)
+
+def getDefaultGetter(paramId, prefix='get'):
+    """
+    Uses getAccessor with a default prefix of 'get'.
+    """
+    return getAccessor(paramId, prefix)
+
 class Mapping:
     def __init__(self, id, type, constructor=None, set=None, get=None):
         self.id = id
         self.type = type
         self.constructor = constructor
-        self.setter = set
-        self.getter = get
+        self.setter = set or getDefaultSetter(id)
+        self.getter = get or getDefaultGetter(id)
 
         if constructor is not None:
             self.dep = tuple(constructor.split())
