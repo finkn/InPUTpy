@@ -293,18 +293,27 @@ def parseDimensions(typeString):
         result.append(int(p))
     return result
 
-def expandParameterScope(contextId):
+def absolute(parentId, paramId):
     """
-    Return a parameter ID that represents an outer scope, or None if the
-    scope cannot be expanded further (the context is already at the root).
-    See info on findAbsoluteParameter for more details.
+    Return the absolute parameter ID of the parameter relative to the
+    parent. If the parent is None or empty (''), then the parameter ID
+    is already absolute and is simply returned.
+    """
+    if parentId is None or parentId == '':
+        return paramId
+    else:
+        return parentId + '.' + paramId
+
+def parent(paramId):
+    """
+    Return the parent ID, or None if the parameter is already at the root.
     This function basically does a '$ cd ..'.
     """
-    index = contextId.rfind('.')
+    index = paramId.rfind('.')
     if index == -1:
         return None
     else:
-        return contextId[:index]
+        return paramId[:index]
 
 def findAbsoluteParameter(contextId, paramId, ids):
     """
@@ -317,15 +326,12 @@ def findAbsoluteParameter(contextId, paramId, ids):
     The contextId is always absolute. IDs in the ids collection are
     always absolute. The paramId may be absolute or relative.
     """
-    if contextId is None:
-        param = paramId
-    else:
-        param = contextId + '.' + paramId
+    param = absolute(contextId, paramId)
 
     if param in ids:
         return param
     elif contextId is None:
         return None
     else:
-        contextId = expandParameterScope(contextId)
+        contextId = parent(contextId)
         return findAbsoluteParameter(contextId, paramId, ids)

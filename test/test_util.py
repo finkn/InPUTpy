@@ -219,14 +219,24 @@ class TestMiscUtil(unittest.TestCase):
                 result = util.parseDimensions(key)
                 self.assertEqual(expected, result)
 
-    def testExpandParameterScope(self):
+    def testParent(self):
         tests = (
             ('T1.P1.X', 'T1.P1'),
             ('P1.X', 'P1'),
             ('P1', None),
         )
         for t in tests:
-            self.assertEqual(t[1], util.expandParameterScope(t[0]))
+            self.assertEqual(t[1], util.parent(t[0]))
+
+    def testAbsolute(self):
+        tests = (
+            ('T1.P1', 'X', 'T1.P1.X'),
+            ('P1', 'X', 'P1.X'),
+            (None, 'X', 'X'),
+            (None, 'P1.X', 'P1.X'),
+        )
+        for t in tests:
+            self.assertEqual(t[2], util.absolute(t[0], t[1]))
 
     def testFindAbsoluteParameter(self):
         ids = [
