@@ -3,7 +3,9 @@ from inputpy.param import Param
 from inputpy.param import ParamStore
 from inputpy.param import Design
 from inputpy.param import getParameter
+from inputpy.param import paramFactory
 from inputpy.designspace import DesignSpace
+from inputpy.q import *
 
 class TestParam(unittest.TestCase):
 
@@ -233,6 +235,22 @@ class TestParam(unittest.TestCase):
         self.assertEqual('A.B.Y', y.getAbsoluteId())
         self.assertEqual('A.B', b.getAbsoluteId())
         self.assertEqual('A', a.getAbsoluteId())
+
+    # Note that this test does not include code mappings!
+    def testParamFactory(self):
+        paramArgs = {
+            'X': {ID_ATTR: 'X', TYPE_ATTR: 'integer', INCL_MIN: '0', },
+            'Y': {ID_ATTR: 'Y', TYPE_ATTR: 'integer', INCL_MAX: '1', },
+            'P1': {ID_ATTR: 'P1', TYPE_ATTR: SPARAM, 'nested': (
+                    {ID_ATTR: 'X', TYPE_ATTR: 'integer', EXCL_MIN: '2', },
+                    {ID_ATTR: 'Y', TYPE_ATTR: 'integer', EXCL_MAX: '3', },
+                ),
+            },
+        }
+        results = {k: paramFactory(v, None) for (k,v) in paramArgs.items()}
+        self.assertCountEqual(paramArgs.keys(), results.keys())
+        p = results['P1']
+        self.assertEqual(2, len(p.getNestedParameters()))
 
     def compareParameters(self, reference, param):
         self.assertEqual(reference.getId(), param.getId())

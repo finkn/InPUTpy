@@ -281,11 +281,53 @@ def getParameter(id, type, **kwargs):
     type = type[:startIndex] + type[endIndex+1:]
     return ParamArray(id, type, size, **kwargs)
 
+# This may come to replace getParameter, or perhaps there is some other way
+# to combine them. This function roughly does with dictionaries what the
+# XML factory does with elements. It should simplify XML import as well as
+# programmatic parameter creation.
+def paramFactory(kwargs, mappings=None):
+    """
+    Return a parameter created from the arguments in the dictionary and
+    optionally combined with a code mapping object.
+    This factory is fairly flexible. Any nested parameters are expected
+    to be listed recursively as dictionaries and will be properly
+    created as needed. Parent IDs are inferred if missing. If the optional
+    code mapping argument is provided, then any mappings that are not
+    already in the dictionary will be added.
+
+    Note: Any existing parent ID or mapping will not be replaced.
+    This function has a side effect: inferred parent IDs are added to the
+    nested arguments.
+    """
+    paramId = kwargs['id']
+    del kwargs['id']
+    paramType = kwargs['type']
+    del kwargs['type']
+    parentId = kwargs.get('parentId')
+    absoluteId = util.absolute(parentId, paramId)
+
+    nested = kwargs.get('nested')
+    if nested is not None:
+        for param in nested:
+            param['parentId'] = absoluteId
+        kwargs['nested'] = [paramFactory(args, mappings) for args in nested]
+
+    # TODO:
+    # Create a null mapping object that always returns a None mapping.
+    # Check that existing mappings are not replaced.
+    if mappings is not None and 'mapping' not in kwargs:
+        m = mappings.getMapping(absoluteId)
+        kwargs['mapping'] = m
+
+    return getParameter(paramId, paramType, **kwargs)
+
+
 class SParam(Identifiable):
     def __init__(self, id, type, nested=[], mapping=None, parentId=None):
         Identifiable.__init__(self, id)
         self.type = type
         self.nested = nested
+        # An SParam without a mapping is probably an error. Need to check!
         self.mapping = mapping
         # Can I use absolute ID here?
         self.dependees = [p.getId() for p in self.nested]
