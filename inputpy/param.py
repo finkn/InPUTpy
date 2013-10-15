@@ -249,7 +249,7 @@ class Param(Identifiable):
         return self.getId()
 
     def __eq__(self, other):
-        if self.getId() != other.getId():
+        if self.absoluteId != other.absoluteId:
             return False
         if self.getType() != other.getType():
             return False
@@ -323,6 +323,16 @@ class SParam(Identifiable):
     # If absolute id replaces plain "id", then this will take over that role.
     def getRelativeId(self):
         return self.getId()
+
+    def __eq__(self, other):
+        # Just use getId once absolute IDs are the norm.
+        if self.absoluteId != other.absoluteId:
+            return False
+        if len(self.nested) != len(other.nested):
+            return False
+        if self.nested != other.nested:
+            return False
+        return True
 
 class ParamArray():
     """

@@ -32,6 +32,8 @@ class TestFactories(unittest.TestCase):
     # Should it test design space/param store/code mapping for equality?
     def testDesignSpaceFactory(self):
         configs = (
+            'simpleIntegerParameterSpace.xml',
+            'advancedIntegerParameterSpace.xml',
             'simpleTriangleSpace.xml',
             'advancedTriangleSpace.xml',
         )
@@ -39,15 +41,12 @@ class TestFactories(unittest.TestCase):
             XMLFactory.getDesignSpace,
             PresetDesignSpaceFactory.getDesignSpace,
         )
-        expectedParamIds = ('X', 'Y', 'P1', 'P4', 'T1', 'T1.P1', 'T1.P1.X',)
-        # Make sure nested parameters don't "leak" out.
-        nonexistentParamIds = ('P2', 'T1.P4',)
+        results = []
+        for factory in factories:
+            results.append({config: factory(config) for config in configs})
 
-        for config in configs:
-            for factory in factories:
-                space = factory(config)
-                ids = space.getSupportedParamIds()
-                for p in expectedParamIds:
-                    self.assertIn(p, ids)
-                for p in nonexistentParamIds:
-                    self.assertNotIn(p, ids)
+        first = results[0]
+        for result in results[1:]:
+            for (k,v) in result.items():
+                msg = 'Import did not match for %s' % (k)
+                self.assertEqual(v, first[k], msg=msg)

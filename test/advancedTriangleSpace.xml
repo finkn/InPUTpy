@@ -26,7 +26,7 @@
         cannot be used as a constructor argument when initializing Triangle.
     -->
     <i:SParam id="P1">
-        <i:NParam id="X" type="integer" inclMin="2" inclMax="2" />
+        <i:NParam id="X" type="integer" inclMin="4" inclMax="4" />
         <i:NParam id="Y" type="integer" inclMin="X + 1" inclMax="X + 1" />
     </i:SParam>
     <!--
@@ -35,7 +35,7 @@
         exist inside a triangle.
     -->
     <i:SParam id="P4">
-        <i:NParam id="X" type="integer" inclMin="4" inclMax="4" />
+        <i:NParam id="X" type="integer" inclMin="2" inclMax="2" />
         <i:NParam id="Y" type="integer" inclMin="X + 1" inclMax="X + 1" />
     </i:SParam>
 

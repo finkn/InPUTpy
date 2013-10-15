@@ -178,7 +178,7 @@ class PresetParamStoreFactory:
                 'X', 'integer', inclMin='2', inclMax='2', parentId='P4'
             ),
             getParameter(
-                'Y', 'integer', inclMin='3', inclMax='3', parentId='P4'
+                'Y', 'integer', inclMin='X + 1', inclMax='X + 1', parentId='P4'
             ),
         ], mapping=mapping.getMapping('P4')),
         # Outer T1.
@@ -252,8 +252,8 @@ class PresetDesignSpaceFactory:
     IDS = {
         'simpleIntegerParameterSpace.xml': 'simpleInteger',
         'advancedIntegerParameterSpace.xml': 'advancedInteger',
-        'simpleTriangleSpace.xml': 'trinagle',
-        'advancedTriangleSpace.xml': 'trinagle',
+        'simpleTriangleSpace.xml': 'triangle',
+        'advancedTriangleSpace.xml': 'triangle',
     }
 
     @staticmethod
