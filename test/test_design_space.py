@@ -132,29 +132,6 @@ class TestDesignSpace(unittest.TestCase):
         self.assertNotEqual(space4, space5)
         self.assertEqual(space5, space6)
 
-    def testFakeFactory(self):
-        fileName = 'simpleIntegerParameterSpace.xml'
-        factory = PresetDesignSpaceFactory.getDesignSpace
-        space = factory(fileName)
-        self.assertEqual('simpleInteger', space.getId())
-        self.assertEqual(17, len(space.getSupportedParamIds()))
-
-    def testImportSimpleIntegerParameterSpace(self):
-        fileName = 'simpleIntegerParameterSpace.xml'
-        factory = PresetDesignSpaceFactory.getDesignSpace
-        space1 = factory(fileName)
-        factory = PresetDesignSpaceFactory.getDesignSpace
-        space2 = factory(fileName)
-        self.assertEqual(space1, space2)
-
-    def testImportAdvancedIntegerParameterSpace(self):
-        fileName = 'advancedIntegerParameterSpace.xml'
-        factory = PresetDesignSpaceFactory.getDesignSpace
-        space1 = factory(fileName)
-        factory = PresetDesignSpaceFactory.getDesignSpace
-        space2 = factory(fileName)
-        self.assertEqual(space1, space2)
-
     def testIsFileShouldBeFalseWhenNoFileWasGiven(self):
         space = DesignSpace(ParamStore())
         self.assertFalse(space.isFile())
