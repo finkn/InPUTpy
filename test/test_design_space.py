@@ -154,9 +154,12 @@ class TestDesignSpace(unittest.TestCase):
         space = factory('simpleIntegerParameterSpace.xml')
         design = space.nextEmptyDesign('some design ID')
         self.assertEqual(design.getId(), 'some design ID')
-        # Trying to fetch parameter values doesn't make sense since there
-        # is no way of distinguishing between an uninitialized and a
-        # nonexistent parameter.
+        # The new design should support exactly the same parameters
+        # (as determined by ID). If all of them map to a None value, that
+        # means that the design is indeed uninitialized.
+        paramIds = design.getSupportedParamIds()
+        self.assertCountEqual(space.getSupportedParamIds(), paramIds)
+        self.assertTrue(all([design.getValue(p) is None for p in paramIds]))
 
 
 if __name__ == '__main__':

@@ -113,7 +113,8 @@ class DesignSpace(Identifiable):
         return self.fileName
 
     def nextEmptyDesign(self, designId=None):
-        return Design({}, self, designId)
+        paramIds = self.params.getSupportedParamIds()
+        return Design({p: None for p in paramIds}, self, designId)
 
     # -------------------------------------------------------------------------
     # This is a dummy implementation, taken from the first version of

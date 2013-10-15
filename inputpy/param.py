@@ -569,6 +569,9 @@ class Design(Identifiable):
     def getSpace(self):
         return self.space
 
+    def getSupportedParamIds(self):
+        return self.params.keys()
+
     # -------------------------------------------------------------------------
     # These are dummy implementations, taken from the first version of Design.
     # -------------------------------------------------------------------------
