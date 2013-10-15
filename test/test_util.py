@@ -228,6 +228,15 @@ class TestMiscUtil(unittest.TestCase):
         for t in tests:
             self.assertEqual(t[1], util.parent(t[0]))
 
+    def testRelative(self):
+        tests = (
+            ('T1.P1.X', 'X'),
+            ('P1.X', 'X'),
+            ('P1', 'P1'),
+        )
+        for t in tests:
+            self.assertEqual(t[1], util.relative(t[0]))
+
     def testAbsolute(self):
         tests = (
             ('T1.P1', 'X', 'T1.P1.X'),

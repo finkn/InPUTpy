@@ -315,6 +315,17 @@ def parent(paramId):
     else:
         return paramId[:index]
 
+def relative(paramId):
+    """
+    Return the relative parameter ID. In other words, it strips away the
+    parent ID from an absolute ID.
+    """
+    index = paramId.rfind('.')
+    if index == -1:
+        return paramId
+    else:
+        return paramId[index + 1:]
+
 def findAbsoluteParameter(contextId, paramId, ids):
     """
     Return the absolute name of a parameter, relative to a context.
