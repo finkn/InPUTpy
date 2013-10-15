@@ -14,37 +14,57 @@ Java version.
 
 from inputpy import config
 
-SCHEMA_LOCATION_ATTR = "schemaLocation"
-MY_NAMESPACE_PREFIX = "in"
-NAMESPACE_ID = "http://TheInPUT.org/"
-XML = ".xml"
-XSD = ".xsd"        # Specific to InPUTpy
-DESIGN_ROOT = "Design"
-DESIGN_SPACE_ROOT = "DesignSpace"
+# InPUTpy-specific additions.
+XSD = '.xsd'
+SHORT = 'short'
+INTEGER = 'integer'
+LONG = 'long'
+FLOAT = 'float'
+DOUBLE = 'double'
+DECIMAL = 'decimal'
+BOOLEAN = 'boolean'
+ARRAY = 'array'
+
+# XML elements.
+DESIGN_ROOT = 'Design'
+DESIGN_SPACE_ROOT = 'DesignSpace'
+NVALUE = 'NValue'
+SVALUE = 'SValue'
+NPARAM = 'NParam'
+SPARAM = 'SParam'
+SCHOICE = 'SChoice'
+SCHOICE_TYPE = 'SChoiceType'
+MAPPING = 'Mapping'
+MAPPING_TYPE = 'MappingType'
+WRAPPER = 'Wrapper'
+
+# XML attributes.
+ADD_ATTR = 'add'
+VALUE_ATTR = 'value'
+TYPE_ATTR = 'type'
+ID_ATTR = 'id'
+EXCL_MIN = 'exclMin'
+EXCL_MAX = 'exclMax'
+INCL_MIN = 'inclMin'
+INCL_MAX = 'inclMax'
+GET_ATTR = 'get'
+SET_ATTR = 'set'
+CONSTR_ATTR = 'constructor'
+FIXED_ATTR = 'fixed'
+MAPPING_ATTR = 'mapping'
+REF_ATTR = 'ref'
+
+# Misc. XML.
+SCHEMA_LOCATION_ATTR = 'schemaLocation'
+MY_NAMESPACE_PREFIX = 'in'
+NAMESPACE_ID = 'http://TheInPUT.org/'
 DESIGN_NAMESPACE_ID = NAMESPACE_ID + DESIGN_ROOT;
-NVALUE = "NValue"
-SVALUE = "SValue"
-NPARAM = "NParam"
-SPARAM = "SParam"
-SCHOICE = "SChoice"
-SCHOICE_TYPE = "SChoiceType"
-VALUE_ATTR = "value"
-TYPE_ATTR = "type"
-ID_ATTR = "id"
-MAPPING = "Mapping"
-MAPPING_TYPE = "MappingType"
+XML = '.xml'
+
 SETTER_PREFIX = "set"
 GETTER_PREFIX = "get"
 RNG = "rng"
 SEED = "Seed"
-EXCL_MIN = "exclMin"
-EXCL_MAX = "exclMax"
-INCL_MIN = "inclMin"
-INCL_MAX = "inclMax"
-GET_ATTR = "get"
-SET_ATTR = "set"
-CONSTR_ATTR = "constructor"
-WRAPPER = "Wrapper"
 ALGORITHM_DESIGN_SPACE = "algorithmSpace"
 ALGORITHM_DESIGN_SPACE_XML = ALGORITHM_DESIGN_SPACE + XML
 PROBLEM_FEATURES = "problemFeatures"
@@ -52,18 +72,14 @@ PROBLEM_FEATURE_SPACE = "problemSpace"
 OUTPUT = "output"
 CODE_MAPPING = "codeMapping"
 RANDOM = "random"
-FIXED_ATTR = "fixed"
-MAPPING_ATTR = "mapping"
 LOGGING = "logging"
 THREAD_SAFE = "threadSafe"
 INJECTION = "injection"
-REF_ATTR = "ref"
 SYSTEM = "System"
 LANGUAGE = "Language"
 JAVA = "java"
 DEFAULT = "default"
 COMPLEX = "complex"
-ADD_ATTR = "add"
 EXP = ".exp"
 INP = ".inp"
 CONFIG_ID = "config"
