@@ -8,10 +8,12 @@ Note that this module has state.
 :license: MIT. See LICENSE for details.
 """
 import importlib
+from inputpy.q import SETTER_PREFIX
+from inputpy.q import GETTER_PREFIX
+import inputpy.util as util
 
 __all__ = ('getType', 'Mapping', 'CodeMapping', )
 
-mappings = {}
 types = {}
 
 def __load(typeString):
@@ -49,30 +51,19 @@ def getType(typeString):
 # If we're serious about supporting parameter names with spaces, then
 # they should be removed or replaced here. Otherwise the accessor will be
 # absolutely illegal and useless.
-def getAccessor(paramId, prefix):
+def getDefaultSetter(paramId, prefix=SETTER_PREFIX):
     """
-    Returns the parameter ID with a prefix attached. This function is
-    almost silly, but it does strip the parameter ID to the relative
-    part, which means that this function can handle absolute IDs.
+    Return the name of the default setter for this parameter ID.
+    A prefix can optionally be specified.
     """
-    # TODO:
-    # Pull this out and make a general utility function out of it.
-    index = paramId.rfind('.')
-    if index != -1:
-        paramId = paramId[index + 1:]
-    return prefix + paramId
+    return prefix + util.relative(paramId)
 
-def getDefaultSetter(paramId, prefix='set'):
+def getDefaultGetter(paramId, prefix=GETTER_PREFIX):
     """
-    Uses getAccessor with a default prefix of 'set'.
+    Return the name of the default getter for this parameter ID.
+    A prefix can optionally be specified.
     """
-    return getAccessor(paramId, prefix)
-
-def getDefaultGetter(paramId, prefix='get'):
-    """
-    Uses getAccessor with a default prefix of 'get'.
-    """
-    return getAccessor(paramId, prefix)
+    return prefix + util.relative(paramId)
 
 class Mapping:
     def __init__(self, id, type, constructor=None, set=None, get=None):
