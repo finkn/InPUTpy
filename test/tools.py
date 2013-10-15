@@ -6,8 +6,10 @@ Exports fake factories for "importing" known configurations.
 from inputpy.designspace import DesignSpace
 from inputpy.param import ParamStore
 from inputpy.param import getParameter
+from inputpy.param import paramFactory
 from inputpy.mapping import Mapping
 from inputpy.mapping import CodeMapping
+from inputpy.q import *
 
 class PresetCodeMappingFactory:
 
@@ -38,7 +40,16 @@ class PresetCodeMappingFactory:
         return CodeMapping(*(PresetCodeMappingFactory.MAPPINGS[fileName]))
 
 class PresetParamStoreFactory:
-    SIMPLE_INTEGER_PARAM_SPACE = [
+    # Trying to compress the arguments.
+    ID = ID_ATTR
+    TYPE = TYPE_ATTR
+    INT = 'integer'
+    IMIN = INCL_MIN
+    IMAX = INCL_MAX
+    NESTED = 'nested'
+    SP = SPARAM
+
+    SIMPLE_INTEGER_SPACE = [
         getParameter('A', 'integer'),
         getParameter('B', 'integer', inclMin='1'),
         getParameter('C', 'integer', inclMax='1'),
@@ -58,7 +69,7 @@ class PresetParamStoreFactory:
         getParameter('Q', 'integer', inclMin='0.1', inclMax='1.9'),
     ]
 
-    ADVANCED_INTEGER_PARAM_SPACE = [
+    ADVANCED_INTEGER_SPACE = [
         getParameter('A', 'integer', inclMin='1 + 2'),
         getParameter('B', 'integer', inclMin='(1 + 2) + 3'),
         getParameter('C', 'integer', inclMin='4 * 3 / 2 + 1 - (2 + 3)'),
@@ -79,174 +90,109 @@ class PresetParamStoreFactory:
         getParameter('Z', 'integer', fixed='2'),
     ]
 
-    mapping = PresetCodeMappingFactory.getCodeMapping('triangleMapping.xml')
-    # With relative names, with parent.
-    SIMPLE_TRIANGLE_PARAM_SPACE = [
-        # Outer X and Y.
-        getParameter('X', 'integer', inclMin='0', inclMax='0'),
-        getParameter('Y', 'integer', inclMin='1', inclMax='1'),
-        # Outer P1 and P4.
-        getParameter('P1', 'SParam', nested=[
-            getParameter(
-                'X', 'integer', inclMin='2', inclMax='2', parentId='P1'
-            ),
-            getParameter(
-                'Y', 'integer', inclMin='3', inclMax='3', parentId='P1'
-            ),
-        ], mapping=mapping.getMapping('P1')),
-        getParameter('P4', 'SParam', nested=[
-            getParameter(
-                'X', 'integer', inclMin='4', inclMax='4', parentId='P4'
-            ),
-            getParameter(
-                'Y', 'integer', inclMin='8', inclMax='8', parentId='P4'
-            ),
-        ], mapping=mapping.getMapping('P4')),
-        # Outer T1.
-        getParameter('T1', 'SParam', nested=[
-            getParameter('P1', 'SParam', nested=[
-                getParameter(
-                    'X', 'integer', inclMin='1', inclMax='1', parentId='T1.P1'
-                ),
-                getParameter(
-                    'Y', 'integer', inclMin='1', inclMax='1', parentId='T1.P1'
-                ),
-            ], mapping=mapping.getMapping('T1.P1'), parentId='T1'),
-            getParameter('P2', 'SParam', nested=[
-                getParameter(
-                    'X', 'integer', inclMin='3', inclMax='3', parentId='T1.P2'
-                ),
-                getParameter(
-                    'Y', 'integer', inclMin='2', inclMax='2', parentId='T1.P2'
-                ),
-            ], mapping=mapping.getMapping('T1.P2'), parentId='T1'),
-            getParameter('P3', 'SParam', nested=[
-                getParameter(
-                    'X', 'integer', inclMin='5', inclMax='5', parentId='T1.P3'
-                ),
-                getParameter(
-                    'Y', 'integer', inclMin='1', inclMax='1', parentId='T1.P3'
-                ),
-            ], mapping=mapping.getMapping('T1.P3'), parentId='T1'),
-        ], mapping=mapping.getMapping('T1')),
-        # Outer T2.
-        getParameter('T2', 'SParam', nested=[
-            getParameter('P1', 'SParam', nested=[
-                getParameter(
-                    'X', 'integer', inclMin='1', inclMax='1', parentId='T2.P1'
-                ),
-                getParameter(
-                    'Y', 'integer', inclMin='1', inclMax='1', parentId='T2.P1'
-                ),
-            ], mapping=mapping.getMapping('T2.P1'), parentId='T2'),
-            getParameter('P2', 'SParam', nested=[
-                getParameter(
-                    'X', 'integer', inclMin='3', inclMax='3', parentId='T2.P2'
-                ),
-                getParameter(
-                    'Y', 'integer', inclMin='2', inclMax='2', parentId='T2.P2'
-                ),
-            ], mapping=mapping.getMapping('T2.P2'), parentId='T2'),
-            getParameter('P3', 'SParam', nested=[
-                getParameter(
-                    'X', 'integer', inclMin='5', inclMax='5', parentId='T2.P3'
-                ),
-                getParameter(
-                    'Y', 'integer', inclMin='1', inclMax='1', parentId='T2.P3'
-                ),
-            ], mapping=mapping.getMapping('T2.P3'), parentId='T2'),
-        ], mapping=mapping.getMapping('T2')),
-    ]
+    SIMPLE_TRIANGLE_SPACE = (
+        {ID: 'X', TYPE: INT, IMIN: '0', IMAX: '0'},
+        {ID: 'Y', TYPE: INT, IMIN: '1', IMAX: '1'},
+        {ID: 'P1', TYPE: SP, NESTED: (
+            {ID: 'X', TYPE: INT, IMIN: '2', IMAX: '2'},
+            {ID: 'Y', TYPE: INT, IMIN: '3', IMAX: '3'},
+        ), },
+        {ID: 'P4', TYPE: SP, NESTED: (
+            {ID: 'X', TYPE: INT, IMIN: '4', IMAX: '4'},
+            {ID: 'Y', TYPE: INT, IMIN: '8', IMAX: '8'},
+        ), },
+        {ID: 'T1', TYPE: SP, NESTED: (
+            {ID: 'P1', TYPE: SP, NESTED: (
+                {ID: 'X', TYPE: INT, IMIN: '1', IMAX: '1'},
+                {ID: 'Y', TYPE: INT, IMIN: '1', IMAX: '1'},
+            ), },
+            {ID: 'P2', TYPE: SP, NESTED: (
+                {ID: 'X', TYPE: INT, IMIN: '3', IMAX: '3'},
+                {ID: 'Y', TYPE: INT, IMIN: '2', IMAX: '2'},
+            ), },
+            {ID: 'P3', TYPE: SP, NESTED: (
+                {ID: 'X', TYPE: INT, IMIN: '5', IMAX: '5'},
+                {ID: 'Y', TYPE: INT, IMIN: '1', IMAX: '1'},
+            ), },
+        ), },
+        {ID: 'T2', TYPE: SP, NESTED: (
+            {ID: 'P1', TYPE: SP, NESTED: (
+                {ID: 'X', TYPE: INT, IMIN: '1', IMAX: '1'},
+                {ID: 'Y', TYPE: INT, IMIN: '1', IMAX: '1'},
+            ), },
+            {ID: 'P2', TYPE: SP, NESTED: (
+                {ID: 'X', TYPE: INT, IMIN: '3', IMAX: '3'},
+                {ID: 'Y', TYPE: INT, IMIN: '2', IMAX: '2'},
+            ), },
+            {ID: 'P3', TYPE: SP, NESTED: (
+                {ID: 'X', TYPE: INT, IMIN: '5', IMAX: '5'},
+                {ID: 'Y', TYPE: INT, IMIN: '1', IMAX: '1'},
+            ), },
+        ), },
+    )
 
     # This config is subject to change. It's supposed to include a wide
     # variety of different dependencies, which isn't the case now.
-    ADVANCED_TRIANGLE_PARAM_SPACE = [
-        # Outer X and Y.
-        getParameter('X', 'integer', inclMin='0', inclMax='0'),
-        getParameter('Y', 'integer', inclMin='X + 1', inclMax='X + 1'),
-        # Outer P1 and P4.
-        getParameter('P1', 'SParam', nested=[
-            getParameter(
-                'X', 'integer', inclMin='4', inclMax='4', parentId='P1'
-            ),
-            getParameter(
-                'Y', 'integer', inclMin='X + 1', inclMax='X + 1', parentId='P1'
-            ),
-        ], mapping=mapping.getMapping('P1')),
-        getParameter('P4', 'SParam', nested=[
-            getParameter(
-                'X', 'integer', inclMin='2', inclMax='2', parentId='P4'
-            ),
-            getParameter(
-                'Y', 'integer', inclMin='X + 1', inclMax='X + 1', parentId='P4'
-            ),
-        ], mapping=mapping.getMapping('P4')),
-        # Outer T1.
-        getParameter('T1', 'SParam', nested=[
-            getParameter('P1', 'SParam', nested=[
-                getParameter(
-                    'X', 'integer', inclMin='1', inclMax='1', parentId='T1.P1'
-                ),
-                getParameter(
-                    'Y', 'integer', inclMin='T2.P2.X + 1', inclMax='T2.P2.X + 1', parentId='T1.P1'
-                ),
-            ], mapping=mapping.getMapping('T1.P1'), parentId='T1'),
-            getParameter('P2', 'SParam', nested=[
-                getParameter(
-                    'X', 'integer', inclMin='3', inclMax='3', parentId='T1.P2'
-                ),
-                getParameter(
-                    'Y', 'integer', inclMin='2', inclMax='2', parentId='T1.P2'
-                ),
-            ], mapping=mapping.getMapping('T1.P2'), parentId='T1'),
-            getParameter('P3', 'SParam', nested=[
-                getParameter(
-                    'X', 'integer', inclMin='5', inclMax='5', parentId='T1.P3'
-                ),
-                getParameter(
-                    'Y', 'integer', inclMin='1', inclMax='1', parentId='T1.P3'
-                ),
-            ], mapping=mapping.getMapping('T1.P3'), parentId='T1'),
-        ], mapping=mapping.getMapping('T1')),
-        # Outer T2.
-        getParameter('T2', 'SParam', nested=[
-            getParameter('P1', 'SParam', nested=[
-                getParameter(
-                    'X', 'integer', inclMin='1', inclMax='1', parentId='T2.P1'
-                ),
-                getParameter(
-                    'Y', 'integer', inclMin='1', inclMax='1', parentId='T2.P1'
-                ),
-            ], mapping=mapping.getMapping('T2.P1'), parentId='T2'),
-            getParameter('P2', 'SParam', nested=[
-                getParameter(
-                    'X', 'integer', inclMin='3', inclMax='3', parentId='T2.P2'
-                ),
-                getParameter(
-                    'Y', 'integer', inclMin='2', inclMax='2', parentId='T2.P2'
-                ),
-            ], mapping=mapping.getMapping('T2.P2'), parentId='T2'),
-            getParameter('P3', 'SParam', nested=[
-                getParameter(
-                    'X', 'integer', inclMin='5', inclMax='5', parentId='T2.P3'
-                ),
-                getParameter(
-                    'Y', 'integer', inclMin='1', inclMax='1', parentId='T2.P3'
-                ),
-            ], mapping=mapping.getMapping('T2.P3'), parentId='T2'),
-        ], mapping=mapping.getMapping('T2')),
-    ]
+    ADVANCED_TRIANGLE_SPACE = (
+        {ID: 'X', TYPE: INT, IMIN: '0', IMAX: '0'},
+        {ID: 'Y', TYPE: INT, IMIN: 'X + 1', IMAX: 'X + 1'},
+        {ID: 'P1', TYPE: SP, NESTED: (
+            {ID: 'X', TYPE: INT, IMIN: '4', IMAX: '4'},
+            {ID: 'Y', TYPE: INT, IMIN: 'X + 1', IMAX: 'X + 1'},
+        ), },
+        {ID: 'P4', TYPE: SP, NESTED: (
+            {ID: 'X', TYPE: INT, IMIN: '2', IMAX: '2'},
+            {ID: 'Y', TYPE: INT, IMIN: 'X + 1', IMAX: 'X + 1'},
+        ), },
+        {ID: 'T1', TYPE: SP, NESTED: (
+            {ID: 'P1', TYPE: SP, NESTED: (
+                {ID: 'X', TYPE: INT, IMIN: '1', IMAX: '1'},
+                {ID: 'Y', TYPE: INT, IMIN: 'T2.P2.X + 1', IMAX: 'T2.P2.X + 1'},
+            ), },
+            {ID: 'P2', TYPE: SP, NESTED: (
+                {ID: 'X', TYPE: INT, IMIN: '3', IMAX: '3'},
+                {ID: 'Y', TYPE: INT, IMIN: '2', IMAX: '2'},
+            ), },
+            {ID: 'P3', TYPE: SP, NESTED: (
+                {ID: 'X', TYPE: INT, IMIN: '5', IMAX: '5'},
+                {ID: 'Y', TYPE: INT, IMIN: '1', IMAX: '1'},
+            ), },
+        ), },
+        {ID: 'T2', TYPE: SP, NESTED: (
+            {ID: 'P1', TYPE: SP, NESTED: (
+                {ID: 'X', TYPE: INT, IMIN: '1', IMAX: '1'},
+                {ID: 'Y', TYPE: INT, IMIN: '1', IMAX: '1'},
+            ), },
+            {ID: 'P2', TYPE: SP, NESTED: (
+                {ID: 'X', TYPE: INT, IMIN: '3', IMAX: '3'},
+                {ID: 'Y', TYPE: INT, IMIN: '2', IMAX: '2'},
+            ), },
+            {ID: 'P3', TYPE: SP, NESTED: (
+                {ID: 'X', TYPE: INT, IMIN: '5', IMAX: '5'},
+                {ID: 'Y', TYPE: INT, IMIN: '1', IMAX: '1'},
+            ), },
+        ), },
+    )
 
     STORES = {
-        'simpleIntegerParameterSpace.xml': SIMPLE_INTEGER_PARAM_SPACE,
-        'advancedIntegerParameterSpace.xml': ADVANCED_INTEGER_PARAM_SPACE,
-        'simpleTriangleSpace.xml': SIMPLE_TRIANGLE_PARAM_SPACE,
-        'advancedTriangleSpace.xml': ADVANCED_TRIANGLE_PARAM_SPACE,
+        'simpleIntegerParameterSpace.xml': SIMPLE_INTEGER_SPACE,
+        'advancedIntegerParameterSpace.xml': ADVANCED_INTEGER_SPACE,
+        'simpleTriangleSpace.xml': SIMPLE_TRIANGLE_SPACE,
+        'advancedTriangleSpace.xml': ADVANCED_TRIANGLE_SPACE,
     }
 
     @staticmethod
-    def getParamStore(fileName):
-        return ParamStore(PresetParamStoreFactory.STORES[fileName])
+    def getParamStore(fileName, mapping=None):
+        newStyleStores = (
+            'simpleTriangleSpace.xml', 'advancedTriangleSpace.xml'
+        )
+        if fileName not in newStyleStores:
+            return ParamStore(PresetParamStoreFactory.STORES[fileName])
+
+        paramArgs = PresetParamStoreFactory.STORES[fileName]
+        params = [paramFactory(args, mapping) for args in paramArgs]
+        return ParamStore(params)
+
 
 class PresetDesignSpaceFactory:
     IDS = {
@@ -256,7 +202,18 @@ class PresetDesignSpaceFactory:
         'advancedTriangleSpace.xml': 'triangle',
     }
 
+    MAPPING = {
+        'simpleTriangleMapping.xml': 'triangleMapping.xml',
+        'advancedTriangleMapping.xml': 'triangleMapping.xml',
+    }
+
     @staticmethod
-    def getDesignSpace(fileName, psFactory=PresetParamStoreFactory):
-        ps = psFactory.getParamStore(fileName)
+    def getDesignSpace(fileName, codeMappingFactory=PresetCodeMappingFactory,
+             psFactory=PresetParamStoreFactory):
+        mappingFile = PresetDesignSpaceFactory.MAPPING.get(fileName)
+        mapping = None
+        if mapping is not None:
+            mapping = codeMappingFactory(mappingFile)
+        ps = psFactory.getParamStore(fileName, mapping)
+
         return DesignSpace(ps, PresetDesignSpaceFactory.IDS[fileName], fileName)
