@@ -2,7 +2,7 @@ import unittest
 from inputpy import mapping
 from test import SomeStructural
 from test.types.simple import EmptyClass
-from test.types.geo import Point
+from test.types.geo import Point, Triangle
 from test.tools import PresetCodeMappingFactory, PresetDesignSpaceFactory
 from inputpy.mapping import Mapping
 from inputpy.mapping import CodeMapping
@@ -115,6 +115,23 @@ class TestMapping(unittest.TestCase):
             self.assertEqual(k, v.getGetter())
         for (k,v) in setter.items():
             self.assertEqual(k, v.getSetter())
+
+    def testDifferentTriangleInitializations(self):
+        dsConfig = 'simpleTriangleSpace.xml'
+        mappingConfigs = (
+            'triangleMapping.xml',
+            #'triangleCustomAccessorMapping.xml',
+            #'triangleDefaultAccessorMapping.xml',
+        )
+        cmFactory = PresetCodeMappingFactory.getCodeMapping
+        dsFactory = PresetDesignSpaceFactory.getDesignSpace
+
+        for config in mappingConfigs:
+            mapping = cmFactory(config)
+            space = dsFactory(dsConfig, codeMappingFactory=lambda x: mapping)
+            result = space.next('T1')
+            expected = Triangle(Point(1,1), Point(3,2), Point(5,1))
+            self.assertEqual(expected, result)
 
     # This isn't very thorough, but it should be good enough.
     def testCodeMappingEquality(self):
