@@ -12,7 +12,7 @@
     />
     <i:MappingType
         id="Triangle"
-        type="test.types.geo.Triangle"
+        type="test.types.geo.TriangleWithoutConstructor"
     />
 
     <i:Mapping id="T1" type="Triangle" />

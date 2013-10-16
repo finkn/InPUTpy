@@ -27,6 +27,7 @@ SP = SPARAM
 POINT = 'test.types.geo.Point'
 TRIANGLE = 'test.types.geo.Triangle'
 TRIANGLE_CUSTOM = 'test.types.geo.TriangleWithCustomAccessors'
+TRIANGLE_DEFAULT = 'test.types.geo.TriangleWithoutConstructor'
 
 class PresetCodeMappingFactory:
 
@@ -58,7 +59,7 @@ class PresetCodeMappingFactory:
 
     DEFAULT_ACCESSOR_TRIANGLE_PMAP = TRIANGLE_PMAP
     DEFAULT_ACCESSOR_TRIANGLE_MAPT = (
-        M(P, POINT, constructor='X Y'), M(T, TRIANGLE),
+        M(P, POINT, constructor='X Y'), M(T, TRIANGLE_DEFAULT),
     )
 
     MAPPINGS = {
