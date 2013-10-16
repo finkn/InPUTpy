@@ -11,43 +11,77 @@ from inputpy.mapping import Mapping
 from inputpy.mapping import CodeMapping
 from inputpy.q import *
 
+__all__ = (
+    'PresetCodeMappingFactory', 'PresetParamStoreFactory',
+    'PresetDesignSpaceFactory',
+)
+
+# Trying to compress the arguments.
+ID = ID_ATTR
+TYPE = TYPE_ATTR
+INT = INTEGER
+IMIN = INCL_MIN
+IMAX = INCL_MAX
+NESTED = 'nested'
+SP = SPARAM
+POINT = 'test.types.geo.Point'
+TRIANGLE = 'test.types.geo.Triangle'
+TRIANGLE_CUSTOM = 'test.types.geo.TriangleWithCustomAccessors'
+
 class PresetCodeMappingFactory:
 
-    SIMPLE_TRIANGLE_PMAP = [
-        Mapping('P1', 'Point'),
-        Mapping('P4', 'Point'),
-        Mapping('T1', 'Triangle'),
-        Mapping('T2', 'Triangle'),
-        Mapping('T1.P1', 'Point'),
-        Mapping('T1.P2', 'Point'),
-        Mapping('T1.P3', 'Point'),
-        Mapping('T2.P1', 'Point'),
-        Mapping('T2.P2', 'Point'),
-        Mapping('T2.P3', 'Point'),
-    ]
+    M = Mapping
+    P = 'Point'
+    T = 'Triangle'
+    TRIANGLE_PMAP = (
+        M('P1', P), M('T1', T), M('T1.P1', P), M('T1.P2', P), M('T1.P3', P),
+        M('P4', P), M('T2', T), M('T2.P1', P), M('T2.P2', P), M('T2.P3', P),
+    )
+    TRIANGLE_MAPT = (
+        M(P, POINT, constructor='X Y'), M(T, TRIANGLE, constructor='P1 P2 P3'),
+    )
 
-    SIMPLE_TRIANGLE_MAPT = [
-        Mapping('Point', 'test.types.geo.Point', constructor='X Y'),
-        Mapping('Triangle', 'test.types.geo.Triangle', constructor='P1 P2 P3'),
-    ]
+    P1 = 'Point1'
+    P2 = 'Point2'
+    P3 = 'Point3'
+    CUSTOM_ACCESSOR_TRIANGLE_PMAP = (
+        M('P1', P), M('P4', P), M('T1', T), M('T2', T),
+        M('T1.P1', P1), M('T1.P2', P2), M('T1.P3', P3),
+        M('T2.P1', P1), M('T2.P2', P2), M('T2.P3', P3),
+    )
+    CUSTOM_ACCESSOR_TRIANGLE_MAPT = (
+        M(P, POINT, constructor='X Y'), M(T, TRIANGLE_CUSTOM),
+        M(P1, POINT, constructor='X Y', set='customP1Setter'),
+        M(P2, POINT, constructor='X Y', set='customP2Setter'),
+        M(P3, POINT, constructor='X Y', set='customP3Setter'),
+    )
+
+    DEFAULT_ACCESSOR_TRIANGLE_PMAP = TRIANGLE_PMAP
+    DEFAULT_ACCESSOR_TRIANGLE_MAPT = (
+        M(P, POINT, constructor='X Y'), M(T, TRIANGLE),
+    )
 
     MAPPINGS = {
-        'triangleMapping.xml': (SIMPLE_TRIANGLE_PMAP, SIMPLE_TRIANGLE_MAPT),
+        'triangleMapping.xml': (
+            TRIANGLE_PMAP, TRIANGLE_MAPT,
+        ),
+        'triangleCustomAccessorMapping.xml': (
+            CUSTOM_ACCESSOR_TRIANGLE_PMAP, CUSTOM_ACCESSOR_TRIANGLE_MAPT
+        ),
+        'triangleDefaultAccessorMapping.xml': (
+            DEFAULT_ACCESSOR_TRIANGLE_PMAP, DEFAULT_ACCESSOR_TRIANGLE_MAPT
+        ),
     }
 
     @staticmethod
     def getCodeMapping(fileName):
+        # Getting code mapping for a design space without a mapping.
+        if fileName is None:
+            return None
         return CodeMapping(*(PresetCodeMappingFactory.MAPPINGS[fileName]))
 
+
 class PresetParamStoreFactory:
-    # Trying to compress the arguments.
-    ID = ID_ATTR
-    TYPE = TYPE_ATTR
-    INT = 'integer'
-    IMIN = INCL_MIN
-    IMAX = INCL_MAX
-    NESTED = 'nested'
-    SP = SPARAM
 
     SIMPLE_INTEGER_SPACE = [
         getParameter('A', 'integer'),
@@ -208,12 +242,12 @@ class PresetDesignSpaceFactory:
     }
 
     @staticmethod
-    def getDesignSpace(fileName, codeMappingFactory=PresetCodeMappingFactory,
-             psFactory=PresetParamStoreFactory):
+    def getDesignSpace(fileName,
+            codeMappingFactory=PresetCodeMappingFactory.getCodeMapping,
+            psFactory=PresetParamStoreFactory.getParamStore):
+
         mappingFile = PresetDesignSpaceFactory.MAPPING.get(fileName)
-        mapping = None
-        if mapping is not None:
-            mapping = codeMappingFactory(mappingFile)
-        ps = psFactory.getParamStore(fileName, mapping)
+        mapping = codeMappingFactory(mappingFile)
+        ps = psFactory(fileName, mapping)
 
         return DesignSpace(ps, PresetDesignSpaceFactory.IDS[fileName], fileName)

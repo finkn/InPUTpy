@@ -7,6 +7,8 @@ class TestFactories(unittest.TestCase):
     def testPresetCodeMappingFactory(self):
         configs = (
             'triangleMapping.xml',
+            'triangleCustomAccessorMapping.xml',
+            'triangleDefaultAccessorMapping.xml',
         )
         factories = (
             XMLFactory.getCodeMapping,

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<i:CodeMappings
+    id="triangle"
+    xmlns:i="http://TheInPUT.org/CodeMappings"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://TheInPUT.org/CodeMappings http://theinput.org/CodeMappings.xsd">
+
+    <i:MappingType
+        id="Point"
+        type="test.types.geo.Point"
+        constructor="X Y"
+    />
+    <i:MappingType
+        id="Triangle"
+        type="test.types.geo.Triangle"
+    />
+
+    <i:Mapping id="T1" type="Triangle" />
+    <i:Mapping id="T2" type="Triangle" />
+
+    <i:Mapping id="P1" type="Point" />
+    <i:Mapping id="P4" type="Point" />
+
+    <i:Mapping id="T1.P1" type="Point" />
+    <i:Mapping id="T1.P2" type="Point" />
+    <i:Mapping id="T1.P3" type="Point" />
+    <i:Mapping id="T2.P1" type="Point" />
+    <i:Mapping id="T2.P2" type="Point" />
+    <i:Mapping id="T2.P3" type="Point" />
+
+</i:CodeMappings>
