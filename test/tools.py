@@ -238,8 +238,8 @@ class PresetDesignSpaceFactory:
     }
 
     MAPPING = {
-        'simpleTriangleMapping.xml': 'triangleMapping.xml',
-        'advancedTriangleMapping.xml': 'triangleMapping.xml',
+        'simpleTriangleSpace.xml': 'triangleMapping.xml',
+        'advancedTriangleSpace.xml': 'triangleMapping.xml',
     }
 
     @staticmethod
