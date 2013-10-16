@@ -14,7 +14,7 @@ to make them easier to understand and thus more useful.
 
 __all__ = (
     'Point', 'PointWithoutConstructor', 'Triangle',
-    'TriangleWithoutConstructor',
+    'TriangleWithoutConstructor', 'TriangleWithCustomAccessors',
 )
 
 class Point:
@@ -24,13 +24,16 @@ class Point:
 
     def getX(self): return self.__x
     def getY(self): return self.__y
-    def setX(self, x): self.__x = x
-    def setY(self, y): self.__y = y
+    def setX(self, x): self.__x = x; return self
+    def setY(self, y): self.__y = y; return self
 
     def __str__(self):
         return '(%i,%i)' % (self.__x, self.__y)
     def __repr__(self):
         return self.__str__()
+
+    def __eq__(self, other):
+        return self.__x == other.__x and self.__y == other.__y
 
 class PointWithoutConstructor(Point):
     def __init__(self):
@@ -45,14 +48,18 @@ class Triangle:
     def getP1(self): return self.p1
     def getP2(self): return self.p2
     def getP3(self): return self.p3
-    def setP1(self, p): self.p1 = p
-    def setP2(self, p): self.p2 = p
-    def setP3(self, p): self.p3 = p
+    def setP1(self, p): self.p1 = p; return self
+    def setP2(self, p): self.p2 = p; return self
+    def setP3(self, p): self.p3 = p; return self
 
     def __str__(self):
         return '(%s,%s,%s)' % (self.p1, self.p2, self.p3)
     def __repr__(self):
         return self.__str__()
+
+    def __eq__(self, other):
+        return (self.p1 == other.p1 and
+            self.p1 == other.p1 and self.p3 == other.p3)
 
 class TriangleWithoutConstructor(Triangle):
     def __init__(self):
@@ -67,9 +74,9 @@ class TriangleWithCustomAccessors(Triangle):
     def customP1Getter(self): return self.p1
     def customP2Getter(self): return self.p2
     def customP3Getter(self): return self.p3
-    def customP1Setter(self, p): self.p1 = p
-    def customP2Setter(self, p): self.p2 = p
-    def customP3Setter(self, p): self.p3 = p
+    def customP1Setter(self, p): self.p1 = p; return self
+    def customP2Setter(self, p): self.p2 = p; return self
+    def customP3Setter(self, p): self.p3 = p; return self
 
     def getP1(*args): raise NotImplementedError('No default accessors.')
     def getP2(*args): raise NotImplementedError('No default accessors.')
