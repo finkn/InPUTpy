@@ -70,8 +70,8 @@ class Mapping:
         self.id = id
         self.type = type
         self.constructor = constructor
-        self.setter = set or getDefaultSetter(id)
-        self.getter = get or getDefaultGetter(id)
+        self.setter = set
+        self.getter = get
 
         if constructor is not None:
             self.dep = tuple(constructor.split())
@@ -94,10 +94,10 @@ class Mapping:
         return self.constructor
 
     def getSetter(self):
-        return self.setter
+        return self.setter or getDefaultSetter(self.id)
 
     def getGetter(self):
-        return self.getter
+        return self.getter or getDefaultGetter(self.id)
 
     def getParameters(self):
         return {
@@ -158,7 +158,7 @@ class CodeMapping:
 
     # Always returns a full/direct mapping.
     def getMapping(self, id):
-        return self.__mappings[id]
+        return self.__mappings.get(id)
 
     def __eq__(self, other):
         smt = self.__mappingTypes
