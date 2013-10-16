@@ -38,7 +38,7 @@ class Param(Identifiable):
     value (with the exception of fixed values), and does not know how to
     generate appropriate values or even which ones would be valid.
     """
-    def __init__(self, id, type, fixed=None, parentId=None,
+    def __init__(self, id, type, fixed=None, parentId=None, mapping=None,
             inclMin=None, exclMin=None, inclMax=None, exclMax=None):
 
         # Check arguments.
@@ -296,9 +296,9 @@ def paramFactory(kwargs, mappings=None):
     already in the dictionary will be added.
 
     Note: Any existing parent ID or mapping will not be replaced.
-    This function has a side effect: inferred parent IDs are added to the
-    nested arguments.
     """
+    kwargs = dict(kwargs)
+
     paramId = kwargs['id']
     del kwargs['id']
     paramType = kwargs['type']
