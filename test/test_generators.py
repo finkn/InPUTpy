@@ -1,32 +1,32 @@
 import unittest
 import inputpy.generators as generator
-from inputpy.param import Param
-from inputpy.param import getParameter
+from inputpy.q import SHORT, INTEGER, LONG, FLOAT, DOUBLE, DECIMAL, BOOLEAN
+from inputpy.q import SPARAM
+from inputpy.param import Param, getParameter, paramFactory
 from test.types.simple import EmptyClass
 from test.types.geo import Point
 from inputpy.mapping import Mapping
-#from inputpy.mapping import CodeMapping
 
 class TestGenerators(unittest.TestCase):
 
     def testGeneratorRandomness(self):
         params = (
-            Param('A', 'integer', inclMin=1, inclMax=10),
-            Param('A', 'float', inclMin=1, inclMax=10),
-            Param('A', 'boolean'),
+            Param('A', INTEGER, inclMin=1, inclMax=10),
+            Param('A', FLOAT, inclMin=1, inclMax=10),
+            Param('A', BOOLEAN),
         )
         for p in params:
             self.checkGeneratorRandomness(p)
 
     def testGeneratorReturnType(self):
         params = (
-            (Param('A', 'short', inclMin=1, inclMax=10), int),
-            (Param('A', 'integer', inclMin=1, inclMax=10), int),
-            (Param('A', 'long', inclMin=1, inclMax=10), int),
-            (Param('A', 'float', inclMin=1, inclMax=10), float),
-            (Param('A', 'double', inclMin=1, inclMax=10), float),
-            (Param('A', 'numeric', inclMin=1, inclMax=10), float),
-            (Param('A', 'boolean', inclMin=1, inclMax=10), bool),
+            (Param('A', SHORT, inclMin=1, inclMax=10), int),
+            (Param('A', INTEGER, inclMin=1, inclMax=10), int),
+            (Param('A', LONG, inclMin=1, inclMax=10), int),
+            (Param('A', FLOAT, inclMin=1, inclMax=10), float),
+            (Param('A', DOUBLE, inclMin=1, inclMax=10), float),
+            (Param('A', DECIMAL, inclMin=1, inclMax=10), float),
+            (Param('A', BOOLEAN, inclMin=1, inclMax=10), bool),
         )
         # Go through parameter-type pairs.
         for pair in params:
@@ -37,27 +37,27 @@ class TestGenerators(unittest.TestCase):
     def testGeneratorRange(self):
         tests = (
             {
-                'param': Param('A', 'short', inclMin=-2, inclMax=0),
+                'param': Param('A', SHORT, inclMin=-2, inclMax=0),
                 'inclMin': (-2,), 'inclMax': (0,),
             },
             {
-                'param': Param('A', 'long', exclMin=1, exclMax=4),
+                'param': Param('A', LONG, exclMin=1, exclMax=4),
                 'inclMin': (2,), 'inclMax': (3,),
             },
             {
-                'param': Param('A', 'integer', inclMin=(1,2,), exclMax=(2,4,)),
+                'param': Param('A', INTEGER, inclMin=(1,2,), exclMax=(2,4,)),
                 'inclMin': (1,2,), 'inclMax': (1,3,),
             },
             {
-                'param': Param('A', 'float', inclMin=0.5, inclMax=0.6),
+                'param': Param('A', FLOAT, inclMin=0.5, inclMax=0.6),
                 'inclMin': (0.5,), 'inclMax': (0.6,),
             },
             {
-                'param': Param('A', 'boolean'),
+                'param': Param('A', BOOLEAN),
                 'inclMin': (0,), 'inclMax': (1,),
             },
             {
-                'param': Param('A', 'double',
+                'param': Param('A', DOUBLE,
                             inclMin=('Math.cos(Math.pi)','.5/2 + B'),
                             inclMax=(.9,'Math.sqrt(16) + B')),
                 'dep': {'B': 3},
@@ -68,7 +68,7 @@ class TestGenerators(unittest.TestCase):
             self.checkRange(**kwarg)
 
     def testNextArray(self):
-        param = Param('A', 'integer', inclMin=1, inclMax=1)
+        param = Param('A', INTEGER, inclMin=1, inclMax=1)
         sizes = (2, 3, 4)
         expected = [
             [
@@ -83,7 +83,7 @@ class TestGenerators(unittest.TestCase):
         self.assertEqual(expected, result)
 
     def testNextArrayWithFixedParameter(self):
-        param = Param('A', 'integer', inclMin=1, inclMax=1, fixed=2)
+        param = Param('A', INTEGER, inclMin=1, inclMax=1, fixed=2)
         sizes = (2, 3)
         expected = [
             [2, 2, 2],
@@ -95,10 +95,10 @@ class TestGenerators(unittest.TestCase):
 
     def testNextValueWithArrayParameter(self):
         params = (
-            getParameter('A', 'short[2][3]', inclMin=1, inclMax=1),
-            getParameter('A', 'integer[2][3]', inclMin=2, inclMax=2),
-            getParameter('A', 'float[2][3]', inclMin=1, inclMax=1, fixed=3.5),
-            getParameter('A', 'boolean[2][3]', fixed='true'),
+            getParameter('A', SHORT+'[2][3]', inclMin=1, inclMax=1),
+            getParameter('A', INTEGER+'[2][3]', inclMin=2, inclMax=2),
+            getParameter('A', FLOAT+'[2][3]', inclMin=1, inclMax=1, fixed=3.5),
+            getParameter('A', BOOLEAN+'[2][3]', fixed='true'),
         )
         sizes = (2, 3)
         for p in params:
@@ -108,13 +108,13 @@ class TestGenerators(unittest.TestCase):
     def testSParamGenerator(self):
         dep = {'X': 2, 'Y': 3}
         nested = [
-            getParameter('X', 'integer', inclMin=2, inclMax=2),
-            getParameter('Y', 'integer', inclMin=3, inclMax=3),
+            getParameter('X', INTEGER, inclMin=2, inclMax=2),
+            getParameter('Y', INTEGER, inclMin=3, inclMax=3),
         ]
         pointMapping = Mapping('Point', 'test.types.geo.Point', 'X Y')
         emptyMapping = Mapping('Empty', 'test.types.simple.EmptyClass')
-        pointParam = getParameter('Point', 'SParam', nested=nested, mapping=pointMapping)
-        emptyParam = getParameter('Empty', 'SParam', nested=[], mapping=emptyMapping)
+        pointParam = getParameter('Point', SPARAM, nested=nested, mapping=pointMapping)
+        emptyParam = getParameter('Empty', SPARAM, nested=[], mapping=emptyMapping)
         self.assertIsNotNone(emptyParam.getMapping())
         self.assertIsNotNone(pointParam.getMapping())
 

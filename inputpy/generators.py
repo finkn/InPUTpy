@@ -16,18 +16,9 @@ import random
 from inputpy.exceptions import InPUTException
 from inputpy.util import Evaluator
 from inputpy import mapping
-
-# Constants for type names.
-SHORT = 'short'
-INTEGER = 'integer'
-LONG = 'long'
-FLOAT = 'float'
-DOUBLE = 'double'
-NUMERIC = 'numeric'
-BOOLEAN = 'boolean'
-# Not a defined type in InPUT. This is used internally in InPUTpy.
-ARRAY = 'array'
-SPARAM = 'SParam'
+from inputpy.q import SHORT, INTEGER, LONG
+from inputpy.q import FLOAT, DOUBLE, DECIMAL
+from inputpy.q import BOOLEAN, ARRAY, SPARAM
 
 # Maps the string description to a range.
 RANGE_MAP = {
@@ -38,11 +29,11 @@ RANGE_MAP = {
     # Floating point types.
     FLOAT: (-2**32, 2**32-1),
     DOUBLE: (-2**64, 2**64-1),
-    NUMERIC: (-2**128, 2**128-1), # Not 100% about this.
+    DECIMAL: (-2**128, 2**128-1), # Not 100% about this.
 }
 
 INT_TYPES = (SHORT, INTEGER, LONG,)
-FLOAT_TYPES = (FLOAT, DOUBLE, NUMERIC,)
+FLOAT_TYPES = (FLOAT, DOUBLE, DECIMAL,)
 
 class ValueGenerator:
     rng = random
