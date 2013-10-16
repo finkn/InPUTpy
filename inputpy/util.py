@@ -214,6 +214,27 @@ def initOrder(params):
         result[l] = p
     return result
 
+# TODO:
+# These two functions are extremely ugly (and possibly even unreliable)
+# heuristics. They must be replaced!
+def isArrayElement(paramId, params):
+    paramId = paramId[paramId.find('.') + 1:]
+    parts = paramId.split('.')
+    for component in parts:
+        if not component.isdigit():
+            return False
+    return True
+
+# Might not even work? What if this is a nested param of an SParam that is
+# an array element?
+def isSParam(paramId, params):
+    paramId = paramId[paramId.find('.') + 1:]
+    parts = paramId.split('.')
+    for component in parts:
+        if component.isdigit():
+            return False
+    return True
+
 def getValue(paramId, params):
     """
     Return the value of the parameter with the given ID.
@@ -226,22 +247,23 @@ def getValue(paramId, params):
         - An array parameter element.
 
     If there should exist a parameter that has the same ID as the element
-    of an array parameter, then the array element takes precedent.
+    of an array parameter, then the array element takes precedence.
     """
     # Handle regular parameter ID without any dots.
     if paramId.find('.') == -1:
         return params.get(paramId)
-    # Handle parameter ID with one or more dots.
-    # This may be a regular parameter after all, or it may be an array element.
+
     parts = paramId.split('.')
     result = params.get(parts[0])
     if result is None:
         return params.get(paramId)
-    # Assumes an array.
-    indexes = [int(i)-1 for i in parts[1:]]
-    for i in indexes:
-        result = result[i]
-    return result
+    if isArrayElement(paramId, params):
+        indexes = [int(i)-1 for i in parts[1:]]
+        for i in indexes:
+            result = result[i]
+        return result
+    elif isSParam(paramId, params):
+        return params.get(paramId)
 
 # This function needs cleaning up!
 def setValue(paramId, params, value):
