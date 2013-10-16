@@ -5,6 +5,7 @@ from inputpy.param import Design
 from inputpy.param import getParameter
 from inputpy.designspace import DesignSpace
 from inputpy.exceptions import InPUTException
+from test.tools import PresetDesignSpaceFactory
 
 class TestDesign(unittest.TestCase):
     def testCreateEmptyDesignWithoutId(self):
@@ -136,6 +137,34 @@ class TestDesign(unittest.TestCase):
         p = design.getValue('Point')
         self.assertEqual(2, p.getX())
         self.assertEqual(3, p.getY())
+
+    # TODO:
+    # It's about time this pattern with the dictionary is pulled out.
+    def testSimpleTriangleDesign(self):
+        config = 'simpleTriangleSpace.xml'
+        factory = PresetDesignSpaceFactory.getDesignSpace
+        space = factory(config)
+        design = space.nextDesign('Design')
+
+        expected = {
+            'X': 0, 'Y': 1, 'P1.X': 2, 'P1.Y': 3, 'T1.P1.X': 1, 'T1.P1.Y': 1,
+        }
+        for (k, v) in expected.items():
+            msg = 'wrong value for parameter %s' % (k)
+            self.assertEqual(v, design.getValue(k), msg=msg)
+
+    def testAdvancedTriangleDesign(self):
+        config = 'advancedTriangleSpace.xml'
+        factory = PresetDesignSpaceFactory.getDesignSpace
+        space = factory(config)
+        design = space.nextDesign('Design')
+
+        expected = {
+            'X': 0, 'Y': 1, 'P1.X': 4, 'P1.Y': 5, 'T1.P2.X': 3,
+        }
+        for (k, v) in expected.items():
+            msg = 'wrong value for parameter %s' % (k)
+            self.assertEqual(v, design.getValue(k), msg=msg)
 
 if __name__ == '__main__':
     unittest.main()
