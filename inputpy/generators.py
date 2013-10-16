@@ -154,17 +154,21 @@ class SParamGenerator(ValueGenerator):
         for d in paramMapping.getDependencies():
             args.append(dep[d])
 
+        # TODO:
         # Update Mapping to make getType return the actual type.
         t = mapping.getType(paramMapping.getTypeName())
-        # TODO:
-        # Go through nested parameters, looking for any setters.
-        # Invoke the setter with the nested parameter value as an argument
-        # in order to initialize the corresponding field.
-        # All nested parameters must be set, either using the constructor
-        # or using a setter method.
 
-        # This works as long as all nested parameters are set by constructor.
-        return t(*args)
+        # Create instance with any constructor arguments.
+        tmp = t(*args)
+        # Now set any remaining nested parameters with setters.
+        dependencies = paramMapping.getDependencies()
+        for p in param.getNestedParameters():
+            if p.getRelativeId() in dependencies:
+                continue
+            depMapping = p.getMapping()
+            setter = tmp.__getattribute__(depMapping.getSetter())
+            setter(dep[p.getRelativeId()])
+        return tmp
 
     @classmethod
     def isValid(cls, param, dep={}):

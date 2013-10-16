@@ -120,8 +120,8 @@ class TestMapping(unittest.TestCase):
         dsConfig = 'simpleTriangleSpace.xml'
         mappingConfigs = (
             'triangleMapping.xml',
-            #'triangleCustomAccessorMapping.xml',
-            #'triangleDefaultAccessorMapping.xml',
+            'triangleCustomAccessorMapping.xml',
+            'triangleDefaultAccessorMapping.xml',
         )
         cmFactory = PresetCodeMappingFactory.getCodeMapping
         dsFactory = PresetDesignSpaceFactory.getDesignSpace
