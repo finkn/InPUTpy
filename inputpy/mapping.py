@@ -111,6 +111,22 @@ class Mapping:
         params['id'] = paramId
         return Mapping(**params)
 
+    def __eq__(self, other):
+        if self.id != other.id: return False
+        if self.type != other.type: return False
+        if self.dep != other.dep: return False
+        if self.constructor != other.constructor: return False
+        if self.setter != other.setter: return False
+        if self.getter != other.getter: return False
+        return True
+
+    def __str__(self):
+        return '%s -> %s' % (self.id, self.type)
+
+    def __repr__(self):
+        return self.__str__()
+
+
 class CodeMapping:
     """
     Objects of this class act as databases of code mappings.
@@ -143,3 +159,23 @@ class CodeMapping:
     # Always returns a full/direct mapping.
     def getMapping(self, id):
         return self.__mappings[id]
+
+    def __eq__(self, other):
+        smt = self.__mappingTypes
+        spm = self.__paramMappings
+        omt = other.__mappingTypes
+        opm = other.__paramMappings
+
+        if len(smt) != len(omt): return False
+        if len(spm) != len(opm): return False
+
+        for m in smt:
+            if smt.count(m) != omt.count(m): return False
+        for m in omt:
+            if smt.count(m) != omt.count(m): return False
+        for m in spm:
+            if spm.count(m) != opm.count(m): return False
+        for m in opm:
+            if spm.count(m) != opm.count(m): return False
+
+        return True

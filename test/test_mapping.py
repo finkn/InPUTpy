@@ -3,6 +3,7 @@ from inputpy import mapping
 from test import SomeStructural
 from test.types.simple import EmptyClass
 from test.types.geo import Point
+from test.tools import PresetCodeMappingFactory, PresetDesignSpaceFactory
 from inputpy.mapping import Mapping
 from inputpy.mapping import CodeMapping
 
@@ -101,19 +102,36 @@ class TestMapping(unittest.TestCase):
 
     def testAccessor(self):
         getter = {
-            Mapping('X', 'builtin.str'): 'getX',
-            Mapping('A.B.X', 'builtin.str'): 'getX',
-            Mapping('X', 'builtin.str', get='customGetter'): 'customGetter',
+            'getX': Mapping('X', 'builtin.str'),
+            'getY': Mapping('A.B.Y', 'builtin.str'),
+            'customGetter': Mapping('X', 'builtin.str', get='customGetter'),
         }
         setter = {
-            Mapping('X', 'builtin.str'): 'setX',
-            Mapping('A.B.X', 'builtin.str'): 'setX',
-            Mapping('X', 'builtin.str', set='customSetter'): 'customSetter',
+            'setX': Mapping('X', 'builtin.str'),
+            'setY': Mapping('A.B.Y', 'builtin.str'),
+            'customSetter': Mapping('X', 'builtin.str', set='customSetter'),
         }
         for (k,v) in getter.items():
-            self.assertEqual(v, k.getGetter())
+            self.assertEqual(k, v.getGetter())
         for (k,v) in setter.items():
-            self.assertEqual(v, k.getSetter())
+            self.assertEqual(k, v.getSetter())
+
+    # This isn't very thorough, but it should be good enough.
+    def testCodeMappingEquality(self):
+        m1 = Mapping('M1', 'builtin.str')
+        m2 = Mapping('M2', 'builtin.str')
+
+        cm1 = CodeMapping([m1], ())
+        cm2 = CodeMapping([m1], ())
+        cm3 = CodeMapping([m2], ())
+        self.assertEqual(cm1, cm2)
+        self.assertNotEqual(cm1, cm3)
+
+        cm1 = CodeMapping((), [m1])
+        cm2 = CodeMapping((), [m1, m2])
+        cm3 = CodeMapping((), [m2])
+        self.assertNotEqual(cm1, cm2)
+        self.assertNotEqual(cm1, cm3)
 
 if __name__ == '__main__':
     unittest.main()
