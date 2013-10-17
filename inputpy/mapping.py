@@ -32,13 +32,8 @@ def __load(typeString):
     This function is as pure as a function that interacts with the file
     system can be.
     """
-    typeName = typeString
-    moduleName = 'builtins'
-    modEnd = typeString.rfind('.')
-
-    if modEnd != -1:
-        moduleName = typeString[:modEnd]
-        typeName = typeString[modEnd+1:]
+    moduleName = util.parent(typeString) or 'builtins'
+    typeName = util.relative(typeString) or typeString
 
     module = importlib.import_module(moduleName)
     return module.__dict__[typeName]
