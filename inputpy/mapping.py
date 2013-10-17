@@ -12,8 +12,7 @@ It's a Null Object.
 :license: MIT. See LICENSE for details.
 """
 import importlib
-from inputpy.q import SETTER_PREFIX
-from inputpy.q import GETTER_PREFIX
+from inputpy.q import SETTER_PREFIX, GETTER_PREFIX
 import inputpy.util as util
 
 __all__ = ('getType', 'Mapping', 'CodeMapping', 'NULL_CODE_MAPPING',)

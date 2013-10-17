@@ -4,8 +4,7 @@ from test import SomeStructural
 from test.types.simple import EmptyClass
 from test.types.geo import Point, Triangle
 from test.tools import PresetCodeMappingFactory, PresetDesignSpaceFactory
-from inputpy.mapping import Mapping
-from inputpy.mapping import CodeMapping
+from inputpy.mapping import Mapping, CodeMapping, NULL_CODE_MAPPING
 
 class TestMapping(unittest.TestCase):
     def testGetBuiltinTypes(self):

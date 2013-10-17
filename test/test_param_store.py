@@ -1,7 +1,5 @@
 import unittest
-from inputpy.param import Param
-from inputpy.param import ParamStore
-from inputpy.param import getParameter
+from inputpy.param import Param, ParamStore, getParameter
 
 class TestParamStore(unittest.TestCase):
     def testAddMultipleParameters(self):

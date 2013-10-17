@@ -4,12 +4,8 @@ test.tools
 Exports fake factories for "importing" known configurations.
 """
 from inputpy.designspace import DesignSpace
-from inputpy.param import ParamStore
-from inputpy.param import getParameter
-from inputpy.param import paramFactory
-from inputpy.mapping import Mapping
-from inputpy.mapping import CodeMapping
-from inputpy.mapping import NULL_CODE_MAPPING
+from inputpy.param import ParamStore, getParameter, paramFactory
+from inputpy.mapping import Mapping, CodeMapping, NULL_CODE_MAPPING
 from inputpy.q import *
 
 __all__ = (

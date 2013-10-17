@@ -11,8 +11,7 @@ with the existing classes in inputpy.design).
 :copyright: (c) 2013 by Christoffer Fink.
 :license: MIT. See LICENSE for details.
 """
-from inputpy.util import Evaluator
-from inputpy.util import initOrder
+from inputpy.util import initOrder, Evaluator
 import inputpy.generators as generator
 import inputpy.util as util
 # Only needed by Design.

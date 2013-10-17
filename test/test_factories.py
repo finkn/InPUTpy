@@ -1,7 +1,6 @@
 import unittest
 from inputpy.factories import XMLFactory
-from test.tools import PresetCodeMappingFactory
-from test.tools import PresetDesignSpaceFactory
+from test.tools import PresetCodeMappingFactory, PresetDesignSpaceFactory
 
 class TestFactories(unittest.TestCase):
     def testPresetCodeMappingFactory(self):

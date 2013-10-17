@@ -6,9 +6,7 @@ inputpy.designspace
 """
 import inputpy.generators as generator
 import inputpy.util as util
-from inputpy.param import Identifiable
-from inputpy.param import Design
-from inputpy.param import ParamStore
+from inputpy.param import Identifiable, Design, ParamStore
 
 class DesignSpace(Identifiable):
     """

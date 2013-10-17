@@ -1,7 +1,5 @@
 import unittest
-from inputpy.util import Evaluator
-from inputpy.util import depLen
-from inputpy.util import initOrder
+from inputpy.util import Evaluator, depLen, initOrder
 import inputpy.util as util
 
 class TestEvaluator(unittest.TestCase):

@@ -1,8 +1,7 @@
 import xml.etree.ElementTree as et
 import inputpy.param as param
 from inputpy.designspace import DesignSpace
-from inputpy.mapping import Mapping
-from inputpy.mapping import CodeMapping
+from inputpy.mapping import Mapping, CodeMapping
 
 class XMLFactory:
     @staticmethod

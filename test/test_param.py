@@ -1,10 +1,6 @@
 import unittest
-from inputpy.param import Param
-from inputpy.param import ParamStore
-from inputpy.param import Design
-from inputpy.param import getParameter
-from inputpy.param import paramFactory
 from inputpy.designspace import DesignSpace
+from inputpy.param import *
 from inputpy.mapping import NULL_CODE_MAPPING
 from inputpy.q import *
 

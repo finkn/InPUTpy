@@ -1,8 +1,5 @@
 import unittest
-from inputpy.param import Param
-from inputpy.param import ParamStore
-from inputpy.param import Design
-from inputpy.param import getParameter
+from inputpy.param import Param, ParamStore, Design, getParameter
 from inputpy.designspace import DesignSpace
 from inputpy.exceptions import InPUTException
 from test.tools import PresetDesignSpaceFactory
