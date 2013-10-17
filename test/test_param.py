@@ -5,6 +5,7 @@ from inputpy.param import Design
 from inputpy.param import getParameter
 from inputpy.param import paramFactory
 from inputpy.designspace import DesignSpace
+from inputpy.mapping import NULL_CODE_MAPPING
 from inputpy.q import *
 
 class TestParam(unittest.TestCase):
@@ -247,7 +248,8 @@ class TestParam(unittest.TestCase):
                 ),
             },
         }
-        results = {k: paramFactory(v, None) for (k,v) in paramArgs.items()}
+        M = NULL_CODE_MAPPING
+        results = {k: paramFactory(v, M) for (k,v) in paramArgs.items()}
         self.assertCountEqual(paramArgs.keys(), results.keys())
         p = results['P1']
         self.assertEqual(2, len(p.getNestedParameters()))

@@ -9,6 +9,7 @@ from inputpy.param import getParameter
 from inputpy.param import paramFactory
 from inputpy.mapping import Mapping
 from inputpy.mapping import CodeMapping
+from inputpy.mapping import NULL_CODE_MAPPING
 from inputpy.q import *
 
 __all__ = (
@@ -78,7 +79,7 @@ class PresetCodeMappingFactory:
     def getCodeMapping(fileName):
         # Getting code mapping for a design space without a mapping.
         if fileName is None:
-            return None
+            return NULL_CODE_MAPPING
         return CodeMapping(*(PresetCodeMappingFactory.MAPPINGS[fileName]))
 
 

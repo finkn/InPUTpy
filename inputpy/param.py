@@ -299,6 +299,9 @@ def paramFactory(kwargs, mappings=None):
     """
     kwargs = dict(kwargs)
 
+    # TODO:
+    # Replace these string literals with constants. What's that, Python
+    # doesn't have constants? Fine, just pretend...
     paramId = kwargs['id']
     del kwargs['id']
     paramType = kwargs['type']
@@ -312,10 +315,8 @@ def paramFactory(kwargs, mappings=None):
             param['parentId'] = absoluteId
         kwargs['nested'] = [paramFactory(args, mappings) for args in nested]
 
-    # TODO:
-    # Create a null mapping object that always returns a None mapping.
     # Check that existing mappings are not replaced.
-    if mappings is not None and 'mapping' not in kwargs:
+    if 'mapping' not in kwargs:
         m = mappings.getMapping(absoluteId)
         kwargs['mapping'] = m
 
