@@ -30,7 +30,7 @@ class TestMapping(unittest.TestCase):
         paramId = 'ParamId'
         m = Mapping(paramId, typeString, 'X Y')
         self.assertEqual(paramId, m.getId())
-        self.assertEqual(typeString, m.getType())
+        self.assertEqual(typeString, m.getTypeName())
         self.assertEqual(('X', 'Y'), m.getDependencies())
 
     def testCreateSimplMapping(self):
@@ -38,7 +38,7 @@ class TestMapping(unittest.TestCase):
         paramId = 'ParamId'
         m = Mapping(paramId, typeString)
         self.assertEqual(paramId, m.getId())
-        self.assertEqual(typeString, m.getType())
+        self.assertEqual(typeString, m.getTypeName())
         self.assertEqual((), m.getDependencies())
 
     def testMakeDirectMapping(self):

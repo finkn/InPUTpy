@@ -68,7 +68,7 @@ def getDefaultGetter(paramId, prefix=GETTER_PREFIX):
 class Mapping:
     def __init__(self, id, type, constructor=None, set=None, get=None):
         self.id = id
-        self.type = type
+        self.typeName = type
         self.constructor = constructor
         self.setter = set
         self.getter = get
@@ -82,10 +82,10 @@ class Mapping:
         return self.id
 
     def getType(self):
-        return self.type
+        return getType(self.typeName)
 
     def getTypeName(self):
-        return self.type
+        return self.typeName
 
     def getDependencies(self):
         return self.dep
@@ -101,8 +101,8 @@ class Mapping:
 
     def getParameters(self):
         return {
-            'id': self.id, 'type': self.type, 'constructor': self.constructor,
-            'set': self.setter, 'get': self.getter,
+            'id': self.id, 'type': self.typeName, 'get': self.getter,
+            'constructor': self.constructor, 'set': self.setter,
         }
 
     @staticmethod
@@ -113,7 +113,7 @@ class Mapping:
 
     def __eq__(self, other):
         if self.id != other.id: return False
-        if self.type != other.type: return False
+        if self.typeName != other.typeName: return False
         if self.dep != other.dep: return False
         if self.constructor != other.constructor: return False
         if self.setter != other.setter: return False
@@ -121,7 +121,7 @@ class Mapping:
         return True
 
     def __str__(self):
-        return '%s -> %s' % (self.id, self.type)
+        return '%s -> %s' % (self.id, self.typeName)
 
     def __repr__(self):
         return self.__str__()
