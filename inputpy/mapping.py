@@ -4,6 +4,10 @@ mapping.py
 A module for handling code mappings.
 Note that this module has state.
 
+The NULL_CODE_MAPPING object is a predefined code mapping that always
+returns None. This can be used when no real mapping exists.
+It's a Null Object.
+
 :copyright: (c) 2013 by Christoffer Fink.
 :license: MIT. See LICENSE for details.
 """
@@ -12,7 +16,7 @@ from inputpy.q import SETTER_PREFIX
 from inputpy.q import GETTER_PREFIX
 import inputpy.util as util
 
-__all__ = ('getType', 'Mapping', 'CodeMapping', )
+__all__ = ('getType', 'Mapping', 'CodeMapping', 'NULL_CODE_MAPPING',)
 
 types = {}
 
@@ -179,3 +183,5 @@ class CodeMapping:
             if spm.count(m) != opm.count(m): return False
 
         return True
+
+NULL_CODE_MAPPING = CodeMapping([], [])
