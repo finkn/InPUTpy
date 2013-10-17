@@ -12,7 +12,6 @@ using the two main functions of this module.
 import random
 from inputpy.exceptions import InPUTException
 from inputpy.util import Evaluator
-from inputpy import mapping
 from inputpy.q import SHORT, INTEGER, LONG
 from inputpy.q import FLOAT, DOUBLE, DECIMAL
 from inputpy.q import BOOLEAN, ARRAY, SPARAM
@@ -156,10 +155,7 @@ class SParamGenerator(ValueGenerator):
         for d in paramMapping.getDependencies():
             args.append(dep[d])
 
-        # TODO:
-        # Update Mapping to make getType return the actual type.
-        t = mapping.getType(paramMapping.getTypeName())
-
+        t = paramMapping.getType()
         # Create instance with any constructor arguments.
         tmp = t(*args)
         # Now set any remaining nested parameters with setters.
