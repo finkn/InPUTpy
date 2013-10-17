@@ -153,5 +153,10 @@ class TestMapping(unittest.TestCase):
         self.assertNotEqual(cm1, cm2)
         self.assertNotEqual(cm1, cm3)
 
+    def testNullCodeMapping(self):
+        tests = ('X', 'hello', None, 3, '', 1.2, True, False,)
+        for t in tests:
+            self.assertIsNone(NULL_CODE_MAPPING.getMapping(t))
+
 if __name__ == '__main__':
     unittest.main()
