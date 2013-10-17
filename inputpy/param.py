@@ -64,6 +64,7 @@ class Param(Identifiable):
         maxIsExcl = exclMax is not None
 
         # Initialize fields.
+        id = util.absolute(parentId, id)
         Identifiable.__init__(self, id)
         self.type = type
         self.exclMin = minIsExcl
@@ -86,12 +87,6 @@ class Param(Identifiable):
 
         # Set fixed value, if any.
         self.setFixed(fixed)
-
-        # Possibly deprecated. SParam does exactly the same thing.
-        if parentId is None:
-            self.absoluteId = id
-        else:
-            self.absoluteId = parentId + '.' + id
 
     @staticmethod
     def __padLimits(minLimits, maxLimits):
@@ -240,15 +235,11 @@ class Param(Identifiable):
         """
         return tuple(self.minDependees + self.maxDependees)
 
-    # Possibly deprecated.
-    def getAbsoluteId(self):
-        return self.absoluteId
-
     def getRelativeId(self):
-        return self.getId()
+        return util.relative(self.getId())
 
     def __eq__(self, other):
-        if self.absoluteId != other.absoluteId:
+        if self.getId() != other.getId():
             return False
         if self.getType() != other.getType():
             return False
@@ -324,20 +315,14 @@ def paramFactory(kwargs, mappings=None):
 
 class SParam(Identifiable):
     def __init__(self, id, type, nested=[], mapping=None, parentId=None):
+        id = util.absolute(parentId, id)
         Identifiable.__init__(self, id)
         self.type = type
         self.nested = nested
         # An SParam without a mapping is probably an error. Need to check!
         self.mapping = mapping
         # Can I use absolute ID here?
-        self.dependees = [p.getId() for p in self.nested]
-        # If an absolute ID is going to remain (in addition to the "regular"
-        # ID), then this should be moved to a common base class, since Param
-        # (what would then become NParam) has to do exactly the same thing.
-        if parentId is None:
-            self.absoluteId = id
-        else:
-            self.absoluteId = parentId + '.' + id
+        self.dependees = [p.getRelativeId() for p in self.nested]
 
     def getType(self):
         return self.type
@@ -357,18 +342,12 @@ class SParam(Identifiable):
     def getContext(self):
         return self.absoluteId
 
-    # Absolute ID may be redundant. It should be possible to only always
-    # deal with absolute IDs.
-    def getAbsoluteId(self):
-        return self.absoluteId
-
     # If absolute id replaces plain "id", then this will take over that role.
     def getRelativeId(self):
-        return self.getId()
+        return util.relative(self.getId())
 
     def __eq__(self, other):
-        # Just use getId once absolute IDs are the norm.
-        if self.absoluteId != other.absoluteId:
+        if self.getId() != other.getId():
             return False
         if len(self.nested) != len(other.nested):
             return False
@@ -453,9 +432,9 @@ class ParamStore:
             for p in param:
                 self.addParam(p)
         except TypeError:
-            self.__params[param.getAbsoluteId()] = param
+            self.__params[param.getId()] = param
             # Update dependencies as new parameters are added.
-            self.__dep[param.getAbsoluteId()] = param.getDependees()
+            self.__dep[param.getId()] = param.getDependees()
 
             if param.getType() == 'SParam':
                 self.addParam(param.getNestedParameters())
@@ -563,7 +542,7 @@ class ParamStore:
         doesn't exist.
         """
         dependees = param.getDependees()
-        context = param.getAbsoluteId()
+        context = param.getId()
         ids = self.__params.keys()
         for d in dependees:
             d = util.findAbsoluteParameter(context, d, ids)

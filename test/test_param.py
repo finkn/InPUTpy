@@ -232,10 +232,10 @@ class TestParam(unittest.TestCase):
         y = getParameter('Y', 'integer', parentId='A.B')
         a = getParameter('A', 'SParam', nested=(x, y))
         b = getParameter('B', 'SParam', nested=(a,), parentId='A')
-        self.assertEqual('A.B.X', x.getAbsoluteId())
-        self.assertEqual('A.B.Y', y.getAbsoluteId())
-        self.assertEqual('A.B', b.getAbsoluteId())
-        self.assertEqual('A', a.getAbsoluteId())
+        self.assertEqual('A.B.X', x.getId())
+        self.assertEqual('A.B.Y', y.getId())
+        self.assertEqual('A.B', b.getId())
+        self.assertEqual('A', a.getId())
 
     # Note that this test does not include code mappings!
     def testParamFactory(self):
