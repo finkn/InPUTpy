@@ -3,11 +3,8 @@ This module primarily exports two functions:
     - isValid
     - nextValue
 
-The generators have to be compatible with the Java version. While Python
-only has one int and one float type, capable of representing arbitrary
-precision, Java has 4 integer types (3 of which are supported by InPUT)
-and 3 floating point types. Therefore, this module exports constants
-defining the min and max ranges for those types.
+It also exports value generators, but these are probably best accessed
+using the two main functions of this module.
 
 :copyright: (c) 2013 by Christoffer Fink.
 :license: MIT. See LICENSE for details.
@@ -19,6 +16,11 @@ from inputpy import mapping
 from inputpy.q import SHORT, INTEGER, LONG
 from inputpy.q import FLOAT, DOUBLE, DECIMAL
 from inputpy.q import BOOLEAN, ARRAY, SPARAM
+
+__all__ = (
+    'isValid', 'nextValue',
+    'IntGenerator', 'FloatGenerator', 'ArrayGenerator', 'SParamGenerator',
+)
 
 # Maps the string description to a range.
 RANGE_MAP = {
