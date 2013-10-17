@@ -1,3 +1,7 @@
+"""
+:copyright: (c) 2013 by Christoffer Fink.
+:license: MIT. See LICENSE for details.
+"""
 import unittest
 from inputpy.param import Param, ParamStore, getParameter
 from inputpy.designspace import DesignSpace

@@ -1,3 +1,7 @@
+"""
+:copyright: (c) 2013 by Christoffer Fink.
+:license: MIT. See LICENSE for details.
+"""
 import unittest
 from test.test_api_design_space import TestDesignSpace
 from test.test_api_design import TestDesign

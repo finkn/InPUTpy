@@ -1,3 +1,7 @@
+"""
+:copyright: (c) 2013 by Christoffer Fink.
+:license: MIT. See LICENSE for details.
+"""
 import unittest
 import inputpy.generators as generator
 from inputpy.q import SHORT, INTEGER, LONG, FLOAT, DOUBLE, DECIMAL, BOOLEAN

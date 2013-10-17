@@ -2,6 +2,9 @@
 test.tools
 
 Exports fake factories for "importing" known configurations.
+
+:copyright: (c) 2013 by Christoffer Fink.
+:license: MIT. See LICENSE for details.
 """
 from inputpy.designspace import DesignSpace
 from inputpy.param import ParamStore, getParameter, paramFactory

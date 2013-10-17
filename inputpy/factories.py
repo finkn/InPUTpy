@@ -1,3 +1,7 @@
+"""
+:copyright: (c) 2013 by Christoffer Fink.
+:license: MIT. See LICENSE for details.
+"""
 import xml.etree.ElementTree as et
 import inputpy.param as param
 from inputpy.designspace import DesignSpace
