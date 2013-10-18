@@ -339,9 +339,6 @@ class SParam(Identifiable):
     def isDependent(self):
         return len(self.nested) > 0
 
-    def getContext(self):
-        return self.absoluteId
-
     # If absolute id replaces plain "id", then this will take over that role.
     def getRelativeId(self):
         return util.relative(self.getId())
