@@ -14,6 +14,7 @@ with the existing classes in inputpy.design).
 from inputpy.util import initOrder, Evaluator
 import inputpy.generators as generator
 import inputpy.util as util
+from inputpy.q import *
 # Only needed by Design.
 from inputpy.exceptions import InPUTException
 
@@ -244,8 +245,8 @@ class NParam(Param):
         Extends Param.setFixed.
         """
         if type(value) is str:
-            if self.getType() == 'boolean':
-                Param.setFixed(self, value.lower() == 'true')
+            if self.getType() == BOOLEAN:
+                Param.setFixed(self, value.lower() == TRUE)
             else:
                 Param.setFixed(self, Evaluator.evaluate(value))
         else:
@@ -346,7 +347,7 @@ class SParam(Param):
 # Factory.
 def getParameter(id, type, **kwargs):
     # This is a structured parameter.
-    if type == 'SParam':
+    if type == SPARAM:
         return SParam(id, type, **kwargs)
     # This is a numeric parameter.
     elif type.find('[') == -1:
@@ -381,23 +382,23 @@ def paramFactory(kwargs, mappings=None):
     # TODO:
     # Replace these string literals with constants. What's that, Python
     # doesn't have constants? Fine, just pretend...
-    paramId = kwargs['id']
-    del kwargs['id']
-    paramType = kwargs['type']
-    del kwargs['type']
-    parentId = kwargs.get('parentId')
+    paramId = kwargs[ID_ATTR]
+    del kwargs[ID_ATTR]
+    paramType = kwargs[TYPE_ATTR]
+    del kwargs[TYPE_ATTR]
+    parentId = kwargs.get(PARENT_ID)
     absoluteId = util.absolute(parentId, paramId)
 
-    nested = kwargs.get('nested')
+    nested = kwargs.get(NESTED)
     if nested is not None:
         for param in nested:
-            param['parentId'] = absoluteId
-        kwargs['nested'] = [paramFactory(args, mappings) for args in nested]
+            param[PARENT_ID] = absoluteId
+        kwargs[NESTED] = [paramFactory(args, mappings) for args in nested]
 
     # Check that existing mappings are not replaced.
-    if 'mapping' not in kwargs:
+    if MAPPING_ATTR not in kwargs:
         m = mappings.getMapping(absoluteId)
-        kwargs['mapping'] = m
+        kwargs[MAPPING_ATTR] = m
 
     return getParameter(paramId, paramType, **kwargs)
 
@@ -426,9 +427,9 @@ class ParamArray():
 
     def getType(self):
         """
-        Always returns 'array'.
+        Always returns inputpy.q.ARRAY.
         """
-        return 'array'
+        return ARRAY
 
     def getSize(self):
         """
@@ -450,7 +451,7 @@ class ParamArray():
 
 
 class ParamStore:
-    def __init__(self, params=None):
+    def __init__(self, params=()):
         """
         The params argument is optional. It can be a single parameter or a
         sequence of multiple parameters. Parameters can be added until the
@@ -459,8 +460,7 @@ class ParamStore:
         self.__params = {}            # ID-to-Param mapping.
         self.__dep = {}               # ID-to-IDs mapping.
         self.__finalized = False
-        if params is not None:
-            self.addParam(params)
+        self.addParam(params)
 
     # Assumes that params is a sequence of parameters. If it turns out to be
     # a single parameter it is placed in a sequence before processing.
@@ -483,7 +483,7 @@ class ParamStore:
             # Update dependencies as new parameters are added.
             self.__dep[param.getId()] = param.getDependees()
 
-            if param.getType() == 'SParam':
+            if param.getType() == SPARAM:
                 self.addParam(param.getNestedParameters())
 
     def getParam(self, paramId):
