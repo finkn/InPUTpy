@@ -63,14 +63,8 @@ class DesignSpace(Identifiable):
         Return a new design with freshly initialized parameters.
         """
         params = {}
-        initOrder = self.params.getInitializationOrder()
-
-        # Initialize all the top-level parameters. Their dependencies will
-        # be resolved recursively by __initParam.
-        initList = sorted(initOrder.keys(), reverse=True)
-        for order in initList:
-            for paramId in initOrder[order]:
-                params = self.__initParam(paramId, params)
+        for paramId in self.params.getSupportedParamIds():
+            params = self.__initParam(paramId, params)
         return Design(params, self, designId)
 
     def __initParam(self, paramId, init):
