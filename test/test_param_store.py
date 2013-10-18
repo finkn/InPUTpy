@@ -93,10 +93,11 @@ class TestParamStore(unittest.TestCase):
             ps.finalize()
 
     def testAddSParams(self):
+        m = 'dummy mapping' # Looks like I'm being very naughty.
         x = getParameter('X', 'integer', parentId='A.B')
         y = getParameter('Y', 'integer', parentId='A.B')
-        b = getParameter('B', 'SParam', nested=(x, y), parentId='A')
-        a = getParameter('A', 'SParam', nested=(b,))
+        b = getParameter('B', 'SParam', nested=(x, y), parentId='A', mapping=m)
+        a = getParameter('A', 'SParam', nested=(b,), mapping=m)
         ps = ParamStore([a, b])
         initOrder = ps.getInitializationOrder()
         self.assertCountEqual(('A.B.X', 'A.B.Y'), initOrder[0])

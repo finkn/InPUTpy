@@ -5,8 +5,8 @@
 import unittest
 from inputpy.designspace import DesignSpace
 from inputpy.param import *
-from inputpy.mapping import NULL_CODE_MAPPING
 from inputpy.q import *
+from test.tools import PresetCodeMappingFactory
 
 class TestParam(unittest.TestCase):
 
@@ -203,7 +203,8 @@ class TestParam(unittest.TestCase):
         self.assertEqual(param1, param2)
 
     def testSParamWithoutNestedParameters(self):
-        param = getParameter('A', 'SParam', nested=())
+        m = 'dummy mapping' # Looks like I'm being very naughty.
+        param = getParameter('A', 'SParam', nested=(), mapping=m)
         self.assertEqual('A', param.getId())
         self.assertEqual('SParam', param.getType())
         self.assertEqual((), param.getNestedParameters())
@@ -211,31 +212,29 @@ class TestParam(unittest.TestCase):
     def testSParamWithNestedParameters(self):
         # A could be a Point object for example, with X and Y
         # NParam nested parameters.
+        m = 'dummy mapping'
         x = getParameter('X', 'integer', parentId='A')
         y = getParameter('Y', 'integer', parentId='A')
-        param = getParameter('A', 'SParam', nested=(x, y))
+        param = getParameter('A', 'SParam', nested=(x, y), mapping=m)
         self.assertEqual('A', param.getId())
         self.assertEqual('SParam', param.getType())
         self.assertEqual((x, y), param.getNestedParameters())
         self.assertCountEqual(('X', 'Y'), param.getDependees())
 
     def testSParamWithMultipleNestingLevels(self):
+        m = 'dummy mapping'
         x = getParameter('X', 'integer', parentId='B.A')
         y1 = getParameter('Y', 'integer', parentId='B.A')
         y2 = getParameter('Y', 'integer', parentId='B')
-        a = getParameter('A', 'SParam', nested=(x, y1), parentId='B')
-        b = getParameter('B', 'SParam', nested=(a, y2))
+        a = getParameter('A', 'SParam', nested=(x, y1), parentId='B', mapping=m)
+        b = getParameter('B', 'SParam', nested=(a, y2), mapping=m)
         self.assertCountEqual(('A', 'Y'), b.getDependees())
 
     def testAbsolutePath(self):
         x = getParameter('X', 'integer', parentId='A.B')
         y = getParameter('Y', 'integer', parentId='A.B')
-        a = getParameter('A', 'SParam', nested=(x, y))
-        b = getParameter('B', 'SParam', nested=(a,), parentId='A')
         self.assertEqual('A.B.X', x.getId())
         self.assertEqual('A.B.Y', y.getId())
-        self.assertEqual('A.B', b.getId())
-        self.assertEqual('A', a.getId())
 
     # Note that this test does not include code mappings!
     def testParamFactory(self):
@@ -248,8 +247,8 @@ class TestParam(unittest.TestCase):
                 ),
             },
         }
-        M = NULL_CODE_MAPPING
-        results = {k: paramFactory(v, M) for (k,v) in paramArgs.items()}
+        m = PresetCodeMappingFactory.getCodeMapping('triangleMapping.xml')
+        results = {k: paramFactory(v, m) for (k,v) in paramArgs.items()}
         self.assertCountEqual(paramArgs.keys(), results.keys())
         p = results['P1']
         self.assertEqual(2, len(p.getNestedParameters()))
