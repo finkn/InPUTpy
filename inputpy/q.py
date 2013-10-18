@@ -24,6 +24,9 @@ DOUBLE = 'double'
 DECIMAL = 'decimal'
 BOOLEAN = 'boolean'
 ARRAY = 'array'
+TRUE = 'true'
+PARENT_ID = 'parentId'
+NESTED = 'nested'
 
 # XML elements.
 DESIGN_ROOT = 'Design'
