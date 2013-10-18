@@ -29,16 +29,115 @@ class Identifiable:
     def getId(self):
         return self.__id
 
-class NParam(Identifiable):
+
+class Param(Identifiable):
     """
-    The parameter class is pretty dumb. It represents the definition of a
-    parameter as opposed to an actual parameter. This means that it knows
-    only the information that was used to define it. It will never have a
-    value (with the exception of fixed values), and does not know how to
-    generate appropriate values or even which ones would be valid.
+    The definition of a parameter. A parameter only knows the information
+    that was used to define it. It will never have a value (with the
+    exception of fixed values), and does not know how to generate
+    appropriate values or even which ones would be valid.
+    """
+    def __init__(self, id, type,
+        fixed=None, parentId=None, mapping=None, dependees=[]):
+        """
+        - ID is always relative.
+        - parent ID is always absolute.
+        - dependees is a sequence of parameter IDs.
+        """
+        Identifiable.__init__(self, util.absolute(parentId, id))
+        self.type = type
+        self.fixed = fixed
+        self.dependees = tuple(dependees)
+        self.parentId = parentId
+        self.mapping = mapping
+        self.relativeId = id
+
+    def getDependees(self):
+        """
+        Return a tuple containing the IDs of any parameters that this
+        parameter depends on.
+        """
+        return self.dependees
+
+    def getFixedValue(self):
+        """
+        Return the value this parameter was fixed to, if any.
+        """
+        return self.fixed
+
+    def getMapping(self):
+        """
+        Return any code mapping for this parameter.
+        """
+        return self.mapping
+
+    def getRelativeId(self):
+        """
+        Return the relative ID of this parameter.
+        """
+        return self.relativeId
+
+    def getType(self):
+        """
+        Return a string representing the type of this parameter.
+        """
+        return self.type
+
+    def isDependent(self):
+        """
+        Return whether this parameter depends on any others.
+        """
+        return len(self.dependees) > 0
+
+    def isFixed(self):
+        """
+        Return whether this parameter has been set to a fixed value.
+        """
+        return self.fixed is not None
+
+    def setFixed(self, fixed):
+        """
+        Set this parameter to a fixed value. A parameter can also be
+        un-fixed by passing None as the value.
+        """
+        self.fixed = fixed
+
+    def __eq__(self, other):
+        if other is None:
+            return False
+        if self.getId() != other.getId():
+            return False
+        if self.getType() != other.getType():
+            return False
+        selfDep = self.getDependees()
+        otherDep = other.getDependees()
+        if len(selfDep) != len(otherDep):
+            return False
+        for d in selfDep:
+            if selfDep.count(d) != otherDep.count(d):
+                return False
+        if self.getFixedValue() != other.getFixedValue():
+            return False
+        if self.getMapping() != other.getMapping():
+           return False
+
+        return True
+
+
+class NParam(Param):
+    """
+    This class represents numeric parameters.
     """
     def __init__(self, id, type, fixed=None, parentId=None, mapping=None,
             inclMin=None, exclMin=None, inclMax=None, exclMax=None):
+        """
+        Raises ValueError if:
+        - type is None
+        - inclusive and exclusive limits are specified at the same time.
+
+        Each of the limits can be either a single value, an expression or
+        a sequence of values or expressions.
+        """
 
         # Check arguments.
         if type is None:
@@ -64,9 +163,6 @@ class NParam(Identifiable):
         maxIsExcl = exclMax is not None
 
         # Initialize fields.
-        id = util.absolute(parentId, id)
-        Identifiable.__init__(self, id)
-        self.type = type
         self.exclMin = minIsExcl
         self.exclMax = maxIsExcl
         self.minDependees = []      # Referenced parameters in min expression.
@@ -85,8 +181,8 @@ class NParam(Identifiable):
         self.minDependees = tuple(self.minDependees)
         self.maxDependees = tuple(self.maxDependees)
 
-        # Set fixed value, if any.
-        self.setFixed(fixed)
+        tmp = self.minDependees + self.maxDependees
+        Param.__init__(self, id, type, fixed, parentId, mapping, tmp)
 
     @staticmethod
     def __padLimits(minLimits, maxLimits):
@@ -114,6 +210,9 @@ class NParam(Identifiable):
         else:
             return limit
 
+    # TODO:
+    # - Make this return results instead of modifying arguments!
+    # - Consider whether simple expressions should really be evaluated.
     @staticmethod
     def __initMinMax(limits, dependees, limit):
         # If min/max are expressions, these will be parsed to find
@@ -126,12 +225,6 @@ class NParam(Identifiable):
             if len(dependees) == 0:
                 limit = Evaluator.evaluate(limit)
         limits.append(limit)
-
-    def isFixed(self):
-        """
-        Return whether this parameter has been set to a fixed value.
-        """
-        return self.fixed is not None
 
     def setFixed(self, value):
         """
@@ -147,26 +240,16 @@ class NParam(Identifiable):
         Boolean parameters do not evaluate expressions. When set to a
         string value, only 'true' (ignoring case) is True. Any other string
         is interpreted as False.
+
+        Extends Param.setFixed.
         """
         if type(value) is str:
-            if self.type == 'boolean':
-                self.fixed = value.lower() == 'true'
-                return
-            self.fixed = Evaluator.evaluate(value)
+            if self.getType() == 'boolean':
+                Param.setFixed(self, value.lower() == 'true')
+            else:
+                Param.setFixed(self, Evaluator.evaluate(value))
         else:
-            self.fixed = value
-
-    def getFixedValue(self):
-        """
-        Return the value this parameter was fixed to, if any.
-        """
-        return self.fixed
-
-    def isDependent(self):
-        """
-        Return whether this parameter depends on any others.
-        """
-        return self.isMinDependent() or self.isMaxDependent()
+            Param.setFixed(self, value)
 
     def isMinDependent(self):
         """
@@ -181,14 +264,6 @@ class NParam(Identifiable):
         maximum value.
         """
         return len(self.maxDependees) > 0
-
-    def getType(self):
-        """
-        Return a string containing the type this parameter was defined with.
-        For example, for an integer parameter (defined with type='integer')
-        the return value will be 'integer'.
-        """
-        return self.type
 
     def getMin(self):
         """
@@ -228,31 +303,45 @@ class NParam(Identifiable):
         """
         return self.exclMax
 
-    def getDependees(self):
-        """
-        Return a tuple containing the IDs of any parameters that this
-        parameter depends on.
-        """
-        return tuple(self.minDependees + self.maxDependees)
-
-    def getRelativeId(self):
-        return util.relative(self.getId())
-
     def __eq__(self, other):
-        if self.getId() != other.getId():
+        if not Param.__eq__(self, other):
             return False
-        if self.getType() != other.getType():
+        if self.getMin() != other.getMin():
             return False
-        if self.min != other.min:
+        if self.getMax() != other.getMax():
             return False
-        if self.max != other.max:
+        if self.isMinExclusive() != other.isMinExclusive():
             return False
-        if self.minDependees != other.minDependees:
-            return False
-        if self.maxDependees != other.maxDependees:
+        if self.isMaxExclusive() != other.isMaxExclusive():
             return False
 
         return True
+
+
+class SParam(Param):
+    def __init__(self, id, type,
+            fixed=None, parentId=None, mapping=None, nested=[]):
+        if mapping is None:
+            raise ValueError('Cannot create SParam with None mapping')
+        self.nested = nested
+        dep = [p.getRelativeId() for p in self.nested]
+        Param.__init__(self, id, type, fixed, parentId, mapping, dep)
+
+    def getNestedParameters(self):
+        return self.nested
+
+    def __eq__(self, other):
+        if not Param.__eq__(self, other):
+            return False
+        selfNest = self.getNestedParameters()
+        otherNest = other.getNestedParameters()
+        if len(selfNest) != len(otherNest):
+            return False
+        for p in selfNest:
+            if selfNest.count(p) != otherNest.count(p):
+                return False
+        return True
+
 
 # Factory.
 def getParameter(id, type, **kwargs):
@@ -312,45 +401,6 @@ def paramFactory(kwargs, mappings=None):
 
     return getParameter(paramId, paramType, **kwargs)
 
-
-class SParam(Identifiable):
-    def __init__(self, id, type, nested=[], mapping=None, parentId=None):
-        id = util.absolute(parentId, id)
-        Identifiable.__init__(self, id)
-        self.type = type
-        self.nested = nested
-        # An SParam without a mapping is probably an error. Need to check!
-        self.mapping = mapping
-        # Can I use absolute ID here?
-        self.dependees = [p.getRelativeId() for p in self.nested]
-
-    def getType(self):
-        return self.type
-
-    def getNestedParameters(self):
-        return self.nested
-
-    def getDependees(self):
-        return self.dependees
-
-    def getMapping(self):
-        return self.mapping
-
-    def isDependent(self):
-        return len(self.nested) > 0
-
-    # If absolute id replaces plain "id", then this will take over that role.
-    def getRelativeId(self):
-        return util.relative(self.getId())
-
-    def __eq__(self, other):
-        if self.getId() != other.getId():
-            return False
-        if len(self.nested) != len(other.nested):
-            return False
-        if self.nested != other.nested:
-            return False
-        return True
 
 class ParamArray():
     """
