@@ -136,6 +136,37 @@ class TestMapping(unittest.TestCase):
             expected = Triangle(Point(1,1), Point(3,2), Point(5,1))
             self.assertEqual(expected, result)
 
+    def testMappingEquality(self):
+        unequal = (
+            Mapping('M1', 'builtin.str'),
+            Mapping('M2', 'builtin.str'),
+            Mapping('M1', 'builtin.int'),
+            Mapping('M1', 'builtin.str', 'X Y'),
+            Mapping('M1', 'builtin.str', 'Y X'),
+            Mapping('M1', 'builtin.str', 'X Y', 'setM1'),
+            Mapping('M1', 'builtin.str', 'X Y', 'M1setter'),
+            Mapping('M1', 'builtin.str', 'X Y', 'M1setter', 'getM1'),
+            Mapping('M1', 'builtin.str', 'X Y', 'M1setter', 'M1getter'),
+        )
+        for m in unequal:
+            self.assertNotEqual(m, None)
+            for n in unequal:
+                if m is n: continue
+                self.assertNotEqual(m, n)
+
+        equal = (
+            (
+                Mapping('M1', 'builtin.str', 'X Y', 'M1setter', 'M1getter'),
+                Mapping('M1', 'builtin.str', 'X Y', 'M1setter', 'M1getter'),
+            ),
+            (
+                Mapping('M1', 'builtin.str'),
+                Mapping('M1', 'builtin.str'),
+            ),
+        )
+        for (m, n) in equal:
+            self.assertEqual(m, n)
+
     # This isn't very thorough, but it should be good enough.
     def testCodeMappingEquality(self):
         m1 = Mapping('M1', 'builtin.str')
