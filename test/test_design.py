@@ -3,7 +3,7 @@
 :license: MIT. See LICENSE for details.
 """
 import unittest
-from inputpy.param import Param, ParamStore, Design, getParameter
+from inputpy.param import ParamStore, Design, getParameter
 from inputpy.designspace import DesignSpace
 from inputpy.exceptions import InPUTException
 from test.tools import PresetDesignSpaceFactory
@@ -26,8 +26,8 @@ class TestDesign(unittest.TestCase):
 
     def testCreateDesignFromDesignSpace(self):
         ps = ParamStore()
-        ps.addParam(Param('A', 'integer', inclMin=1, inclMax=1))
-        ps.addParam(Param('B', 'integer', exclMin=1, exclMax=3))
+        ps.addParam(getParameter('A', 'integer', inclMin=1, inclMax=1))
+        ps.addParam(getParameter('B', 'integer', exclMin=1, exclMax=3))
         space = DesignSpace(ps)
         design = space.nextDesign('Design')
         self.assertEqual(1, design.getValue('A'))
@@ -109,8 +109,8 @@ class TestDesign(unittest.TestCase):
 
     def testGetSpace(self):
         ps = ParamStore()
-        ps.addParam(Param('A', 'integer', inclMin=1, inclMax=1))
-        ps.addParam(Param('B', 'integer', exclMin=1, exclMax=3))
+        ps.addParam(getParameter('A', 'integer', inclMin=1, inclMax=1))
+        ps.addParam(getParameter('B', 'integer', exclMin=1, exclMax=3))
         space = DesignSpace(ps)
         design = Design({}, space, 'Design')
         self.assertEqual(space, design.getSpace())

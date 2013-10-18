@@ -29,7 +29,7 @@ class Identifiable:
     def getId(self):
         return self.__id
 
-class Param(Identifiable):
+class NParam(Identifiable):
     """
     The parameter class is pretty dumb. It represents the definition of a
     parameter as opposed to an actual parameter. This means that it knows
@@ -261,7 +261,7 @@ def getParameter(id, type, **kwargs):
         return SParam(id, type, **kwargs)
     # This is a numeric parameter.
     elif type.find('[') == -1:
-        return Param(id, type, **kwargs)
+        return NParam(id, type, **kwargs)
 
     # This is an array parameter.
     # 'integer[2][3]' should become size: 2, paramType: 'integer[3]'

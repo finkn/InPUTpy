@@ -6,7 +6,7 @@ import unittest
 import inputpy.generators as generator
 from inputpy.q import SHORT, INTEGER, LONG, FLOAT, DOUBLE, DECIMAL, BOOLEAN
 from inputpy.q import SPARAM
-from inputpy.param import Param, getParameter, paramFactory
+from inputpy.param import getParameter, paramFactory
 from test.types.simple import EmptyClass
 from test.types.geo import Point
 from inputpy.mapping import Mapping
@@ -15,22 +15,22 @@ class TestGenerators(unittest.TestCase):
 
     def testGeneratorRandomness(self):
         params = (
-            Param('A', INTEGER, inclMin=1, inclMax=10),
-            Param('A', FLOAT, inclMin=1, inclMax=10),
-            Param('A', BOOLEAN),
+            getParameter('A', INTEGER, inclMin=1, inclMax=10),
+            getParameter('A', FLOAT, inclMin=1, inclMax=10),
+            getParameter('A', BOOLEAN),
         )
         for p in params:
             self.checkGeneratorRandomness(p)
 
     def testGeneratorReturnType(self):
         params = (
-            (Param('A', SHORT, inclMin=1, inclMax=10), int),
-            (Param('A', INTEGER, inclMin=1, inclMax=10), int),
-            (Param('A', LONG, inclMin=1, inclMax=10), int),
-            (Param('A', FLOAT, inclMin=1, inclMax=10), float),
-            (Param('A', DOUBLE, inclMin=1, inclMax=10), float),
-            (Param('A', DECIMAL, inclMin=1, inclMax=10), float),
-            (Param('A', BOOLEAN, inclMin=1, inclMax=10), bool),
+            (getParameter('A', SHORT, inclMin=1, inclMax=10), int),
+            (getParameter('A', INTEGER, inclMin=1, inclMax=10), int),
+            (getParameter('A', LONG, inclMin=1, inclMax=10), int),
+            (getParameter('A', FLOAT, inclMin=1, inclMax=10), float),
+            (getParameter('A', DOUBLE, inclMin=1, inclMax=10), float),
+            (getParameter('A', DECIMAL, inclMin=1, inclMax=10), float),
+            (getParameter('A', BOOLEAN, inclMin=1, inclMax=10), bool),
         )
         # Go through parameter-type pairs.
         for pair in params:
@@ -41,27 +41,28 @@ class TestGenerators(unittest.TestCase):
     def testGeneratorRange(self):
         tests = (
             {
-                'param': Param('A', SHORT, inclMin=-2, inclMax=0),
+                'param': getParameter('A', SHORT, inclMin=-2, inclMax=0),
                 'inclMin': (-2,), 'inclMax': (0,),
             },
             {
-                'param': Param('A', LONG, exclMin=1, exclMax=4),
+                'param': getParameter('A', LONG, exclMin=1, exclMax=4),
                 'inclMin': (2,), 'inclMax': (3,),
             },
             {
-                'param': Param('A', INTEGER, inclMin=(1,2,), exclMax=(2,4,)),
+                'param':
+                    getParameter('A', INTEGER, inclMin=(1,2,), exclMax=(2,4,)),
                 'inclMin': (1,2,), 'inclMax': (1,3,),
             },
             {
-                'param': Param('A', FLOAT, inclMin=0.5, inclMax=0.6),
+                'param': getParameter('A', FLOAT, inclMin=0.5, inclMax=0.6),
                 'inclMin': (0.5,), 'inclMax': (0.6,),
             },
             {
-                'param': Param('A', BOOLEAN),
+                'param': getParameter('A', BOOLEAN),
                 'inclMin': (0,), 'inclMax': (1,),
             },
             {
-                'param': Param('A', DOUBLE,
+                'param': getParameter('A', DOUBLE,
                             inclMin=('Math.cos(Math.pi)','.5/2 + B'),
                             inclMax=(.9,'Math.sqrt(16) + B')),
                 'dep': {'B': 3},
@@ -72,7 +73,7 @@ class TestGenerators(unittest.TestCase):
             self.checkRange(**kwarg)
 
     def testNextArray(self):
-        param = Param('A', INTEGER, inclMin=1, inclMax=1)
+        param = getParameter('A', INTEGER, inclMin=1, inclMax=1)
         sizes = (2, 3, 4)
         expected = [
             [
@@ -87,7 +88,7 @@ class TestGenerators(unittest.TestCase):
         self.assertEqual(expected, result)
 
     def testNextArrayWithFixedParameter(self):
-        param = Param('A', INTEGER, inclMin=1, inclMax=1, fixed=2)
+        param = getParameter('A', INTEGER, inclMin=1, inclMax=1, fixed=2)
         sizes = (2, 3)
         expected = [
             [2, 2, 2],

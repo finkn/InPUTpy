@@ -23,23 +23,23 @@ class TestParam(unittest.TestCase):
     }
 
     def testCreateBasicParam(self):
-        param = Param('A', 'integer')
+        param = NParam('A', 'integer')
 
     def testGetId(self):
-        param = Param('A', 'integer')
+        param = NParam('A', 'integer')
         pId = param.getId()
         self.assertEqual('A', pId, msg='The parameter ID should be "A"')
 
     def testGetType(self):
-        param = Param('A', 'integer')
+        param = NParam('A', 'integer')
         pType = param.getType()
         self.assertEqual('integer', pType, msg='Parameter should be "integer"')
 
     def testCreateParamWithMultipleRanges(self):
-        Param('A', 'integer', inclMin=(1,5), inclMax=(2,7))
-        Param('A', 'integer', inclMin=('1','5','-5'), inclMax=(2,7,5))
-        Param('A', 'float', exclMin=('.5','5.0','-5'), exclMax=(.9,7,5))
-        Param('A', 'float',
+        NParam('A', 'integer', inclMin=(1,5), inclMax=(2,7))
+        NParam('A', 'integer', inclMin=('1','5','-5'), inclMax=(2,7,5))
+        NParam('A', 'float', exclMin=('.5','5.0','-5'), exclMax=(.9,7,5))
+        NParam('A', 'float',
             inclMin=('Math.cos(Math.pi)','.5/2 + B'),
             inclMax=(.9,'Math.sqrt(16) + B'))
 
@@ -64,35 +64,35 @@ class TestParam(unittest.TestCase):
         self.checkLimits(eMin=(1,2,-5), iMax=(3,10))
 
     def testCreatingParamWithSingleLimitStillReturnsMultiLimit(self):
-        param = Param('A', 'integer', inclMin=1, inclMax=2)
+        param = NParam('A', 'integer', inclMin=1, inclMax=2)
         self.assertIsNotNone(iter(param.getMin()))
 
     def testNoneIdShouldNotRaiseError(self):
-        param = Param(None, 'integer')
+        param = NParam(None, 'integer')
         self.assertIsNotNone(param.getId())
 
     def testNoneTypeShouldRaiseError(self):
         with self.assertRaises(ValueError):
-            param = Param('A', None)
+            param = NParam('A', None)
 
     def testMultipleMinLimitsShouldRaiseError(self):
         with self.assertRaises(ValueError):
-            param = Param('A', 'integer', inclMin=1, exclMin=10)
+            param = NParam('A', 'integer', inclMin=1, exclMin=10)
 
     def testMultipleMaxLimitsShouldRaiseError(self):
         with self.assertRaises(ValueError):
-            param = Param('A', 'integer', inclMax=1, exclMax=10)
+            param = NParam('A', 'integer', inclMax=1, exclMax=10)
 
     def testParamWithoutLimitsIsNotDependent(self):
-        param = Param('A', 'integer')
+        param = NParam('A', 'integer')
         self.assertFalse(param.isDependent())
 
     def testParamWithIntegerLimitIsNotDependent(self):
-        param = Param('A', 'integer', inclMin=1, exclMax=3)
+        param = NParam('A', 'integer', inclMin=1, exclMax=3)
         self.assertFalse(param.isDependent())
 
     def testParamWithParameterReferenceIsDependent(self):
-        param = Param('A', 'integer', inclMin='B', exclMax='B + C')
+        param = NParam('A', 'integer', inclMin='B', exclMax='B + C')
         self.assertTrue(param.isDependent())
 
     def testDependencies(self):
@@ -107,12 +107,12 @@ class TestParam(unittest.TestCase):
             minExp = key
             maxExp = random.choice(keyList)
             expected = tests[minExp] + tests[maxExp]
-            param = Param('A', 'integer', inclMin=minExp, inclMax=maxExp)
+            param = NParam('A', 'integer', inclMin=minExp, inclMax=maxExp)
             dependees = param.getDependees()
             self.assertCountEqual(expected, dependees)
 
     def testIndependentParameterWithExpressionShouldBeEvaluated(self):
-        param = Param('A', 'integer', inclMin='1', exclMax='1 + 2')
+        param = NParam('A', 'integer', inclMin='1', exclMax='1 + 2')
         self.assertFalse(param.isDependent())
         self.assertEqual((1,), param.getMin())
         self.assertEqual((3,), param.getMax())
@@ -122,27 +122,27 @@ class TestParam(unittest.TestCase):
         eMin = 'Math.sqrt(Math.ceil(2.1) + Math.cos(0.0))'
         # 5.0
         iMax = 'Math.log(Math.exp(10)) / Math.floor(2.9)'
-        param = Param('A', 'integer', exclMin=eMin, inclMax=iMax)
+        param = NParam('A', 'integer', exclMin=eMin, inclMax=iMax)
         self.assertFalse(param.isDependent())
         # Should probably really expect 2 and 5 here.
         self.assertEqual((2.0,), param.getMin())
         self.assertEqual((5.0,), param.getMax())
 
     def testDependentParameterWithSimpleDependency(self):
-        param = Param('A', 'integer', inclMin='B')
+        param = NParam('A', 'integer', inclMin='B')
         self.assertTrue(param.isDependent())
 
     def testCreatingFixedParameter(self):
-        param = Param('A', 'integer', fixed=3)
+        param = NParam('A', 'integer', fixed=3)
         self.assertTrue(param.isFixed())
 
     def testUnfixParameter(self):
-        param = Param('A', 'integer', fixed=3)
+        param = NParam('A', 'integer', fixed=3)
         param.setFixed(None)
         self.assertFalse(param.isFixed())
 
     def testFixAndUnfixExistingParameter(self):
-        param = Param('A', 'integer')
+        param = NParam('A', 'integer')
         self.assertFalse(param.isFixed())
         param.setFixed(3)
         self.assertTrue(param.isFixed())
@@ -171,7 +171,7 @@ class TestParam(unittest.TestCase):
             self.assertIsNotNone((), p.getSize())
 
     def testGetParam(self):
-        reference = Param('A', 'integer', inclMin=3, fixed=4)
+        reference = NParam('A', 'integer', inclMin=3, fixed=4)
         param = getParameter('A', 'integer', inclMin=3, fixed=4)
         self.compareParameters(reference, param)
 
@@ -278,7 +278,7 @@ class TestParam(unittest.TestCase):
             kwargs['exclMax'] = eMax
 
         # Create the parameter based on the arguments.
-        param = Param(*args, **kwargs)
+        param = NParam(*args, **kwargs)
 
         # Check that the ranges were padded.
         self.assertEqual(len(param.getMin()), len(param.getMax()))
