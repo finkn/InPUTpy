@@ -425,7 +425,12 @@ def paramFactory(kwargs, mappings=None):
 
     # Make sure that existing mappings are not replaced.
     if MAPPING_ATTR not in kwargs:
-        m = mappings.getMapping(absoluteId)
+        # String parameters are implicitly mapped by type rather than
+        # explicitly by ID. Try to fall back on type if no mapping exists
+        # for the ID.
+        # TODO:
+        # Note! This is a temporary hack!
+        m = mappings.getMapping(absoluteId) or mappings.getMapping(baseType)
         kwargs[MAPPING_ATTR] = m
 
     return getParameter(paramId, **kwargs)

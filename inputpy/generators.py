@@ -12,9 +12,7 @@ using the two main functions of this module.
 import random
 from inputpy.exceptions import InPUTException
 from inputpy.util import Evaluator
-from inputpy.q import SHORT, INTEGER, LONG
-from inputpy.q import FLOAT, DOUBLE, DECIMAL
-from inputpy.q import BOOLEAN, ARRAY, SPARAM
+from inputpy.q import *
 
 __all__ = (
     'isValid', 'nextValue',
@@ -150,6 +148,10 @@ class ArrayGenerator(ValueGenerator):
 class SParamGenerator(ValueGenerator):
     @classmethod
     def nextValue(cls, param, dep={}):
+        # Special case for String type.
+        if param.getType() == STRING:
+            return param.getRelativeId()
+
         args = []
         paramMapping = param.getMapping()
         for d in paramMapping.getDependencies():

@@ -8,7 +8,7 @@ from inputpy.q import *
 from inputpy.param import getParameter, paramFactory
 from test.types.simple import EmptyClass
 from test.types.geo import Point
-from inputpy.mapping import Mapping
+from inputpy.mapping import Mapping, CodeMapping
 
 class TestGenerators(unittest.TestCase):
 
@@ -136,6 +136,12 @@ class TestGenerators(unittest.TestCase):
         self.assertIsInstance(point, Point)
         self.assertEqual(2, point.getX())
         self.assertEqual(3, point.getY())
+
+    def testSParamStringGenerator(self):
+        cm = CodeMapping([], [])
+        args = {ID_ATTR: 'some string', TAG: SPARAM, TYPE_ATTR: STRING}
+        param = paramFactory(args, cm)
+        self.assertEqual('some string', generator.nextValue(param))
 
     def checkDimensions(self, array, sizes):
         size = sizes[0]
