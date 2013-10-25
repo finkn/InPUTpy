@@ -14,14 +14,14 @@ class XMLFactory:
     def __getParamArgs(element, parentId=None):
         args = element.attrib
         if element.tag.endswith(SPARAM):
-            args['type'] = SPARAM
+            args[TAG] = SPARAM
             paramId = args[ID_ATTR]
             nextParent = util.absolute(parentId, paramId)
-            args['nested'] = [
+            args[NESTED] = [
                 XMLFactory.__getParamArgs(e, nextParent) for e in element
             ]
 
-        args['parentId'] = parentId
+        args[PARENT_ID] = parentId
         return args
 
     @staticmethod

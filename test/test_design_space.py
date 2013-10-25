@@ -6,6 +6,7 @@ import unittest
 from inputpy.param import ParamStore, getParameter
 from inputpy.designspace import DesignSpace
 from test.tools import PresetDesignSpaceFactory
+from inputpy.q import *
 
 class TestDesignSpace(unittest.TestCase):
     def testCreateEmptyDesignSpaceWithoutId(self):
@@ -22,7 +23,7 @@ class TestDesignSpace(unittest.TestCase):
         self.assertCountEqual(params, ())
 
     def testAddParams(self):
-        param = getParameter('A', 'integer')
+        param = getParameter('A', NPARAM, INTEGER)
         ps = ParamStore()
         ps.addParam(param)
         ps.addParam(param)
@@ -31,8 +32,8 @@ class TestDesignSpace(unittest.TestCase):
         self.assertCountEqual(params, ('A'))
 
     def testNext(self):
-        param1 = getParameter('A', 'integer', inclMin=1, inclMax=1)
-        param2 = getParameter('B', 'integer', exclMin=1, exclMax=3)
+        param1 = getParameter('A', NPARAM, INTEGER, inclMin=1, inclMax=1)
+        param2 = getParameter('B', NPARAM, INTEGER, exclMin=1, exclMax=3)
         ps = ParamStore()
         ps.addParam(param1)
         ps.addParam(param2)
@@ -42,7 +43,7 @@ class TestDesignSpace(unittest.TestCase):
 
     def testSetFixedInteger(self):
         paramId = 'Y'
-        param = getParameter(paramId, 'integer')
+        param = getParameter(paramId, NPARAM, INTEGER)
         ps = ParamStore()
         ps.addParam(param)
         space = DesignSpace(ps)
@@ -52,7 +53,7 @@ class TestDesignSpace(unittest.TestCase):
 
     def testSetFixedBoolean(self):
         paramId = 'A'
-        param = getParameter(paramId, 'boolean')
+        param = getParameter(paramId, NPARAM, BOOLEAN)
         space = DesignSpace(ParamStore(param))
         self.assertFalse(param.isFixed())
         space.setFixed(paramId, 'true')
@@ -65,7 +66,7 @@ class TestDesignSpace(unittest.TestCase):
 
     def testGenerateValueForFixedParameter(self):
         paramId = 'Z'
-        param = getParameter(paramId, 'integer', inclMin=1, inclMax=1)
+        param = getParameter(paramId, NPARAM, INTEGER, inclMin=1, inclMax=1)
         ps = ParamStore()
         ps.addParam(param)
         space = DesignSpace(ps)
@@ -78,7 +79,7 @@ class TestDesignSpace(unittest.TestCase):
     def testSetFixedToExpression(self):
         paramId = 'X'
         ps = ParamStore()
-        ps.addParam(getParameter(paramId, 'integer'))
+        ps.addParam(getParameter(paramId, NPARAM, INTEGER))
         space = DesignSpace(ps)
         # 2.0
         exp = 'Math.log(Math.e * Math.cos(Math.sin(Math.pi/2)-1)) + 1'
@@ -87,18 +88,20 @@ class TestDesignSpace(unittest.TestCase):
 
     def testNextValueForDependentParameter(self):
         ps = ParamStore()
-        ps.addParam(getParameter('A', 'integer', inclMin=3, inclMax='B + C'))
-        ps.addParam(getParameter('B', 'integer', inclMin='C - 5', inclMax=10))
-        ps.addParam(getParameter('C', 'integer', inclMin=5, inclMax=7))
+        ps.addParam(getParameter('A', NPARAM, INTEGER,
+            inclMin=3, inclMax='B + C'))
+        ps.addParam(getParameter('B', NPARAM, INTEGER,
+            inclMin='C - 5', inclMax=10))
+        ps.addParam(getParameter('C', NPARAM, INTEGER, inclMin=5, inclMax=7))
         space = DesignSpace(ps)
         self.assertTrue(3 <= space.next('A') <= 17)
         self.assertTrue(0 <= space.next('B') <= 10)
         self.assertTrue(5 <= space.next('C') <= 7)
 
     def testCreateDesignFromDesignSpaceWithDependentParameters(self):
-        param1 = getParameter('A', 'integer', inclMin=3, inclMax='B + C')
-        param2 = getParameter('B', 'integer', inclMin='C', inclMax=10)
-        param3 = getParameter('C', 'integer', inclMin=5, inclMax=7)
+        param1 = getParameter('A', NPARAM, INTEGER, inclMin=3, inclMax='B + C')
+        param2 = getParameter('B', NPARAM, INTEGER, inclMin='C', inclMax=10)
+        param3 = getParameter('C', NPARAM, INTEGER, inclMin=5, inclMax=7)
         space = DesignSpace(ParamStore((param1, param2, param3)))
         design = space.nextDesign()
         a = design.getValue('A')
@@ -109,17 +112,18 @@ class TestDesignSpace(unittest.TestCase):
         self.assertTrue(5 <= design.getValue('C') <= 7)
 
     def testCreateDesignSpaceWithArray(self):
-        param = getParameter('A', 'integer[2][2]', fixed=1)
-        self.assertEqual('array', param.getType())
+        t = INTEGER + '[2][2]'
+        param = getParameter('A', NPARAM, t, fixed=1)
+        self.assertEqual(ARRAY, param.getType())
         space = DesignSpace(ParamStore(param))
         expected = [[1,1], [1,1]]
         result = space.next('A')
         self.assertEqual(expected, result)
 
     def testEqual(self):
-        param1 = getParameter('A', 'integer')
-        param2 = getParameter('B', 'integer')
-        param3 = getParameter('A', 'integer', inclMin=1)
+        param1 = getParameter('A', NPARAM, INTEGER)
+        param2 = getParameter('B', NPARAM, INTEGER)
+        param3 = getParameter('A', NPARAM, INTEGER, inclMin=1)
         ps1 = ParamStore((param1, param2))
         ps2 = ParamStore((param1, param2, param3))
         ps3 = ParamStore((param1, param2, param3))  # Same as ps2

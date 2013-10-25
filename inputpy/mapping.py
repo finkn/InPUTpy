@@ -110,7 +110,7 @@ class Mapping:
         return Mapping(**params)
 
     def __eq__(self, other):
-        if other is None:
+        if not isinstance(other, Mapping):
             return False
         if self.id != other.id: return False
         if self.typeName != other.typeName: return False

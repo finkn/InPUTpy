@@ -27,6 +27,7 @@ ARRAY = 'array'
 TRUE = 'true'
 PARENT_ID = 'parentId'
 NESTED = 'nested'
+TAG = 'tag'
 
 # XML elements.
 DESIGN_ROOT = 'Design'

@@ -1,12 +1,22 @@
 """
 inputpy.param
 
-This module exports two classes:
-    - Param
+This module exports four main classes:
+    - NParam
+    - SParam
     - ParamStore
+    - Design
+and two different factory functions for creating parameters:
+    - getParameter
+    - paramFactory
 
-The Design and DesignSpace classes will probably be moved (probably merged
-with the existing classes in inputpy.design).
+getParameter is low-level and picky about arguments. paramFactory is more
+high-level and can infer arguments and fill in some blanks.
+
+The module also contains a few supporting classes:
+    - Identifiable
+    - Param
+    - ArrayParam
 
 :copyright: (c) 2013 by Christoffer Fink.
 :license: MIT. See LICENSE for details.
@@ -17,6 +27,13 @@ import inputpy.util as util
 from inputpy.q import *
 # Only needed by Design.
 from inputpy.exceptions import InPUTException
+
+__all__ = (
+    'Identifiable', 'NParam', 'SParam',
+    'getParameter', 'paramFactory', 'Design',
+)
+
+NPARAM_TYPES = (SHORT, INTEGER, LONG, FLOAT, DOUBLE, DECIMAL, BOOLEAN)
 
 class Identifiable:
     """
@@ -38,7 +55,7 @@ class Param(Identifiable):
     exception of fixed values), and does not know how to generate
     appropriate values or even which ones would be valid.
     """
-    def __init__(self, id, type,
+    def __init__(self, id, type, tag,
         fixed=None, parentId=None, mapping=None, dependees=[]):
         """
         - ID is always relative.
@@ -52,6 +69,7 @@ class Param(Identifiable):
         self.parentId = parentId
         self.mapping = mapping
         self.relativeId = id
+        self.tag = tag
 
     def getDependees(self):
         """
@@ -124,12 +142,16 @@ class Param(Identifiable):
 
         return True
 
+    def getTag(self):
+        return self.tag
+
 
 class NParam(Param):
     """
     This class represents numeric parameters.
     """
-    def __init__(self, id, type, fixed=None, parentId=None, mapping=None,
+    def __init__(self, id, type,
+            tag=NPARAM, fixed=None, parentId=None, mapping=None,
             inclMin=None, exclMin=None, inclMax=None, exclMax=None):
         """
         Raises ValueError if:
@@ -139,7 +161,6 @@ class NParam(Param):
         Each of the limits can be either a single value, an expression or
         a sequence of values or expressions.
         """
-
         # Check arguments.
         if type is None:
             raise ValueError('The parameter type was None')
@@ -147,6 +168,8 @@ class NParam(Param):
             raise ValueError('Defined both inclusive and exclusive limits')
         if inclMax is not None and exclMax is not None:
             raise ValueError('Defined both inclusive and exclusive limits')
+
+        assert type in NPARAM_TYPES
 
         if inclMin is None:
             minTmp = exclMin
@@ -183,7 +206,7 @@ class NParam(Param):
         self.maxDependees = tuple(self.maxDependees)
 
         tmp = self.minDependees + self.maxDependees
-        Param.__init__(self, id, type, fixed, parentId, mapping, tmp)
+        Param.__init__(self, id, type, tag, fixed, parentId, mapping, tmp)
 
     @staticmethod
     def __padLimits(minLimits, maxLimits):
@@ -320,13 +343,13 @@ class NParam(Param):
 
 
 class SParam(Param):
-    def __init__(self, id, type,
+    def __init__(self, id, type=None, tag=SPARAM,
             fixed=None, parentId=None, mapping=None, nested=[]):
         if mapping is None:
             raise ValueError('Cannot create SParam with None mapping')
         self.nested = nested
         dep = [p.getRelativeId() for p in self.nested]
-        Param.__init__(self, id, type, fixed, parentId, mapping, dep)
+        Param.__init__(self, id, type, tag, fixed, parentId, mapping, dep)
 
     def getNestedParameters(self):
         return self.nested
@@ -345,26 +368,26 @@ class SParam(Param):
 
 
 # Factory.
-def getParameter(id, type, **kwargs):
-    # This is a structured parameter.
-    if type == SPARAM:
-        return SParam(id, type, **kwargs)
-    # This is a numeric parameter.
-    elif type.find('[') == -1:
-        return NParam(id, type, **kwargs)
+def getParameter(id, tag, type=None, **kwargs):
+    """
+    Return a parameter object that matches the arguments.
+    The id may not be None. A None tag is legal but discouraged. The type
+    is optional for SParams but mandatory for NParams.
+    """
+    paramClasses = {NPARAM: NParam, SPARAM: SParam,}
+
+    assert id is not None
+    # May or may not be an array. Check the base type.
+    assert util.getBaseType(type) in NPARAM_TYPES or tag != NPARAM
 
     # This is an array parameter.
-    # 'integer[2][3]' should become size: 2, paramType: 'integer[3]'
-    startIndex = type.index('[')
-    endIndex = type.index(']')
-    size = int(type[startIndex+1:endIndex] or 0)
-    type = type[:startIndex] + type[endIndex+1:]
-    return ParamArray(id, type, size, **kwargs)
+    if type is not None and type.find('[') != -1:
+        (size, type) = util.stripFirstArrayDimension(type)
+        return ParamArray(id, type, tag, size, **kwargs)
 
-# This may come to replace getParameter, or perhaps there is some other way
-# to combine them. This function roughly does with dictionaries what the
-# XML factory does with elements. It should simplify XML import as well as
-# programmatic parameter creation.
+    return paramClasses[tag](id, type, **kwargs)
+
+
 def paramFactory(kwargs, mappings=None):
     """
     Return a parameter created from the arguments in the dictionary and
@@ -379,28 +402,33 @@ def paramFactory(kwargs, mappings=None):
     """
     kwargs = dict(kwargs)
 
-    # TODO:
-    # Replace these string literals with constants. What's that, Python
-    # doesn't have constants? Fine, just pretend...
     paramId = kwargs[ID_ATTR]
     del kwargs[ID_ATTR]
-    paramType = kwargs[TYPE_ATTR]
-    del kwargs[TYPE_ATTR]
     parentId = kwargs.get(PARENT_ID)
     absoluteId = util.absolute(parentId, paramId)
 
+    # Infer tag if necessary.
+    tag = kwargs.get(TAG)
+    baseType = util.getBaseType(kwargs.get(TYPE_ATTR))
+    if tag is None and baseType in NPARAM_TYPES:
+        tag = NPARAM
+    elif tag is None:
+        tag = SPARAM
+    kwargs[TAG] = tag
+
+    # Create nested parameters recursively.
     nested = kwargs.get(NESTED)
     if nested is not None:
         for param in nested:
             param[PARENT_ID] = absoluteId
         kwargs[NESTED] = [paramFactory(args, mappings) for args in nested]
 
-    # Check that existing mappings are not replaced.
+    # Make sure that existing mappings are not replaced.
     if MAPPING_ATTR not in kwargs:
         m = mappings.getMapping(absoluteId)
         kwargs[MAPPING_ATTR] = m
 
-    return getParameter(paramId, paramType, **kwargs)
+    return getParameter(paramId, **kwargs)
 
 
 class ParamArray():
@@ -417,8 +445,8 @@ class ParamArray():
     And overrides one method:
     - getType
     """
-    def __init__(self, paramId, paramType, size, **kwargs):
-        self.__param = getParameter(paramId, paramType, **kwargs)
+    def __init__(self, paramId, paramType, tag, size, **kwargs):
+        self.__param = getParameter(paramId, tag, paramType, **kwargs)
         self.__size = size
         assert self.__param is not None
 
@@ -483,7 +511,7 @@ class ParamStore:
             # Update dependencies as new parameters are added.
             self.__dep[param.getId()] = param.getDependees()
 
-            if param.getType() == SPARAM:
+            if param.getTag() == SPARAM:
                 self.addParam(param.getNestedParameters())
 
     def getParam(self, paramId):

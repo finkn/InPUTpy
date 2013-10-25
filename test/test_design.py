@@ -6,6 +6,7 @@ import unittest
 from inputpy.param import ParamStore, Design, getParameter
 from inputpy.designspace import DesignSpace
 from inputpy.exceptions import InPUTException
+from inputpy.q import *
 from test.tools import PresetDesignSpaceFactory
 
 class TestDesign(unittest.TestCase):
@@ -26,8 +27,8 @@ class TestDesign(unittest.TestCase):
 
     def testCreateDesignFromDesignSpace(self):
         ps = ParamStore()
-        ps.addParam(getParameter('A', 'integer', inclMin=1, inclMax=1))
-        ps.addParam(getParameter('B', 'integer', exclMin=1, exclMax=3))
+        ps.addParam(getParameter('A', NPARAM, INTEGER, inclMin=1, inclMax=1))
+        ps.addParam(getParameter('B', NPARAM, INTEGER, exclMin=1, exclMax=3))
         space = DesignSpace(ps)
         design = space.nextDesign('Design')
         self.assertEqual(1, design.getValue('A'))
@@ -35,8 +36,10 @@ class TestDesign(unittest.TestCase):
         self.assertEqual('Design', design.getId())
 
     def testCreateDesignWithArray(self):
-        param = getParameter('A', 'integer[2][][3]', inclMin=2, inclMax=2)
-        param2 = getParameter('A.1', 'float', inclMin=2, inclMax=2, fixed=0.5)
+        t = INTEGER + '[2][][3]'
+        param = getParameter('A', NPARAM, t, inclMin=2, inclMax=2)
+        param2 = getParameter('A.1', NPARAM, FLOAT,
+            inclMin=2, inclMax=2, fixed=0.5)
         space = DesignSpace(ParamStore((param, param2)))
         design = space.nextDesign('Design')
         expected = [
@@ -51,8 +54,9 @@ class TestDesign(unittest.TestCase):
         self.assertEqual(2, design.getValue('A.2.1.3'))
 
     def testSetValue(self):
-        param1 = getParameter('A', 'integer[2][3]')
-        param2 = getParameter('B', 'float', inclMin=-1, inclMax=1)
+        t = INTEGER + '[2][][3]'
+        param1 = getParameter('A', NPARAM, t)
+        param2 = getParameter('B', NPARAM, FLOAT, inclMin=-1, inclMax=1)
         space = DesignSpace(ParamStore((param1, param2)))
         design = space.nextDesign('Design')
 
@@ -109,8 +113,8 @@ class TestDesign(unittest.TestCase):
 
     def testGetSpace(self):
         ps = ParamStore()
-        ps.addParam(getParameter('A', 'integer', inclMin=1, inclMax=1))
-        ps.addParam(getParameter('B', 'integer', exclMin=1, exclMax=3))
+        ps.addParam(getParameter('A', NPARAM, INTEGER, inclMin=1, inclMax=1))
+        ps.addParam(getParameter('B', NPARAM, INTEGER, exclMin=1, exclMax=3))
         space = DesignSpace(ps)
         design = Design({}, space, 'Design')
         self.assertEqual(space, design.getSpace())
@@ -127,8 +131,8 @@ class TestDesign(unittest.TestCase):
 
     def testPointSParamDesign(self):
         from inputpy.mapping import Mapping
-        x = getParameter('X', 'integer', inclMin=2, inclMax=2)
-        y = getParameter('Y', 'integer', inclMin=3, inclMax=3)
+        x = getParameter('X', NPARAM, INTEGER, inclMin=2, inclMax=2)
+        y = getParameter('Y', NPARAM, INTEGER, inclMin=3, inclMax=3)
         ps = ParamStore([x, y])
         pointMapping = Mapping('Point', 'test.types.geo.Point', 'X Y')
         pointParam = getParameter('Point', 'SParam', nested=[x, y], mapping=pointMapping)

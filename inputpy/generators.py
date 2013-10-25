@@ -182,19 +182,27 @@ GENERATORS[BOOLEAN] = BoolGenerator
 GENERATORS[ARRAY] = ArrayGenerator
 GENERATORS[SPARAM] = SParamGenerator
 
+# Hack to deal with the asymmetry between NParam and SParam and their
+# tag/type values.
+def __getGenerator(param):
+    if param.getTag() == SPARAM:
+        return SParamGenerator
+    else:
+        return GENERATORS[param.getType()]
+
 def nextValue(param, dep={}):
     """
     Return a value for the parameter. Optionally, a dictionary of
     parameter ID to value mappings can be supplied to resolve dependencies.
     """
-    return GENERATORS[param.getType()].nextValue(param, dep)
+    return __getGenerator(param).nextValue(param, dep)
 
 def isValid(param, dep={}):
     """
     Return whether the parameter is valid. Optionally, a dictionary of
     parameter ID to value mappings can be supplied to resolve dependencies.
     """
-    return GENERATORS[param.getType()].isValid(param, dep)
+    return __getGenerator(param).isValid(param, dep)
 
 def nextArray(param, sizes=(0,), dep={}):
     """

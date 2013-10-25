@@ -29,6 +29,11 @@ TRIANGLE = 'test.types.geo.Triangle'
 TRIANGLE_CUSTOM = 'test.types.geo.TriangleWithCustomAccessors'
 TRIANGLE_DEFAULT = 'test.types.geo.TriangleWithoutConstructor'
 
+def makeIntParam(d):
+    d[TAG] = NPARAM
+    d[TYPE] = INTEGER
+    return d
+
 class PresetCodeMappingFactory:
 
     M = Mapping
@@ -84,82 +89,85 @@ class PresetCodeMappingFactory:
 
 class PresetParamStoreFactory:
 
-    SIMPLE_INTEGER_SPACE = [
-        getParameter('A', 'integer'),
-        getParameter('B', 'integer', inclMin='1'),
-        getParameter('C', 'integer', inclMax='1'),
-        getParameter('D', 'integer', exclMin='1'),
-        getParameter('E', 'integer', exclMax='1'),
-        getParameter('F', 'integer', inclMin='1', inclMax='3'),
-        getParameter('G', 'integer', exclMin='1', exclMax='3'),
-        getParameter('H', 'integer', inclMin='1', exclMax='3'),
-        getParameter('I', 'integer', exclMin='1', inclMax='3'),
-        getParameter('J', 'integer', exclMin='0', inclMax='3'),
-        getParameter('K', 'integer', exclMin='-1', inclMax='0'),
-        getParameter('L', 'integer', inclMin='0', inclMax='0'),
-        getParameter('M', 'integer', fixed='43'),
-        getParameter('N', 'integer', inclMin='1', fixed='43'),
-        getParameter('O', 'integer', inclMin='1', inclMax='3', fixed='43'),
-        getParameter('P', 'integer', fixed='2.9'),
-        getParameter('Q', 'integer', inclMin='0.1', inclMax='1.9'),
-    ]
+    SIMPLE_INTEGER_SPACE = (
+        {ID: 'A', },
+        {ID: 'B', INCL_MIN: '1'},
+        {ID: 'C', INCL_MAX: '1'},
+        {ID: 'D', EXCL_MIN: '1'},
+        {ID: 'E', EXCL_MAX: '1'},
+        {ID: 'F', INCL_MIN: '1', INCL_MAX: '3'},
+        {ID: 'G', EXCL_MIN: '1', EXCL_MAX: '3'},
+        {ID: 'H', INCL_MIN: '1', EXCL_MAX: '3'},
+        {ID: 'I', EXCL_MIN: '1', INCL_MAX: '3'},
+        {ID: 'J', EXCL_MIN: '0', INCL_MAX: '3'},
+        {ID: 'K', EXCL_MIN: '-1', INCL_MAX: '0'},
+        {ID: 'L', INCL_MIN: '0', INCL_MAX: '0'},
+        {ID: 'M', FIXED_ATTR: '43'},
+        {ID: 'N', INCL_MIN: '1', FIXED_ATTR: '43'},
+        {ID: 'O', INCL_MIN: '1', INCL_MAX: '3', FIXED_ATTR: '43'},
+        {ID: 'P', FIXED_ATTR: '2.9'},
+        {ID: 'Q', INCL_MIN: '0.1', INCL_MAX: '1.9'},
+    )
+    SIMPLE_INTEGER_SPACE = tuple(map(makeIntParam, SIMPLE_INTEGER_SPACE))
 
-    ADVANCED_INTEGER_SPACE = [
-        getParameter('A', 'integer', inclMin='1 + 2'),
-        getParameter('B', 'integer', inclMin='(1 + 2) + 3'),
-        getParameter('C', 'integer', inclMin='4 * 3 / 2 + 1 - (2 + 3)'),
-        getParameter('D', 'integer', inclMin='4 * (3 / (2 + 1)) - 2 + 3'),
-        getParameter('E', 'integer', inclMin='(4 * 3) / (2 + (-1 - (1 - 3)))'),
-        getParameter('F', 'integer', inclMin='(4*3)/(2+(-1-(1-3)))'),
-        getParameter('G', 'integer', inclMin='Math.cos(Math.pi)'),
-        getParameter('H', 'integer', inclMin='Math.exp(Math.cos(Math.pi*2)) / (Math.e * 2)'),
-        getParameter('I', 'integer', inclMin='Y'),
-        getParameter('J', 'integer', inclMin='Z'),
-        getParameter('K', 'integer', inclMin='Z + Y'),
-        getParameter('L', 'integer', inclMin='(Z + Y) * Z / ((4 + Y) - Z)'),
-        getParameter('M', 'integer', inclMin='Math.exp(Math.cos(Z*2)) / (Math.e * Y)'),
-        getParameter('N', 'integer', fixed='1 + 2'),
-        getParameter('O', 'integer', inclMin='(4 * 3) / (2 + (-1 - (1 - 3)))'),
-        getParameter('P', 'integer', inclMin='Math.exp(Math.cos(Math.pi*2)) / (Math.e * 2)'),
-        getParameter('Y', 'integer', inclMin='2', inclMax='2'),
-        getParameter('Z', 'integer', fixed='2'),
-    ]
+
+    ADVANCED_INTEGER_SPACE = (
+        {ID: 'A', INCL_MIN: '1 + 2'},
+        {ID: 'B', INCL_MIN: '(1 + 2) + 3'},
+        {ID: 'C', INCL_MIN: '4 * 3 / 2 + 1 - (2 + 3)'},
+        {ID: 'D', INCL_MIN: '4 * (3 / (2 + 1)) - 2 + 3'},
+        {ID: 'E', INCL_MIN: '(4 * 3) / (2 + (-1 - (1 - 3)))'},
+        {ID: 'F', INCL_MIN: '(4*3)/(2+(-1-(1-3)))'},
+        {ID: 'G', INCL_MIN: 'Math.cos(Math.pi)'},
+        {ID: 'H', INCL_MIN: 'Math.exp(Math.cos(Math.pi*2)) / (Math.e * 2)'},
+        {ID: 'I', INCL_MIN: 'Y'},
+        {ID: 'J', INCL_MIN: 'Z'},
+        {ID: 'K', INCL_MIN: 'Z + Y'},
+        {ID: 'L', INCL_MIN: '(Z + Y) * Z / ((4 + Y) - Z)'},
+        {ID: 'M', INCL_MIN: 'Math.exp(Math.cos(Z*2)) / (Math.e * Y)'},
+        {ID: 'N', FIXED_ATTR: '1 + 2'},
+        {ID: 'O', INCL_MIN: '(4 * 3) / (2 + (-1 - (1 - 3)))'},
+        {ID: 'P', INCL_MIN: 'Math.exp(Math.cos(Math.pi*2)) / (Math.e * 2)'},
+        {ID: 'Y', INCL_MIN: '2', INCL_MAX: '2'},
+        {ID: 'Z', FIXED_ATTR: '2'},
+    )
+    ADVANCED_INTEGER_SPACE = tuple(map(makeIntParam, ADVANCED_INTEGER_SPACE))
 
     SIMPLE_TRIANGLE_SPACE = (
         {ID: 'X', TYPE: INT, IMIN: '0', IMAX: '0'},
         {ID: 'Y', TYPE: INT, IMIN: '1', IMAX: '1'},
-        {ID: 'P1', TYPE: SP, NESTED: (
+        {ID: 'P1', TAG: SP, NESTED: (
             {ID: 'X', TYPE: INT, IMIN: '2', IMAX: '2'},
             {ID: 'Y', TYPE: INT, IMIN: '3', IMAX: '3'},
         ), },
-        {ID: 'P4', TYPE: SP, NESTED: (
+        {ID: 'P4', TAG: SP, NESTED: (
             {ID: 'X', TYPE: INT, IMIN: '4', IMAX: '4'},
             {ID: 'Y', TYPE: INT, IMIN: '8', IMAX: '8'},
         ), },
-        {ID: 'T1', TYPE: SP, NESTED: (
-            {ID: 'P1', TYPE: SP, NESTED: (
+        {ID: 'T1', TAG: SP, NESTED: (
+            {ID: 'P1', TAG: SP, NESTED: (
                 {ID: 'X', TYPE: INT, IMIN: '1', IMAX: '1'},
                 {ID: 'Y', TYPE: INT, IMIN: '1', IMAX: '1'},
             ), },
-            {ID: 'P2', TYPE: SP, NESTED: (
+            {ID: 'P2', TAG: SP, NESTED: (
                 {ID: 'X', TYPE: INT, IMIN: '3', IMAX: '3'},
                 {ID: 'Y', TYPE: INT, IMIN: '2', IMAX: '2'},
             ), },
-            {ID: 'P3', TYPE: SP, NESTED: (
+            {ID: 'P3', TAG: SP, NESTED: (
                 {ID: 'X', TYPE: INT, IMIN: '5', IMAX: '5'},
                 {ID: 'Y', TYPE: INT, IMIN: '1', IMAX: '1'},
             ), },
         ), },
-        {ID: 'T2', TYPE: SP, NESTED: (
-            {ID: 'P1', TYPE: SP, NESTED: (
+        {ID: 'T2', TAG: SP, NESTED: (
+            {ID: 'P1', TAG: SP, NESTED: (
                 {ID: 'X', TYPE: INT, IMIN: '1', IMAX: '1'},
                 {ID: 'Y', TYPE: INT, IMIN: '1', IMAX: '1'},
             ), },
-            {ID: 'P2', TYPE: SP, NESTED: (
+            {ID: 'P2', TAG: SP, NESTED: (
                 {ID: 'X', TYPE: INT, IMIN: '3', IMAX: '3'},
                 {ID: 'Y', TYPE: INT, IMIN: '2', IMAX: '2'},
             ), },
-            {ID: 'P3', TYPE: SP, NESTED: (
+            {ID: 'P3', TAG: SP, NESTED: (
                 {ID: 'X', TYPE: INT, IMIN: '5', IMAX: '5'},
                 {ID: 'Y', TYPE: INT, IMIN: '1', IMAX: '1'},
             ), },
@@ -171,38 +179,38 @@ class PresetParamStoreFactory:
     ADVANCED_TRIANGLE_SPACE = (
         {ID: 'X', TYPE: INT, IMIN: '0', IMAX: '0'},
         {ID: 'Y', TYPE: INT, IMIN: 'X + 1', IMAX: 'X + 1'},
-        {ID: 'P1', TYPE: SP, NESTED: (
+        {ID: 'P1', TAG: SP, NESTED: (
             {ID: 'X', TYPE: INT, IMIN: '4', IMAX: '4'},
             {ID: 'Y', TYPE: INT, IMIN: 'X + 1', IMAX: 'X + 1'},
         ), },
-        {ID: 'P4', TYPE: SP, NESTED: (
+        {ID: 'P4', TAG: SP, NESTED: (
             {ID: 'X', TYPE: INT, IMIN: '2', IMAX: '2'},
             {ID: 'Y', TYPE: INT, IMIN: 'X + 1', IMAX: 'X + 1'},
         ), },
-        {ID: 'T1', TYPE: SP, NESTED: (
-            {ID: 'P1', TYPE: SP, NESTED: (
+        {ID: 'T1', TAG: SP, NESTED: (
+            {ID: 'P1', TAG: SP, NESTED: (
                 {ID: 'X', TYPE: INT, IMIN: '1', IMAX: '1'},
                 {ID: 'Y', TYPE: INT, IMIN: 'T2.P2.X + 1', IMAX: 'T2.P2.X + 1'},
             ), },
-            {ID: 'P2', TYPE: SP, NESTED: (
+            {ID: 'P2', TAG: SP, NESTED: (
                 {ID: 'X', TYPE: INT, IMIN: '3', IMAX: '3'},
                 {ID: 'Y', TYPE: INT, IMIN: '2', IMAX: '2'},
             ), },
-            {ID: 'P3', TYPE: SP, NESTED: (
+            {ID: 'P3', TAG: SP, NESTED: (
                 {ID: 'X', TYPE: INT, IMIN: '5', IMAX: '5'},
                 {ID: 'Y', TYPE: INT, IMIN: '1', IMAX: '1'},
             ), },
         ), },
-        {ID: 'T2', TYPE: SP, NESTED: (
-            {ID: 'P1', TYPE: SP, NESTED: (
+        {ID: 'T2', TAG: SP, NESTED: (
+            {ID: 'P1', TAG: SP, NESTED: (
                 {ID: 'X', TYPE: INT, IMIN: '1', IMAX: '1'},
                 {ID: 'Y', TYPE: INT, IMIN: '1', IMAX: '1'},
             ), },
-            {ID: 'P2', TYPE: SP, NESTED: (
+            {ID: 'P2', TAG: SP, NESTED: (
                 {ID: 'X', TYPE: INT, IMIN: '3', IMAX: '3'},
                 {ID: 'Y', TYPE: INT, IMIN: '2', IMAX: '2'},
             ), },
-            {ID: 'P3', TYPE: SP, NESTED: (
+            {ID: 'P3', TAG: SP, NESTED: (
                 {ID: 'X', TYPE: INT, IMIN: '5', IMAX: '5'},
                 {ID: 'Y', TYPE: INT, IMIN: '1', IMAX: '1'},
             ), },
@@ -218,12 +226,6 @@ class PresetParamStoreFactory:
 
     @staticmethod
     def getParamStore(fileName, mapping=None):
-        newStyleStores = (
-            'simpleTriangleSpace.xml', 'advancedTriangleSpace.xml'
-        )
-        if fileName not in newStyleStores:
-            return ParamStore(PresetParamStoreFactory.STORES[fileName])
-
         paramArgs = PresetParamStoreFactory.STORES[fileName]
         params = [paramFactory(args, mapping) for args in paramArgs]
         return ParamStore(params)
