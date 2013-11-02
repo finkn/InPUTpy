@@ -51,3 +51,7 @@ class TestFactories(unittest.TestCase):
             for (k,v) in result.items():
                 msg = 'Import did not match for %s' % (k)
                 self.assertEqual(v, first[k], msg=msg)
+
+
+if __name__ == '__main__':
+    unittest.main()

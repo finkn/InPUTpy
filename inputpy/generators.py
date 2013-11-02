@@ -12,9 +12,7 @@ using the two main functions of this module.
 import random
 from inputpy.exceptions import InPUTException
 from inputpy.util import Evaluator
-from inputpy.q import SHORT, INTEGER, LONG
-from inputpy.q import FLOAT, DOUBLE, DECIMAL
-from inputpy.q import BOOLEAN, ARRAY, SPARAM
+from inputpy.q import *
 
 __all__ = (
     'isValid', 'nextValue',
@@ -150,6 +148,10 @@ class ArrayGenerator(ValueGenerator):
 class SParamGenerator(ValueGenerator):
     @classmethod
     def nextValue(cls, param, dep={}):
+        # Special case for String type.
+        if param.getType() == STRING:
+            return param.getRelativeId()
+
         args = []
         paramMapping = param.getMapping()
         for d in paramMapping.getDependencies():
@@ -182,19 +184,27 @@ GENERATORS[BOOLEAN] = BoolGenerator
 GENERATORS[ARRAY] = ArrayGenerator
 GENERATORS[SPARAM] = SParamGenerator
 
+# Hack to deal with the asymmetry between NParam and SParam and their
+# tag/type values.
+def __getGenerator(param):
+    if param.getTag() == SPARAM:
+        return SParamGenerator
+    else:
+        return GENERATORS[param.getType()]
+
 def nextValue(param, dep={}):
     """
     Return a value for the parameter. Optionally, a dictionary of
     parameter ID to value mappings can be supplied to resolve dependencies.
     """
-    return GENERATORS[param.getType()].nextValue(param, dep)
+    return __getGenerator(param).nextValue(param, dep)
 
 def isValid(param, dep={}):
     """
     Return whether the parameter is valid. Optionally, a dictionary of
     parameter ID to value mappings can be supplied to resolve dependencies.
     """
-    return GENERATORS[param.getType()].isValid(param, dep)
+    return __getGenerator(param).isValid(param, dep)
 
 def nextArray(param, sizes=(0,), dep={}):
     """

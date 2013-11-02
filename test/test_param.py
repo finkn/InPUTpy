@@ -15,25 +15,35 @@ class TestParam(unittest.TestCase):
         'A + B': ('A', 'B',),
         'A + B-C/ D *E': ('A', 'B', 'C', 'D', 'E',),
         'Math.log(A)': ('A',),
-        'A+ Math.sqr( B / C )': ('A', 'B', 'C',),
+        'A+ Math.sqrt( B / C )': ('A', 'B', 'C',),
         ' 2 * ( (( A+B ) - (C) ) ) + A': ('A', 'B', 'C',),
         ' SomeParam + AnotherParam ': ('SomeParam', 'AnotherParam',),
         'A * -.3': ('A',),
         '1 + 2 - Math.cos(0.0)': (),
+        'A.X + B.Y': ('A.X', 'B.Y',),
+        'Math.sqrt(A.X + Math.log(B.Y))': ('A.X', 'B.Y',),
     }
 
-    def testCreateBasicParam(self):
-        param = NParam('A', 'integer')
-
     def testGetId(self):
-        param = NParam('A', 'integer')
-        pId = param.getId()
-        self.assertEqual('A', pId, msg='The parameter ID should be "A"')
+        param = NParam('A', INTEGER)
+        result = param.getId()
+        expected = 'A'
+        msg = 'The parameter ID should be "A"'
+        self.assertEqual(expected, result, msg=msg)
 
     def testGetType(self):
-        param = NParam('A', 'integer')
-        pType = param.getType()
-        self.assertEqual('integer', pType, msg='Parameter should be "integer"')
+        param = NParam('A', INTEGER)
+        result = param.getType()
+        expected = INTEGER
+        msg = 'Parameter should be "%s"' % (expected)
+        self.assertEqual(expected, result, msg=msg)
+
+    def testGetTag(self):
+        param = NParam('A', INTEGER)
+        result = param.getTag()
+        expected = NPARAM
+        msg = 'Parameter should be "%s"' % (expected)
+        self.assertEqual(expected, result, msg=msg)
 
     def testCreateParamWithMultipleRanges(self):
         NParam('A', 'integer', inclMin=(1,5), inclMax=(2,7))
@@ -64,11 +74,11 @@ class TestParam(unittest.TestCase):
         self.checkLimits(eMin=(1,2,-5), iMax=(3,10))
 
     def testCreatingParamWithSingleLimitStillReturnsMultiLimit(self):
-        param = NParam('A', 'integer', inclMin=1, inclMax=2)
+        param = NParam('A', INTEGER, inclMin=1, inclMax=2)
         self.assertIsNotNone(iter(param.getMin()))
 
     def testNoneIdShouldNotRaiseError(self):
-        param = NParam(None, 'integer')
+        param = NParam(None, INTEGER)
         self.assertIsNotNone(param.getId())
 
     def testNoneTypeShouldRaiseError(self):
@@ -77,22 +87,22 @@ class TestParam(unittest.TestCase):
 
     def testMultipleMinLimitsShouldRaiseError(self):
         with self.assertRaises(ValueError):
-            param = NParam('A', 'integer', inclMin=1, exclMin=10)
+            param = NParam('A', INTEGER, inclMin=1, exclMin=10)
 
     def testMultipleMaxLimitsShouldRaiseError(self):
         with self.assertRaises(ValueError):
-            param = NParam('A', 'integer', inclMax=1, exclMax=10)
+            param = NParam('A', INTEGER, inclMax=1, exclMax=10)
 
     def testParamWithoutLimitsIsNotDependent(self):
-        param = NParam('A', 'integer')
+        param = NParam('A', INTEGER)
         self.assertFalse(param.isDependent())
 
     def testParamWithIntegerLimitIsNotDependent(self):
-        param = NParam('A', 'integer', inclMin=1, exclMax=3)
+        param = NParam('A', INTEGER, inclMin=1, exclMax=3)
         self.assertFalse(param.isDependent())
 
     def testParamWithParameterReferenceIsDependent(self):
-        param = NParam('A', 'integer', inclMin='B', exclMax='B + C')
+        param = NParam('A', INTEGER, inclMin='B', exclMax='B + C')
         self.assertTrue(param.isDependent())
 
     def testDependencies(self):
@@ -107,12 +117,12 @@ class TestParam(unittest.TestCase):
             minExp = key
             maxExp = random.choice(keyList)
             expected = tests[minExp] + tests[maxExp]
-            param = NParam('A', 'integer', inclMin=minExp, inclMax=maxExp)
+            param = NParam('A', INTEGER, inclMin=minExp, inclMax=maxExp)
             dependees = param.getDependees()
             self.assertCountEqual(expected, dependees)
 
     def testIndependentParameterWithExpressionShouldBeEvaluated(self):
-        param = NParam('A', 'integer', inclMin='1', exclMax='1 + 2')
+        param = NParam('A', INTEGER, inclMin='1', exclMax='1 + 2')
         self.assertFalse(param.isDependent())
         self.assertEqual((1,), param.getMin())
         self.assertEqual((3,), param.getMax())
@@ -122,27 +132,27 @@ class TestParam(unittest.TestCase):
         eMin = 'Math.sqrt(Math.ceil(2.1) + Math.cos(0.0))'
         # 5.0
         iMax = 'Math.log(Math.exp(10)) / Math.floor(2.9)'
-        param = NParam('A', 'integer', exclMin=eMin, inclMax=iMax)
+        param = NParam('A', INTEGER, exclMin=eMin, inclMax=iMax)
         self.assertFalse(param.isDependent())
         # Should probably really expect 2 and 5 here.
         self.assertEqual((2.0,), param.getMin())
         self.assertEqual((5.0,), param.getMax())
 
     def testDependentParameterWithSimpleDependency(self):
-        param = NParam('A', 'integer', inclMin='B')
+        param = NParam('A', INTEGER, inclMin='B')
         self.assertTrue(param.isDependent())
 
     def testCreatingFixedParameter(self):
-        param = NParam('A', 'integer', fixed=3)
+        param = NParam('A', INTEGER, fixed=3)
         self.assertTrue(param.isFixed())
 
     def testUnfixParameter(self):
-        param = NParam('A', 'integer', fixed=3)
+        param = NParam('A', INTEGER, fixed=3)
         param.setFixed(None)
         self.assertFalse(param.isFixed())
 
     def testFixAndUnfixExistingParameter(self):
-        param = NParam('A', 'integer')
+        param = NParam('A', INTEGER)
         self.assertFalse(param.isFixed())
         param.setFixed(3)
         self.assertTrue(param.isFixed())
@@ -151,99 +161,100 @@ class TestParam(unittest.TestCase):
 
     def testIsArray(self):
         params = (
-            getParameter('A', 'short'),
-            getParameter('A', 'integer'),
-            getParameter('A', 'boolean'),
-            getParameter('A', 'float'),
+            getParameter('A', NPARAM, SHORT),
+            getParameter('A', NPARAM, INTEGER),
+            getParameter('A', NPARAM, BOOLEAN),
+            getParameter('A', NPARAM, FLOAT),
         )
         arrays = (
-            getParameter('A', 'short[]'),
-            getParameter('A', 'integer[2]'),
-            getParameter('A', 'boolean[][2]'),
-            getParameter('A', 'float[2][]'),
-            getParameter('A', 'long[2][1][3]'),
+            getParameter('A', NPARAM, SHORT + '[]'),
+            getParameter('A', NPARAM, INTEGER + '[2]'),
+            getParameter('A', NPARAM, BOOLEAN + '[][2]'),
+            getParameter('A', NPARAM, FLOAT + '[2][]'),
+            getParameter('A', NPARAM, LONG + '[2][1][3]'),
         )
         for p in params:
-            self.assertNotEqual('array', p.getType())
+            self.assertNotEqual(ARRAY, p.getType())
         for p in arrays:
-            self.assertEqual('array', p.getType())
+            self.assertEqual(ARRAY, p.getType())
             self.assertIsNotNone((), p.getParameter())
             self.assertIsNotNone((), p.getSize())
 
     def testGetParam(self):
-        reference = NParam('A', 'integer', inclMin=3, fixed=4)
-        param = getParameter('A', 'integer', inclMin=3, fixed=4)
+        reference = NParam('A', INTEGER, inclMin=3, fixed=4)
+        param = getParameter('A', NPARAM, INTEGER, inclMin=3, fixed=4)
         self.compareParameters(reference, param)
 
-        arrayParam = getParameter('A', 'integer[2]', inclMin=3, fixed=4)
+        t = INTEGER + '[2]'
+        arrayParam = getParameter('A', NPARAM, t, inclMin=3, fixed=4)
         self.assertEqual(2, arrayParam.getSize())
         self.compareParameters(param, arrayParam.getParameter())
 
-        arrayParam2 = getParameter('A', 'integer[2][2]', inclMin=3, fixed=4)
+        t = INTEGER + '[2][2]'
+        arrayParam2 = getParameter('A', NPARAM, t, inclMin=3, fixed=4)
         self.compareParameters(arrayParam, arrayParam2.getParameter())
 
     def testEqual(self):
-        param1 = getParameter('A', 'integer')
-        param2 = getParameter('A', 'integer')
+        param1 = getParameter('A', NPARAM, INTEGER)
+        param2 = getParameter('A', NPARAM, INTEGER)
         self.assertEqual(param1, param2)
-        param2 = getParameter('A', 'integer', inclMin=3)
+        param2 = getParameter('A', NPARAM, INTEGER, inclMin=3)
         self.assertNotEqual(param1, param2)
-        param1 = getParameter('A', 'integer', inclMin=3)
+        param1 = getParameter('A', NPARAM, INTEGER, inclMin=3)
         self.assertEqual(param1, param2)
 
     def testEqualArrays(self):
-        param1 = getParameter('A', 'integer[2]')
-        param2 = getParameter('A', 'integer[2]')
+        param1 = getParameter('A', NPARAM, INTEGER + '[2]')
+        param2 = getParameter('A', NPARAM, INTEGER + '[2]')
         self.assertEqual(param1, param2)
-        param2 = getParameter('A', 'integer[3]')
+        param2 = getParameter('A', NPARAM, INTEGER + '[3]')
         self.assertNotEqual(param1, param2)
-        param1 = getParameter('A', 'integer[3]', inclMax=3)
+        param1 = getParameter('A', NPARAM, INTEGER + '[3]', inclMax=3)
         self.assertNotEqual(param1, param2)
-        param2 = getParameter('A', 'integer[3]', inclMax=3)
+        param2 = getParameter('A', NPARAM, INTEGER + '[3]', inclMax=3)
         self.assertEqual(param1, param2)
 
     def testSParamWithoutNestedParameters(self):
         m = 'dummy mapping' # Looks like I'm being very naughty.
-        param = getParameter('A', 'SParam', nested=(), mapping=m)
+        param = getParameter('A', SPARAM, nested=(), mapping=m)
         self.assertEqual('A', param.getId())
-        self.assertEqual('SParam', param.getType())
+        self.assertEqual(SPARAM, param.getTag())
         self.assertEqual((), param.getNestedParameters())
 
     def testSParamWithNestedParameters(self):
         # A could be a Point object for example, with X and Y
         # NParam nested parameters.
         m = 'dummy mapping'
-        x = getParameter('X', 'integer', parentId='A')
-        y = getParameter('Y', 'integer', parentId='A')
-        param = getParameter('A', 'SParam', nested=(x, y), mapping=m)
+        x = getParameter('X', NPARAM, INTEGER, parentId='A')
+        y = getParameter('Y', NPARAM, INTEGER, parentId='A')
+        param = getParameter('A', SPARAM, nested=(x, y), mapping=m)
         self.assertEqual('A', param.getId())
-        self.assertEqual('SParam', param.getType())
+        self.assertEqual(SPARAM, param.getTag())
         self.assertEqual((x, y), param.getNestedParameters())
         self.assertCountEqual(('X', 'Y'), param.getDependees())
 
     def testSParamWithMultipleNestingLevels(self):
         m = 'dummy mapping'
-        x = getParameter('X', 'integer', parentId='B.A')
-        y1 = getParameter('Y', 'integer', parentId='B.A')
-        y2 = getParameter('Y', 'integer', parentId='B')
-        a = getParameter('A', 'SParam', nested=(x, y1), parentId='B', mapping=m)
-        b = getParameter('B', 'SParam', nested=(a, y2), mapping=m)
+        x = getParameter('X', NPARAM, INTEGER, parentId='B.A')
+        y1 = getParameter('Y', NPARAM, INTEGER, parentId='B.A')
+        y2 = getParameter('Y', NPARAM, INTEGER, parentId='B')
+        a = getParameter('A', SPARAM, nested=(x, y1), parentId='B', mapping=m)
+        b = getParameter('B', SPARAM, nested=(a, y2), mapping=m)
         self.assertCountEqual(('A', 'Y'), b.getDependees())
 
     def testAbsolutePath(self):
-        x = getParameter('X', 'integer', parentId='A.B')
-        y = getParameter('Y', 'integer', parentId='A.B')
+        x = getParameter('X', NPARAM, INTEGER, parentId='A.B')
+        y = getParameter('Y', NPARAM, INTEGER, parentId='A.B')
         self.assertEqual('A.B.X', x.getId())
         self.assertEqual('A.B.Y', y.getId())
 
-    # Note that this test does not include code mappings!
     def testParamFactory(self):
         paramArgs = {
-            'X': {ID_ATTR: 'X', TYPE_ATTR: 'integer', INCL_MIN: '0', },
-            'Y': {ID_ATTR: 'Y', TYPE_ATTR: 'integer', INCL_MAX: '1', },
-            'P1': {ID_ATTR: 'P1', TYPE_ATTR: SPARAM, 'nested': (
-                    {ID_ATTR: 'X', TYPE_ATTR: 'integer', EXCL_MIN: '2', },
-                    {ID_ATTR: 'Y', TYPE_ATTR: 'integer', EXCL_MAX: '3', },
+            'X': {ID_ATTR: 'X', TYPE_ATTR: INTEGER, INCL_MIN: '0', },
+            'Y': {ID_ATTR: 'Y', TYPE_ATTR: INTEGER, INCL_MAX: '1', },
+            'P1': {ID_ATTR: 'P1', TYPE_ATTR: SPARAM, NESTED: (
+                    {ID_ATTR: 'X', TYPE_ATTR: INTEGER, EXCL_MIN: '2', },
+                    {ID_ATTR: 'Y', TYPE_ATTR: INTEGER, EXCL_MAX: '3', },
                 ),
             },
         }
@@ -259,22 +270,22 @@ class TestParam(unittest.TestCase):
         self.assertEqual(reference.getMin(), param.getMin())
         self.assertEqual(reference.getMax(), param.getMax())
         self.assertEqual(reference.getFixedValue(), param.getFixedValue())
-        if param.getType() == 'array':
+        if param.getType() == ARRAY:
             refChild = reference.getParameter()
             paramChild = param.getParameter()
             self.compareParameters(refChild, paramChild)
 
     def checkLimits(self, pa=None, iMin=None, eMin=None, iMax=None, eMax=None):
-        args = pa or ('A', 'integer')
+        args = pa or ('A', INTEGER, NPARAM)
         kwargs = {}
         if iMin is not None:
-            kwargs['inclMin'] = iMin
+            kwargs[INCL_MIN] = iMin
         if eMin is not None:
-            kwargs['exclMin'] = eMin
+            kwargs[EXCL_MIN] = eMin
         if iMax is not None:
-            kwargs['inclMax'] = iMax
+            kwargs[INCL_MAX] = iMax
         if eMax is not None:
-            kwargs['exclMax'] = eMax
+            kwargs[EXCL_MAX] = eMax
 
         # Create the parameter based on the arguments.
         param = NParam(*args, **kwargs)

@@ -12,7 +12,7 @@ It's a Null Object.
 :license: MIT. See LICENSE for details.
 """
 import importlib
-from inputpy.q import SETTER_PREFIX, GETTER_PREFIX
+from inputpy.q import SETTER_PREFIX, GETTER_PREFIX, STRING, STRING_TYPE
 import inputpy.util as util
 
 __all__ = ('getType', 'Mapping', 'CodeMapping', 'NULL_CODE_MAPPING',)
@@ -110,7 +110,7 @@ class Mapping:
         return Mapping(**params)
 
     def __eq__(self, other):
-        if other is None:
+        if not isinstance(other, Mapping):
             return False
         if self.id != other.id: return False
         if self.typeName != other.typeName: return False
@@ -125,6 +125,9 @@ class Mapping:
 
     def __repr__(self):
         return self.__str__()
+
+STRING_MAPPING = Mapping(STRING, STRING_TYPE)
+PREDEFINED_MAPPINGS = {STRING: STRING_MAPPING}
 
 
 class CodeMapping:
@@ -157,8 +160,10 @@ class CodeMapping:
         })
 
     # Always returns a full/direct mapping.
+    # This implementation must be temporary. In the future, Mappings and
+    # MappingTypes must be handled separately.
     def getMapping(self, id):
-        return self.__mappings.get(id)
+        return self.__mappings.get(id) or PREDEFINED_MAPPINGS.get(id)
 
     def __eq__(self, other):
         smt = self.__mappingTypes

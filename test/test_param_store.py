@@ -4,26 +4,30 @@
 """
 import unittest
 from inputpy.param import ParamStore, getParameter
+from inputpy.q import *
 
 class TestParamStore(unittest.TestCase):
+    param_A = getParameter('A', NPARAM, INTEGER)
+    param_B = getParameter('B', NPARAM, INTEGER)
+
     def testAddMultipleParameters(self):
-        param1 = getParameter('A', 'integer')
-        param2 = getParameter('B', 'integer')
+        param1 = TestParamStore.param_A
+        param2 = TestParamStore.param_B
         params = (param1, param2)
         ps = ParamStore()
         ps.addParam(params)
         self.checkForParametersInParamStore(params, ps)
 
     def testCreateParamStoreWithMultipleParameters(self):
-        param1 = getParameter('A', 'integer')
-        param2 = getParameter('B', 'integer')
+        param1 = TestParamStore.param_A
+        param2 = TestParamStore.param_B
         params = (param1, param2)
         ps = ParamStore(params)
         self.checkForParametersInParamStore(params, ps)
 
     def testSetFixed(self):
-        paramId = 'A'
-        param = getParameter(paramId, 'integer')
+        param = TestParamStore.param_A
+        paramId = param.getId()
         ps = ParamStore()
         ps.addParam(param)
         self.assertFalse(param.isFixed())
@@ -33,8 +37,8 @@ class TestParamStore(unittest.TestCase):
         self.assertFalse(param.isFixed())
 
     def testGetInitializationOrderForUnfinalizedParamStore(self):
-        param1 = getParameter('A', 'integer')
-        param2 = getParameter('B', 'integer', inclMin='A')
+        param1 = TestParamStore.param_A
+        param2 = getParameter('B', NPARAM, INTEGER, inclMin='A')
         ps = ParamStore((param1, param2))
         expected = {0: ['A'], 1: ['B']}
         self.assertEqual(expected, ps.getInitializationOrder())
@@ -60,18 +64,23 @@ class TestParamStore(unittest.TestCase):
         ps = ParamStore()
         ps.finalize()
         with self.assertRaises(NotImplementedError):
-            ps.addParam(getParameter('A', 'integer'))
+            ps.addParam(TestParamStore.param_A)
 
     def testParameterWithUnmetDependencies(self):
-        ps = ParamStore(getParameter('A', 'integer', inclMin='B + 1'))
+        ps = ParamStore(getParameter('A', NPARAM, INTEGER, inclMin='B + 1'))
         with self.assertRaises(ValueError):
             ps.finalize()
 
+    # Move this test to test_param.
     def testNonEmptyRangeShouldSucceed(self):
-        getParameter('A', 'integer', inclMin=1, inclMax=1)
-        getParameter('A', 'integer', exclMin=1, exclMax=3)
+        getParameter('A', NPARAM, INTEGER, inclMin=1, inclMax=1)
+        getParameter('A', NPARAM, INTEGER, exclMin=1, exclMax=3)
 
     def testEmptyRangeShouldRaiseError(self):
+        self.checkRangeErrors({INCL_MIN:1, EXCL_MAX:1})
+        self.checkRangeErrors({EXCL_MIN:1, INCL_MAX:1})
+        self.checkRangeErrors({EXCL_MIN:1, EXCL_MAX:2})
+        self.checkRangeErrors({EXCL_MIN:1, EXCL_MAX:2})
         self.checkRangeErrors({'inclMin':1, 'exclMax':1})
         self.checkRangeErrors({'exclMin':1, 'inclMax':1})
         self.checkRangeErrors({'exclMin':1, 'exclMax':2})
@@ -80,32 +89,33 @@ class TestParamStore(unittest.TestCase):
     def testAddingParamWithCircularDependencyRaisesError(self):
         ps = ParamStore()
         with self.assertRaises(ValueError):
-            ps.addParam(getParameter('A', 'integer', inclMin='B'))
-            ps.addParam(getParameter('B', 'integer', inclMin='A'))
+            ps.addParam(getParameter('A', NPARAM, INTEGER, inclMin='B'))
+            ps.addParam(getParameter('B', NPARAM, INTEGER, inclMin='A'))
             ps.finalize()
 
     def testAddingParamWithIndirectCircularDependencyRaisesError(self):
         ps = ParamStore()
         with self.assertRaises(ValueError):
-            ps.addParam(getParameter('A', 'integer', inclMin='B'))
-            ps.addParam(getParameter('B', 'integer', inclMin='C'))
-            ps.addParam(getParameter('C', 'integer', inclMin='A'))
+            ps.addParam(getParameter('A', NPARAM, INTEGER, inclMin='B'))
+            ps.addParam(getParameter('B', NPARAM, INTEGER, inclMin='C'))
+            ps.addParam(getParameter('C', NPARAM, INTEGER, inclMin='A'))
             ps.finalize()
 
     def testAddSParams(self):
         m = 'dummy mapping' # Looks like I'm being very naughty.
-        x = getParameter('X', 'integer', parentId='A.B')
-        y = getParameter('Y', 'integer', parentId='A.B')
-        b = getParameter('B', 'SParam', nested=(x, y), parentId='A', mapping=m)
-        a = getParameter('A', 'SParam', nested=(b,), mapping=m)
+        x = getParameter('X', NPARAM, INTEGER, parentId='A.B')
+        y = getParameter('Y', NPARAM, INTEGER, parentId='A.B')
+        b = getParameter('B', SPARAM, nested=(x, y), parentId='A', mapping=m)
+        a = getParameter('A', SPARAM, nested=(b,), mapping=m)
         ps = ParamStore([a, b])
         initOrder = ps.getInitializationOrder()
         self.assertCountEqual(('A.B.X', 'A.B.Y'), initOrder[0])
 
     def checkRangeErrors(self, kwargs, pa=None):
-        args = pa or ('A', 'integer')
+        args = pa or ('A', NPARAM, INTEGER)
         ps = ParamStore(getParameter(*args, **kwargs))
-        with self.assertRaises(ValueError):
+        msg = '%s should define an empty range' % (kwargs)
+        with self.assertRaises(ValueError, msg=msg):
             ps.finalize()
 
     def checkForParametersInParamStore(self, params, ps):

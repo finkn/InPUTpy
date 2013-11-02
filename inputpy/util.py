@@ -298,6 +298,33 @@ def setValue(paramId, params, value):
     except TypeError:
         raise KeyError('No parameter with ID %s exists.' % (paramId))
 
+def stripFirstArrayDimension(typeString):
+    """
+    Return a tuple of first array dimension and the rest of the type
+    string. Example:
+    'integer[2][3]' => (2, 'integer[3]')
+    'integer[3]'    => (3, 'integer')
+    Missing dimensions (empty brackets) default to 0:
+    'integer[][3]' => (0, 'integer[3]')
+    """
+    startIndex = typeString.index('[')
+    endIndex = typeString.index(']')
+    size = int(typeString[startIndex+1:endIndex] or 0)
+    typeString = typeString[:startIndex] + typeString[endIndex+1:]
+    return (size, typeString)
+
+def getBaseType(typeString):
+    """
+    Return the base type. Returns the type without any array dimensions.
+    For regular parameters, the type string is simply returned as is.
+    """
+    if typeString is None:
+        return typeString
+    startIndex = typeString.find('[')
+    if startIndex == -1:
+        return typeString
+    return typeString[:startIndex]
+
 def parseDimensions(typeString):
     """
     Return the array dimensions this type string encodes.
