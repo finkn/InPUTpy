@@ -4,6 +4,7 @@
 """
 import unittest
 from inputpy.param import ParamStore, getParameter
+from inputpy.mapping import DUMMY_MAPPING
 from inputpy.q import *
 
 class TestParamStore(unittest.TestCase):
@@ -102,12 +103,12 @@ class TestParamStore(unittest.TestCase):
             ps.finalize()
 
     def testAddSParams(self):
-        m = 'dummy mapping' # Looks like I'm being very naughty.
+        m = DUMMY_MAPPING
         x = getParameter('X', NPARAM, INTEGER, parentId='A.B')
         y = getParameter('Y', NPARAM, INTEGER, parentId='A.B')
         b = getParameter('B', SPARAM, nested=(x, y), parentId='A', mapping=m)
         a = getParameter('A', SPARAM, nested=(b,), mapping=m)
-        ps = ParamStore([a, b])
+        ps = ParamStore(a)
         initOrder = ps.getInitializationOrder()
         self.assertCountEqual(('A.B.X', 'A.B.Y'), initOrder[0])
 

@@ -1,16 +1,17 @@
-from inputpy.design import DesignSpace
+from inputpy.factories import XMLFactory
 from inputpy.exceptions import InPUTException
 from test import *
 from inputpy import q as Q
 import unittest
 
-DESIGN_SPACE_FILE = "test/testSpace.xml"
-DESIGN_MAPPING_FILE = "test/testSpaceMapping.xml"
+DESIGN_SPACE_FILE = "testSpace.xml"
+DESIGN_MAPPING_FILE = "testSpaceMapping.xml"
 
 class TestDesignSpace(unittest.TestCase):
 
     def setUp(self):
-        self.space = DesignSpace(DESIGN_SPACE_FILE)
+        #self.space = DesignSpace(fileName=DESIGN_SPACE_FILE)
+        self.space = XMLFactory.getDesignSpace(DESIGN_SPACE_FILE)
 
     def tearDown(self):
         del self.space
@@ -39,10 +40,10 @@ class TestDesignSpace(unittest.TestCase):
     @unittest.skip("Not implemented yet.")
     def testNextString(self):
         space = self.space      # Alias to save typing.
-        paramId = someStringCustomizedByTheUser
+        paramId = 'someStringCustomizedByTheUser'
         expected = paramId
-        anotherParamId = anotherStringCustomizedByTheUser
-        arrayParamId = someStringArrayCustomizedByTheUser 
+        anotherParamId = 'anotherStringCustomizedByTheUser'
+        arrayParamId = 'someStringArrayCustomizedByTheUser'
         expectedAlternatives = (
             "someFile.xml", "someFile.txt", "anotherFile.xml"
         )

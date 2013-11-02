@@ -7,7 +7,7 @@ from inputpy.param import ParamStore, Design, getParameter
 from inputpy.designspace import DesignSpace
 from inputpy.exceptions import InPUTException
 from inputpy.q import *
-from test.tools import PresetDesignSpaceFactory
+from test.factories import PresetDesignSpaceFactory
 
 class TestDesign(unittest.TestCase):
     def testCreateEmptyDesignWithoutId(self):
@@ -133,7 +133,8 @@ class TestDesign(unittest.TestCase):
         from inputpy.mapping import Mapping
         x = getParameter('X', NPARAM, INTEGER, inclMin=2, inclMax=2)
         y = getParameter('Y', NPARAM, INTEGER, inclMin=3, inclMax=3)
-        ps = ParamStore([x, y])
+        #ps = ParamStore([x, y])
+        ps = ParamStore()
         pointMapping = Mapping('Point', 'test.types.geo.Point', 'X Y')
         pointParam = getParameter('Point', 'SParam', nested=[x, y], mapping=pointMapping)
         ps.addParam(pointParam)

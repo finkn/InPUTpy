@@ -4,11 +4,12 @@
 """
 import unittest
 import inputpy.generators as generator
+import test.tools as tools
 from inputpy.q import *
 from inputpy.param import getParameter, paramFactory
 from test.types.simple import EmptyClass
 from test.types.geo import Point
-from inputpy.mapping import Mapping, CodeMapping
+from inputpy.mapping import Mapping, CodeMapping, NULL_CODE_MAPPING
 
 class TestGenerators(unittest.TestCase):
 
@@ -138,30 +139,19 @@ class TestGenerators(unittest.TestCase):
         self.assertEqual(3, point.getY())
 
     def testSParamStringGenerator(self):
-        cm = CodeMapping([], [])
+        cm = NULL_CODE_MAPPING
         args = {ID_ATTR: 'some string', TAG: SPARAM, TYPE_ATTR: STRING}
         param = paramFactory(args, cm)
         self.assertEqual('some string', generator.nextValue(param))
 
     def checkDimensions(self, array, sizes):
-        size = sizes[0]
-        self.assertEqual(size, len(array))
-        if len(sizes) == 1:
-            return
-        for element in array:
-            self.checkDimensions(element, sizes[1:])
+        result = tools.checkArrayDimensions(sizes, array)
+        self.assertTrue(result, msg='Array dimension mismatch')
 
     def checkGeneratorRandomness(self, param, dep={}, iterations=10):
-        self.assertTrue(iterations > 1, msg='1 iteration makes no sense!')
-        values = []
-        for i in range(iterations):
-            value = generator.nextValue(param, dep)
-            if len(values) > 0 and value not in values:
-                return
-            else:
-                values.append(value)
-        msg = 'No unique value after %d iterations.' % (iterations)
-        self.fail(msg)
+        f = lambda: generator.nextValue(param, dep)
+        result = tools.checkVariability(f)
+        self.assertTrue(result, msg='No variation in generator output')
 
     # This test always assumes that the range is inclusive.
     def checkRange(self, inclMin, inclMax, param, dep={}, iterations=10):

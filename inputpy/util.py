@@ -395,3 +395,19 @@ def findAbsoluteParameter(contextId, paramId, ids):
     else:
         contextId = parent(contextId)
         return findAbsoluteParameter(contextId, paramId, ids)
+
+def getAbsoluteDependenciesForParam(param, supportedIds):
+    results = []
+    paramId = param.getId()
+    for depId in param.getDependees():
+        absolute = findAbsoluteParameter(paramId, depId, supportedIds)
+        if absolute is None:
+            msg = '%s referencing nonexistent parameter %s' % (paramId, depId)
+            raise ValueError(msg)
+        else:
+            results.append(absolute)
+    return results
+
+def getAbsoluteDependencies(params):#, dependencies):
+    return {k: getAbsoluteDependenciesForParam(params[k], params.keys())
+            for k in params.keys()}

@@ -7,7 +7,7 @@ from inputpy import mapping
 from test import SomeStructural
 from test.types.simple import EmptyClass
 from test.types.geo import Point, Triangle
-from test.tools import PresetCodeMappingFactory, PresetDesignSpaceFactory
+from test.factories import PresetCodeMappingFactory, PresetDesignSpaceFactory
 from inputpy.mapping import Mapping, CodeMapping, NULL_CODE_MAPPING
 
 class TestMapping(unittest.TestCase):
@@ -186,8 +186,10 @@ class TestMapping(unittest.TestCase):
 
     def testNullCodeMapping(self):
         tests = ('X', 'hello', None, 3, '', 1.2, True, False,)
+        expected = Mapping(None, None)
         for t in tests:
-            self.assertIsNone(NULL_CODE_MAPPING.getMapping(t))
+            #self.assertIsNone(NULL_CODE_MAPPING.getMapping(t))
+            self.assertEqual(expected, NULL_CODE_MAPPING.getMapping(t))
 
 if __name__ == '__main__':
     unittest.main()

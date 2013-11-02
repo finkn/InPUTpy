@@ -5,7 +5,7 @@
 import unittest
 from inputpy.param import ParamStore, getParameter
 from inputpy.designspace import DesignSpace
-from test.tools import PresetDesignSpaceFactory
+from test.factories import PresetDesignSpaceFactory
 from inputpy.q import *
 
 class TestDesignSpace(unittest.TestCase):
@@ -23,13 +23,14 @@ class TestDesignSpace(unittest.TestCase):
         self.assertCountEqual(params, ())
 
     def testAddParams(self):
-        param = getParameter('A', NPARAM, INTEGER)
         ps = ParamStore()
+        param = getParameter('A', NPARAM, INTEGER)
         ps.addParam(param)
+        param = getParameter('B', NPARAM, INTEGER)
         ps.addParam(param)
         space = DesignSpace(ps)
         params = space.getSupportedParamIds()
-        self.assertCountEqual(params, ('A'))
+        self.assertCountEqual(params, ('A', 'B'))
 
     def testNext(self):
         param1 = getParameter('A', NPARAM, INTEGER, inclMin=1, inclMax=1)
@@ -123,7 +124,7 @@ class TestDesignSpace(unittest.TestCase):
     def testEqual(self):
         param1 = getParameter('A', NPARAM, INTEGER)
         param2 = getParameter('B', NPARAM, INTEGER)
-        param3 = getParameter('A', NPARAM, INTEGER, inclMin=1)
+        param3 = getParameter('C', NPARAM, INTEGER, inclMin=1)
         ps1 = ParamStore((param1, param2))
         ps2 = ParamStore((param1, param2, param3))
         ps3 = ParamStore((param1, param2, param3))  # Same as ps2

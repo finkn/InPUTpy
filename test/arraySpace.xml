@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<i:DesignSpace
+    id="array"
+    mapping="arrayMapping.xml"
+    xmlns:i="http://TheInPUT.org/DesignSpace"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://TheInPUT.org/DesignSpace http://theinput.org/DesignSpace.xsd" >
+
+    <!--
+        Single- and multi-dimensional arrays of int, float and boolean.
+    -->
+    <i:NParam id="IntArray1" type="integer[3]" inclMin="1" inclMax="1"/>
+    <i:NParam id="IntArray2" type="integer[3][][2]" inclMin="2" inclMax="2"/>
+
+    <i:NParam id="FloatArray1" type="float[3]" inclMin="3.5" inclMax="3.5"/>
+    <i:NParam id="FloatArray2" type="float[3][][2]" inclMin="4.5" inclMax="4.5"/>
+
+    <i:NParam id="BoolArray1" type="boolean[3]" />
+    <i:NParam id="BoolArray2" type="boolean[3][][2]" />
+
+    <i:NParam id="FixedIntArray" type="integer[3][][2]" fixed="5" />
+    <i:NParam id="FixedBoolArray" type="boolean[3][][2]" fixed="false" />
+
+    <!--
+        Single- and multi-dimensional arrays of Strings and arbitrary SParam.
+    -->
+    <i:SParam id="StringArray1" type="String[3]" />
+    <i:SParam id="StringArray2" type="String[3][][2]" />
+
+    <!-- Type exists in code mapping. -->
+    <!-- EmptyClass takes no args. -->
+    <i:SParam id="EmptyClassArray1" type="[3]" />
+    <i:SParam id="EmptyClassArray2" type="[3][][2]" />
+
+    <i:SParam id="PointArray1" type="[3]">
+        <i:NParam id="X" type="integer" inclMin="1" inclMax="1" />
+        <i:NParam id="Y" type="integer" inclMin="2" inclMax="2" />
+    </i:SParam>
+    <i:SParam id="PointArray2" type="[3][][2]">
+        <i:NParam id="X" type="integer" inclMin="1" inclMax="1" />
+        <i:NParam id="Y" type="integer" inclMin="2" inclMax="2" />
+    </i:SParam>
+
+    <!-- Array with SChoices. -->
+    <i:SParam id="EmptyChoiceArray" type="[3]">
+        <i:SChoice id="Empty1" />
+        <i:SChoice id="Empty2" />
+        <i:SChoice id="Empty3" />
+    </i:SParam>
+
+    <i:SParam id="PointChoiceArray">
+        <i:NParam id="X" type="integer" inclMin="1" inclMax="1" />
+        <i:NParam id="Y" type="integer" inclMin="2" inclMax="2" />
+        <i:SChoice id="Regular" />
+        <i:SChoice id="Double" />
+        <i:SChoice id="NoConstructor" />
+    </i:SParam>
+
+</i:DesignSpace>

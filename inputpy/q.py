@@ -23,11 +23,12 @@ FLOAT = 'float'
 DOUBLE = 'double'
 DECIMAL = 'decimal'
 BOOLEAN = 'boolean'
-ARRAY = 'array'
+ARRAY = 'array'         # Array meta parameter "type".
 TRUE = 'true'
 PARENT_ID = 'parentId'
-NESTED = 'nested'
+NESTED = 'nested'       # Nested (child) parameters.
 TAG = 'tag'
+CHOICE = 'Choice'       # Choice meta parameter "type".
 
 # XML elements.
 DESIGN_ROOT = 'Design'

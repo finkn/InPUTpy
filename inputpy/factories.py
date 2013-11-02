@@ -9,17 +9,26 @@ from inputpy.designspace import DesignSpace
 from inputpy.mapping import Mapping, CodeMapping, NULL_CODE_MAPPING
 from inputpy.q import *
 
+def getTag(tag):
+    index = tag.index('}')
+    return tag[index+1:]
+
 class XMLFactory:
     @staticmethod
     def __getParamArgs(element, parentId=None):
         args = element.attrib
-        if element.tag.endswith(SPARAM):
-            args[TAG] = SPARAM
+        tag = getTag(element.tag)
+        if tag == SPARAM or tag == SCHOICE:
+            args[TAG] = tag
             paramId = args[ID_ATTR]
             nextParent = util.absolute(parentId, paramId)
             args[NESTED] = [
                 XMLFactory.__getParamArgs(e, nextParent) for e in element
             ]
+
+        # Clean this up.
+        #if element.tag.endswith(SCHOICE):
+            #args[TAG] = SCHOICE
 
         args[PARENT_ID] = parentId
         return args

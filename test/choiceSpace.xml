@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<i:DesignSpace
+    id="choice"
+    mapping="choiceMapping.xml"
+    xmlns:i="http://TheInPUT.org/DesignSpace"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://TheInPUT.org/DesignSpace http://theinput.org/DesignSpace.xsd">
+
+    <i:SParam id="Empty">
+        <i:SChoice id="E1" />
+        <i:SChoice id="E2" />
+        <i:SChoice id="E3" />
+    </i:SParam>
+
+    <i:SParam id="Point">
+        <i:NParam id="X" type="integer" inclMin="1" inclMax="1" />
+        <i:NParam id="Y" type="integer" inclMin="2" inclMax="2" />
+        <i:SChoice id="Regular" />
+        <i:SChoice id="Double" />
+        <i:SChoice id="NoAccessors" />
+        <i:SChoice id="NoConstructor" />
+    </i:SParam>
+
+    <i:SParam id="NonEmpty">
+        <i:SChoice id="NE1">
+            <i:NParam id="Obj" type="integer" />
+        </i:SChoice>
+        <i:SChoice id="NE2">
+            <i:NParam id="Obj" type="float" />
+        </i:SChoice>
+    </i:SParam>
+
+    <i:SParam id="Shape">
+        <i:SParam id="Point">
+            <i:NParam id="X" type="integer" inclMin="1" inclMax="1" />
+            <i:NParam id="Y" type="integer" inclMin="2" inclMax="2" />
+        </i:SParam>
+        <i:SChoice id="Square">
+            <i:NParam id="Side" type="integer" inclMin="3" inclMax="3" />
+        </i:SChoice>
+        <i:SChoice id="Rectangle">
+            <i:NParam id="Width" type="integer" inclMin="4" inclMax="4" />
+            <i:NParam id="Height" type="integer" inclMin="2" inclMax="2" />
+        </i:SChoice>
+    </i:SParam>
+
+</i:DesignSpace>

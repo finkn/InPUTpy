@@ -146,29 +146,101 @@ class ArrayGenerator(ValueGenerator):
         return True
 
 class SParamGenerator(ValueGenerator):
-    @classmethod
-    def nextValue(cls, param, dep={}):
+    @staticmethod
+    def getConstructorArgs(param):
+        return param.getMapping().getDependencies()
+
+    @staticmethod
+    def getConstructorDependencies(param, dep):
+        args = []
+        msg = 'Unmet dependency %s while initialzing %s'
+        for d in SParamGenerator.getConstructorArgs(param):
+            constArg = dep.get(d)
+            assert constArg is not None, msg % (d, param.getId())
+            args.append(constArg)
+        return args
+
+    @staticmethod
+    def instantiateSParam(param, dep):
         # Special case for String type.
         if param.getType() == STRING:
             return param.getRelativeId()
 
-        args = []
+        args = SParamGenerator.getConstructorDependencies(param, dep)
         paramMapping = param.getMapping()
-        for d in paramMapping.getDependencies():
-            args.append(dep[d])
-
         t = paramMapping.getType()
-        # Create instance with any constructor arguments.
-        tmp = t(*args)
-        # Now set any remaining nested parameters with setters.
-        dependencies = paramMapping.getDependencies()
-        for p in param.getNestedParameters():
-            if p.getRelativeId() in dependencies:
+        return t(*args)
+
+    @staticmethod
+    def initNested(partial, nested, dep):
+        depMapping = nested.getMapping()
+        # This has to be handled better.
+        if depMapping is None:
+            setterName = 'set' + nested.getRelativeId()
+        else:
+            setterName = depMapping.getSetter()
+        setter = partial.__getattribute__(setterName)
+        setterArg = dep.get(nested.getRelativeId())
+        assert setterArg is not None, 'Missing setter arg'
+        try:
+            setter(setterArg)
+        except TypeError:
+            print('error using setter: %s with arg %s' % (setter, setterArg))
+            raise
+        return partial
+
+    @staticmethod
+    def initializeWithSetters(partial, nested, constArgs, dep):
+        for p in nested:
+            if p.getRelativeId() in constArgs:
                 continue
-            depMapping = p.getMapping()
-            setter = tmp.__getattribute__(depMapping.getSetter())
-            setter(dep[p.getRelativeId()])
-        return tmp
+            partial = SParamGenerator.initNested(partial, p, dep)
+        return partial
+
+    @staticmethod
+    def getValueForRegularSParam(param, dep):
+        # Special case for String type.
+        if param.getType() == STRING:
+            return param.getRelativeId()
+
+        tmp = SParamGenerator.instantiateSParam(param, dep)
+        nested = param.getNestedParameters()
+        args = SParamGenerator.getConstructorArgs(param)
+        try:
+            return SParamGenerator.initializeWithSetters(tmp, nested, args, dep)
+        except TypeError:
+            print('error initializing %s' % (param.getId()))
+            raise
+
+    @staticmethod
+    def getSChoice(param):
+        choiceParams = param.getSChoices()
+        assert len(choiceParams) == 1
+        return choiceParams[0]
+
+    @staticmethod
+    def getValueForSParamWithSChoice(param, dep):
+        choice = SParamGenerator.getSChoice(param)
+        tmp = dep[choice.getRelativeId()]
+        nested = param.getRealNested()
+        args = SParamGenerator.getConstructorArgs(choice)
+        return SParamGenerator.initializeWithSetters(tmp, nested, args, dep)
+
+    @classmethod
+    def nextValue(cls, param, dep={}):
+        if param.hasChoice():
+            return cls.getValueForSParamWithSChoice(param, dep)
+        else:
+            return cls.getValueForRegularSParam(param, dep)
+
+    @classmethod
+    def isValid(cls, param, dep={}):
+        return True    # Is it?
+
+class ChoiceGenerator(ValueGenerator):
+    @classmethod
+    def nextValue(cls, param, dep={}):
+        return nextValue(cls.rng.choice(param.getChoices()), dep)
 
     @classmethod
     def isValid(cls, param, dep={}):
@@ -187,10 +259,18 @@ GENERATORS[SPARAM] = SParamGenerator
 # Hack to deal with the asymmetry between NParam and SParam and their
 # tag/type values.
 def __getGenerator(param):
-    if param.getTag() == SPARAM:
+    tag = param.getTag()
+    if tag == CHOICE:
+        return ChoiceGenerator
+    elif tag == SPARAM or tag == SCHOICE:
         return SParamGenerator
     else:
         return GENERATORS[param.getType()]
+
+def getChoice(param):
+    if param.getTag() != CHOICE:
+        return param
+    return ValueGenerator.rng.choice(param.getChoices())
 
 def nextValue(param, dep={}):
     """

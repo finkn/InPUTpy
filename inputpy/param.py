@@ -145,6 +145,12 @@ class Param(Identifiable):
     def getTag(self):
         return self.tag
 
+    def getParentId(self):
+        return self.parentId
+
+    def getNestedParameters(self):
+        return ()
+
 
 class NParam(Param):
     """
@@ -194,10 +200,9 @@ class NParam(Param):
         self.min = []
         self.max = []
 
-        for minLimit in minTmp:
-            self.__initMinMax(self.min, self.minDependees, minLimit)
-        for maxLimit in maxTmp:
-            self.__initMinMax(self.max, self.maxDependees, maxLimit)
+        # Initialize min/max limits and dependencies.
+        self.__initMinMax(self.min, self.minDependees, minTmp)
+        self.__initMinMax(self.max, self.maxDependees, maxTmp)
 
         self.__padLimits(self.min, self.max)
         self.min = tuple(self.min)
@@ -206,8 +211,10 @@ class NParam(Param):
         self.maxDependees = tuple(self.maxDependees)
 
         tmp = self.minDependees + self.maxDependees
+        fixed = self.__evaluateFixed(type, fixed)
         Param.__init__(self, id, type, tag, fixed, parentId, mapping, tmp)
 
+    # Fill in missing limits with None to make all end points match.
     @staticmethod
     def __padLimits(minLimits, maxLimits):
         minLen = len(minLimits)
@@ -220,6 +227,7 @@ class NParam(Param):
             limits.append(None)
 
     # Is this the best way to check whether limit is already a sequence?
+    # Make sure limits are always a sequence.
     @staticmethod
     def __transformLimit(limit):
         if limit is None:
@@ -234,21 +242,33 @@ class NParam(Param):
         else:
             return limit
 
-    # TODO:
-    # - Make this return results instead of modifying arguments!
-    # - Consider whether simple expressions should really be evaluated.
+    # Return a tuple with a single limit and multiple dependencies.
     @staticmethod
-    def __initMinMax(limits, dependees, limit):
-        # If min/max are expressions, these will be parsed to find
-        # dependencies. If the expression does not contain references to any
-        # other parameters, then the expression is evaluated immediately.
-        # Any dependencies are recorded.
-
-        if type(limit) is str:
-            dependees.extend(Evaluator.parseDependencies(limit))
-            if len(dependees) == 0:
+    def __getLimitAndDependencies(limit):
+        dependencies = ()
+        if isinstance(limit, str):
+            dependencies = Evaluator.parseDependencies(limit)
+            if len(dependencies) == 0:
                 limit = Evaluator.evaluate(limit)
-        limits.append(limit)
+        return (limit, dependencies)
+
+    # Updates limits and dependees.
+    @staticmethod
+    def __initMinMax(limits, dependees, unprocessedLimits):
+        for limit in unprocessedLimits:
+            result = NParam.__getLimitAndDependencies(limit)
+            limits.append(result[0])
+            dependees.extend(result[1])
+
+    @staticmethod
+    def __evaluateFixed(type, value):
+        if isinstance(value, str):
+            if type == BOOLEAN:
+                return value.lower() == TRUE
+            else:
+                return Evaluator.evaluate(value)
+        else:
+            return value
 
     def setFixed(self, value):
         """
@@ -267,13 +287,7 @@ class NParam(Param):
 
         Extends Param.setFixed.
         """
-        if type(value) is str:
-            if self.getType() == BOOLEAN:
-                Param.setFixed(self, value.lower() == TRUE)
-            else:
-                Param.setFixed(self, Evaluator.evaluate(value))
-        else:
-            Param.setFixed(self, value)
+        Param.setFixed(self, self.__evaluateFixed(Param.getType(self), value))
 
     def isMinDependent(self):
         """
@@ -345,14 +359,39 @@ class NParam(Param):
 class SParam(Param):
     def __init__(self, id, type=None, tag=SPARAM,
             fixed=None, parentId=None, mapping=None, nested=[]):
-        if mapping is None:
-            raise ValueError('Cannot create SParam with None mapping')
+        # Strings are a special case and don't require a mapping.
+        if mapping is None and type != STRING:
+            msg = 'Cannot create SParam "%s" with None mapping' % (id)
+            raise ValueError(msg)
         self.nested = nested
+        self.schoices = []
+        self.nonchoices = []
+
+        for p in nested:
+            if p.getTag() == SCHOICE:
+                self.schoices.append(p)
+            else:
+                self.nonchoices.append(p)
+
         dep = [p.getRelativeId() for p in self.nested]
+        # Hack: Children inherit constructor, so they inherit dependencies.
+        if len(self.schoices) == 0:
+            # Hack: String type parameters have no mapping.
+            if type != STRING:
+                dep = dep + list(mapping.getDependencies())
         Param.__init__(self, id, type, tag, fixed, parentId, mapping, dep)
 
     def getNestedParameters(self):
         return self.nested
+
+    def hasChoice(self):
+        return len(self.schoices) > 0
+
+    def getSChoices(self):
+        return self.schoices
+
+    def getRealNested(self):
+        return self.nonchoices
 
     def __eq__(self, other):
         if not Param.__eq__(self, other):
@@ -366,6 +405,12 @@ class SParam(Param):
                 return False
         return True
 
+class SChoice(SParam):
+    def __init__(self, id, type=None, tag=SCHOICE, parentId=None,
+            mapping=None, nested=[]):
+        SParam.__init__(self, id, type, tag, parentId=parentId,
+            mapping=mapping, nested=nested)
+
 
 # Factory.
 def getParameter(id, tag, type=None, **kwargs):
@@ -374,7 +419,7 @@ def getParameter(id, tag, type=None, **kwargs):
     The id may not be None. A None tag is legal but discouraged. The type
     is optional for SParams but mandatory for NParams.
     """
-    paramClasses = {NPARAM: NParam, SPARAM: SParam,}
+    paramClasses = {NPARAM: NParam, SPARAM: SParam, SCHOICE: SChoice}
 
     assert id is not None
     # May or may not be an array. Check the base type.
@@ -425,15 +470,105 @@ def paramFactory(kwargs, mappings=None):
 
     # Make sure that existing mappings are not replaced.
     if MAPPING_ATTR not in kwargs:
-        # String parameters are implicitly mapped by type rather than
-        # explicitly by ID. Try to fall back on type if no mapping exists
-        # for the ID.
-        # TODO:
-        # Note! This is a temporary hack!
-        m = mappings.getMapping(absoluteId) or mappings.getMapping(baseType)
-        kwargs[MAPPING_ATTR] = m
+        kwargs[MAPPING_ATTR] = mappings.getMapping(absoluteId)
+
+    if tag == SCHOICE:
+        kwargs[MAPPING_ATTR] = mappings.getInherited(absoluteId, parentId)
 
     return getParameter(paramId, **kwargs)
+
+
+def choiceFactory(sparam):
+    # Any non-choice sparam are returned unchanged.
+    if sparam.getTag() != SPARAM:
+        return sparam
+    elif not sparam.hasChoice():
+        return sparam
+
+    realParams = []
+    choiceParams = []
+    for p in sparam.getNestedParameters():
+        if p.getTag() == SCHOICE:
+            choiceParams.append(p)
+        else:
+            realParams.append(p)
+
+    choices = []
+    paramId = sparam.getId()
+    parentId = util.parent(paramId)
+    for p in choiceParams:
+        nested = list(realParams) + [p]
+
+        kwargs = {
+            ID_ATTR: paramId, TAG: SPARAM, TYPE_ATTR: sparam.getType(),
+            PARENT_ID: parentId, MAPPING_ATTR: sparam.getMapping(),
+            NESTED: nested,
+        }
+        choices.append(SParam(**kwargs))
+
+    return Choice(sparam, choices)
+
+
+class Choice():
+    def __init__(self, sparam, choices):
+        self.choices = choices
+        self.original = sparam
+        dep = []
+        for p in choices:
+            for d in p.getDependees():
+                dep.append(d)
+        self.dep = tuple(set(dep))
+
+    def getChoices(self):
+        return self.choices
+
+    def getChoice(self, paramId):
+        for c in self.choices:
+            for n in c.getSChoices():
+                if n.getRelativeId() == paramId:
+                    return c
+        assert False, 'Unable to find choice %s in %s' % (paramId, self.getId())
+
+    def getId(self):
+        return self.original.getId()
+
+    def getTag(self):
+        return CHOICE
+
+    def getType(self):
+        return self.original.getType()
+
+    def getDependees(self):
+        return self.dep
+
+    def getParentId(self):
+        return self.original.getParentId()
+
+    def getFixedValue(self):
+        return self.original.getFixedValue()
+
+    def getMapping(self):
+        return self.original.getMapping()
+
+    def getNestedParameters(self):
+        return self.original.getNestedParameters()
+
+    def isDependent(self):
+        return len(self.dep) > 0
+
+    def getOriginal(self):
+        return self.original
+
+    def __eq__(self, other):
+        if not isinstance(other, Choice):
+            return False
+        if self.getId() != other.getId():
+            return False
+        if self.original != other.original:
+            return False
+        if self.choices != other.choices:
+            return False
+        return True
 
 
 class ParamArray():
@@ -451,17 +586,23 @@ class ParamArray():
     - getType
     """
     def __init__(self, paramId, paramType, tag, size, **kwargs):
-        self.__param = getParameter(paramId, tag, paramType, **kwargs)
+        # Convert to choice on the fly as needed.
+        self.__param = choiceFactory(getParameter(paramId, tag, paramType, **kwargs))
         self.__size = size
         assert self.__param is not None
 
     def __getattr__(self, attr):
         return getattr(self.__param, attr)
 
+    # TODO:
+    # This shouldn't be needed anymore.
     def getType(self):
         """
         Always returns inputpy.q.ARRAY.
         """
+        return ARRAY
+
+    def getTag(self):
         return ARRAY
 
     def getSize(self):
@@ -478,9 +619,18 @@ class ParamArray():
         return self.__param
 
     def __eq__(self, other):
+        if not isinstance(other, ParamArray):
+            return False
         if self.getSize() != other.getSize():
             return False
         return self.getParameter() == other.getParameter()
+
+
+def transformParameters(paramDict):
+    return {k: choiceFactory(v) for (k,v) in paramDict.items()}
+
+def getTopLevelParameters(parameters):
+    return list(filter(lambda p: p.getParentId() is None, parameters))
 
 
 class ParamStore:
@@ -512,12 +662,12 @@ class ParamStore:
             for p in param:
                 self.addParam(p)
         except TypeError:
-            self.__params[param.getId()] = param
-            # Update dependencies as new parameters are added.
-            self.__dep[param.getId()] = param.getDependees()
+            msg = 'Parameter %s already exists' % (param.getId())
+            assert not param.getId() in self.__params, msg
 
-            if param.getTag() == SPARAM:
-                self.addParam(param.getNestedParameters())
+            self.__params[param.getId()] = param
+            self.__dep[param.getId()] = param.getDependees()
+            self.addParam(param.getNestedParameters())
 
     def getParam(self, paramId):
         """
@@ -541,19 +691,10 @@ class ParamStore:
         """
         if self.__finalized:
             return
+        self.__params = transformParameters(self.__params)
+        self.__topLevel = getTopLevelParameters(self.__params.values())
         # Update dependencies so that all are absolute.
-        absoluteDependencies = {}
-        ids = self.__params.keys()
-        for (k, v) in self.__dep.items():
-            l = []
-            for p in v:
-                absolute = util.findAbsoluteParameter(k, p, ids)
-                l.append(absolute)
-                if absolute is None:
-                    msg = '%s referencing nonexistent parameter %s' % (k, p)
-                    raise ValueError(msg)
-            absoluteDependencies[k] = l
-        self.__dep = absoluteDependencies
+        self.__dep = util.getAbsoluteDependencies(self.__params)#, self.__dep)
 
         # The order of these two calls (__validateParamters and initOrder)
         # is significant.
@@ -589,6 +730,9 @@ class ParamStore:
         """
         return self.__params.keys()
 
+    def getTopLevelParameters(self):
+        return self.__topLevel
+
     def __validateParameters(self):
         """
         Check that all parameters are valid.
@@ -616,6 +760,7 @@ class ParamStore:
             return True     # Don't know that it's invalid at least.
         return generator.isValid(param)
 
+    # Is this function superfluous now?
     def __missingDep(self, param):
         """
         Return any unmet dependency. That is, any referenced parameter that

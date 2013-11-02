@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<i:CodeMappings
+    id="array"
+    xmlns:i="http://TheInPUT.org/CodeMappings"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://TheInPUT.org/CodeMappings http://theinput.org/CodeMappings.xsd">
+
+    <i:MappingType
+        id="Empty"
+        type="test.types.simple.EmptyClass"
+    />
+    <i:MappingType
+        id="Point"
+        type="test.types.geo.Point"
+        constructor="X Y"
+    />
+    <i:Mapping id="EmptyClassArray1" type="Empty" />
+    <i:Mapping id="EmptyClassArray2" type="Empty" />
+    <i:Mapping id="PointArray1" type="Point" />
+    <i:Mapping id="PointArray2" type="Point" />
+
+    <i:Mapping id="EmptyChoiceArray" type="Empty" />
+    <i:Mapping id="EmptyChoiceArray.Empty1" type="test.types.simple.Empty1" />
+    <i:Mapping id="EmptyChoiceArray.Empty2" type="test.types.simple.Empty2" />
+    <i:Mapping id="EmptyChoiceArray.Empty3" type="test.types.simple.Empty3" />
+
+    <i:Mapping
+        id="PointChoiceArray"
+        type="Point"
+    />
+    <i:Mapping
+        id="PointChoiceArray.Regular"
+        type="Point"
+    />
+    <i:Mapping
+        id="PointChoiceArray.Double"
+        type="test.types.geo.DoublePoint"
+    />
+    <i:Mapping
+        id="PointChoiceArray.NoConstructor"
+        type="test.types.geo.PointWithoutConstructor"
+        constructor=""
+    />
+
+</i:CodeMappings>

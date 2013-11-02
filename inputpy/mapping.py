@@ -63,6 +63,13 @@ def getDefaultGetter(paramId, prefix=GETTER_PREFIX):
     """
     return prefix + util.relative(paramId)
 
+def inheritMapping(child, parent):
+    kwargs = parent.getParameters()
+    for (k,v) in child.getParameters().items():
+        if v is not None:
+            kwargs[k] = v
+    return Mapping(**kwargs)
+
 class Mapping:
     def __init__(self, id, type, constructor=None, set=None, get=None):
         self.id = id
@@ -126,9 +133,6 @@ class Mapping:
     def __repr__(self):
         return self.__str__()
 
-STRING_MAPPING = Mapping(STRING, STRING_TYPE)
-PREDEFINED_MAPPINGS = {STRING: STRING_MAPPING}
-
 
 class CodeMapping:
     """
@@ -160,10 +164,14 @@ class CodeMapping:
         })
 
     # Always returns a full/direct mapping.
-    # This implementation must be temporary. In the future, Mappings and
-    # MappingTypes must be handled separately.
     def getMapping(self, id):
-        return self.__mappings.get(id) or PREDEFINED_MAPPINGS.get(id)
+        return self.__mappings.get(id)
+
+    # Child mapping inherits from parent.
+    def getInherited(self, childId, parentId):
+        child = self.getMapping(childId)
+        parent = self.getMapping(parentId)
+        return inheritMapping(child, parent)
 
     def __eq__(self, other):
         smt = self.__mappingTypes
@@ -176,13 +184,11 @@ class CodeMapping:
 
         for m in smt:
             if smt.count(m) != omt.count(m): return False
-        for m in omt:
-            if smt.count(m) != omt.count(m): return False
         for m in spm:
-            if spm.count(m) != opm.count(m): return False
-        for m in opm:
             if spm.count(m) != opm.count(m): return False
 
         return True
 
+DUMMY_MAPPING = Mapping(None, None)
 NULL_CODE_MAPPING = CodeMapping([], [])
+NULL_CODE_MAPPING.getMapping = lambda p: DUMMY_MAPPING

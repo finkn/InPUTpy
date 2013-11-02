@@ -13,8 +13,10 @@ to make them easier to understand and thus more useful.
 """
 
 __all__ = (
-    'Point', 'PointWithoutConstructor', 'Triangle',
-    'TriangleWithoutConstructor', 'TriangleWithCustomAccessors',
+    'Point', 'DoublePoint',
+    'PointWithoutConstructor', 'PointWithoutAccessors',
+    'PointWithCustomAccessors', 'PointWithCustomAccessorsNoConstructor',
+    'Triangle', 'TriangleWithoutConstructor', 'TriangleWithCustomAccessors',
 )
 
 class Point:
@@ -28,7 +30,7 @@ class Point:
     def setY(self, y): self.__y = y; return self
 
     def __str__(self):
-        return '(%i,%i)' % (self.__x, self.__y)
+        return '(%s,%s)' % (self.__x, self.__y)
     def __repr__(self):
         return self.__str__()
 
@@ -39,27 +41,73 @@ class PointWithoutConstructor(Point):
     def __init__(self):
         Point.__init__(self, None, None)
 
-class Triangle:
-    def __init__(self, p1, p2, p3):
-        self.p1 = p1
-        self.p2 = p2
-        self.p3 = p3
+class PointWithoutAccessors(Point):
+    # Redefine get and set methods to make sure the default accessors
+    # are not called.
+    def getX(*args): raise NotImplementedError('No default accessors.')
+    def getY(*args): raise NotImplementedError('No default accessors.')
+    def setX(*args): raise NotImplementedError('No default accessors.')
+    def setY(*args): raise NotImplementedError('No default accessors.')
 
-    def getP1(self): return self.p1
-    def getP2(self): return self.p2
-    def getP3(self): return self.p3
-    def setP1(self, p): self.p1 = p; return self
-    def setP2(self, p): self.p2 = p; return self
-    def setP3(self, p): self.p3 = p; return self
+class PointWithCustomAccessors(PointWithoutAccessors):
+    def customXGetter(self): return Point.getX(self)
+    def customYGetter(self): return Point.getY(self)
+    def customXSetter(self, n): return Point.setX(self, n)
+    def customYSetter(self, n): return Point.setY(self, n)
+
+class PointWithCustomAccessorsNoConstructor(PointWithCustomAccessors):
+    def __init__(self):
+        Point.__init__(self, None, None)
+
+class DoublePoint(Point):
+    def __init__(self, x, y):
+        Point.__init__(self, x*2, y*2)
+
+class Shape:
+    def __init__(self, *args):
+        self.points = [p for p in args]
+
+    def getPoint(self, index):
+        return self.points[index]
+
+    def setPoint(self, index, point):
+        self.points[index] = point
+        return self
 
     def __str__(self):
-        return '(%s,%s,%s)' % (self.p1, self.p2, self.p3)
+        return str(self.points)
+
     def __repr__(self):
         return self.__str__()
 
     def __eq__(self, other):
-        return (self.p1 == other.p1 and
-            self.p1 == other.p1 and self.p3 == other.p3)
+        if not isinstance(other, Shape):
+            return False
+        if self.points != other.points:
+            return False
+        return True
+
+
+class Triangle(Shape):
+    def __init__(self, p1, p2, p3):
+        Shape.__init__(self, p1, p2, p3)
+
+    def getP1(self): return Shape.getPoint(self, 0)
+    def getP2(self): return Shape.getPoint(self, 1)
+    def getP3(self): return Shape.getPoint(self, 2)
+    def setP1(self, p): return Shape.setPoint(self, 0, p)
+    def setP2(self, p): return Shape.setPoint(self, 1, p)
+    def setP3(self, p): return Shape.setPoint(self, 2, p)
+
+    def __str__(self):
+        return '(%s,%s,%s)' % (self.getP1(), self.getP2(), self.getP3())
+    def __repr__(self):
+        return self.__str__()
+
+    def __eq__(self, other):
+        return (self.points[0] == other.points[0] and
+            self.points[1] == other.points[1] and
+            self.points[2] == other.points[2])
 
 class TriangleWithoutConstructor(Triangle):
     def __init__(self):
@@ -71,12 +119,12 @@ class TriangleWithCustomAccessors(Triangle):
 
     # Redefine get and set methods to make sure the default accessors
     # are not called.
-    def customP1Getter(self): return self.p1
-    def customP2Getter(self): return self.p2
-    def customP3Getter(self): return self.p3
-    def customP1Setter(self, p): self.p1 = p; return self
-    def customP2Setter(self, p): self.p2 = p; return self
-    def customP3Setter(self, p): self.p3 = p; return self
+    def customP1Getter(self): return Shape.getPoint(self, 0)
+    def customP2Getter(self): return Shape.getPoint(self, 1)
+    def customP3Getter(self): return Shape.getPoint(self, 2)
+    def customP1Setter(self, p): return Shape.setPoint(self, 0, p)
+    def customP2Setter(self, p): return Shape.setPoint(self, 1, p)
+    def customP3Setter(self, p): return Shape.setPoint(self, 2, p)
 
     def getP1(*args): raise NotImplementedError('No default accessors.')
     def getP2(*args): raise NotImplementedError('No default accessors.')
@@ -85,3 +133,14 @@ class TriangleWithCustomAccessors(Triangle):
     def setP2(*args): raise NotImplementedError('No default accessors.')
     def setP3(*args): raise NotImplementedError('No default accessors.')
 
+
+class Rectangle(Shape):
+    def __init__(self, topLeft, width, height):
+        topRight = Point(topLeft.getX() + width, topLeft.getY())
+        botRight = Point(topLeft.getX() + width, topLeft.getY() - height)
+        botLeft = Point(topLeft.getX(), topLeft.getY() - height)
+        Shape.__init__(self, topLeft, topRight, botRight, botLeft)
+
+class Square(Rectangle):
+    def __init__(self, topLeft, side):
+        Rectangle.__init__(self, topLeft, side, side)

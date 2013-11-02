@@ -12,11 +12,14 @@ from test.test_param import TestParam
 from test.test_param_store import TestParamStore
 from test.test_types import TestTypes
 from test.test_util import TestEvaluator, TestMiscUtil
+from test.test_array_space import TestArraySpace
+from test.test_tools import TestTools
 
 __all__ = (
     'TestDesign', 'TestDesignSpace', 'TestParam', 'TestParamStore',
     'TestEvaluator', 'TestMiscUtil', 'TestGenerators', 'TestMapping',
-    'TestTypes', 'TestFactories',
+    'TestTypes', 'TestFactories', 'TestArraySpace',
+    'TestTools',
 )
 
 if __name__ == '__main__':

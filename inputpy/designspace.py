@@ -6,6 +6,9 @@ inputpy.designspace
 """
 import inputpy.generators as generator
 import inputpy.util as util
+import inputpy.mapping as mapping
+import inputpy.param as param
+from inputpy.q import *
 from inputpy.param import Identifiable, Design, ParamStore
 
 class DesignSpace(Identifiable):
@@ -27,7 +30,7 @@ class DesignSpace(Identifiable):
     """
 
     # fileName is currently ignored.
-    def __init__(self, paramStore, spaceId=None, fileName=None):
+    def __init__(self, paramStore=None, spaceId=None, fileName=None):
         """
         An instance is always created using a ParamStore. A file name (if
         specified) only indicates which file the DesignSpace is based on.
@@ -55,6 +58,13 @@ class DesignSpace(Identifiable):
         This method isn't used while generating a design. It exists mostly
         for API compatibility with InPUT4j.
         """
+        param = self.params.getParam(paramId)
+        if param.getTag() == SCHOICE:
+            parentId = param.getParentId()
+            relativeId = param.getRelativeId()
+            parent = self.params.getParam(parentId)
+            param = parent.getChoice(relativeId)
+        paramId = param.getId()
         return self.__initParam(paramId, {})[paramId]
 
     # readOnly is currently ignored.
@@ -63,8 +73,8 @@ class DesignSpace(Identifiable):
         Return a new design with freshly initialized parameters.
         """
         params = {}
-        for paramId in self.params.getSupportedParamIds():
-            params = self.__initParam(paramId, params)
+        for p in self.params.getTopLevelParameters():
+            params = self.__initParam(p.getId(), params)
         return Design(params, self, designId)
 
     def __initParam(self, paramId, init):
@@ -76,17 +86,19 @@ class DesignSpace(Identifiable):
         if paramId in init:
             return init
         param = self.params.getParam(paramId)
+        # if Choice, get choice
+        # if SChoice, get Choice and get the corresponding choice
+        param = generator.getChoice(param)
 
         # When initializing dependent parameters, find the absolute ID of the
         # dependencies. Then use the appropriate values for those IDs when
         # resolving dependencies. (map the relative ID to the proper value)
         dependencies = {}
-        if param.isDependent():
-            ids = self.params.getSupportedParamIds()
-            for d in param.getDependees():
-                absolute = util.findAbsoluteParameter(paramId, d, ids)
-                init = self.__initParam(absolute, init)
-                dependencies[d] = init[absolute]
+        ids = self.params.getSupportedParamIds()
+        for d in param.getDependees():
+            absolute = util.findAbsoluteParameter(paramId, d, ids)
+            init = self.__initParam(absolute, init)
+            dependencies[d] = init[absolute]
 
         init[paramId] = generator.nextValue(param, dependencies)
         return init
@@ -117,7 +129,11 @@ class DesignSpace(Identifiable):
     # -------------------------------------------------------------------------
 
     def __eq__(self, other):
+        if not isinstance(other, DesignSpace):
+            return False
         if self.getId() != other.getId():
+            return False
+        if self.getFileName() != other.getFileName():
             return False
         paramKeys1 = self.getSupportedParamIds()
         paramKeys2 = other.getSupportedParamIds()

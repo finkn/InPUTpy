@@ -4,9 +4,10 @@
 """
 import unittest
 from inputpy.designspace import DesignSpace
+from inputpy.mapping import DUMMY_MAPPING
 from inputpy.param import *
 from inputpy.q import *
-from test.tools import PresetCodeMappingFactory
+from test.factories import PresetCodeMappingFactory
 
 class TestParam(unittest.TestCase):
 
@@ -177,8 +178,8 @@ class TestParam(unittest.TestCase):
             self.assertNotEqual(ARRAY, p.getType())
         for p in arrays:
             self.assertEqual(ARRAY, p.getType())
-            self.assertIsNotNone((), p.getParameter())
-            self.assertIsNotNone((), p.getSize())
+            self.assertIsNotNone(p.getParameter())
+            self.assertIsNotNone(p.getSize())
 
     def testGetParam(self):
         reference = NParam('A', INTEGER, inclMin=3, fixed=4)
@@ -215,7 +216,7 @@ class TestParam(unittest.TestCase):
         self.assertEqual(param1, param2)
 
     def testSParamWithoutNestedParameters(self):
-        m = 'dummy mapping' # Looks like I'm being very naughty.
+        m = DUMMY_MAPPING
         param = getParameter('A', SPARAM, nested=(), mapping=m)
         self.assertEqual('A', param.getId())
         self.assertEqual(SPARAM, param.getTag())
@@ -224,7 +225,7 @@ class TestParam(unittest.TestCase):
     def testSParamWithNestedParameters(self):
         # A could be a Point object for example, with X and Y
         # NParam nested parameters.
-        m = 'dummy mapping'
+        m = DUMMY_MAPPING
         x = getParameter('X', NPARAM, INTEGER, parentId='A')
         y = getParameter('Y', NPARAM, INTEGER, parentId='A')
         param = getParameter('A', SPARAM, nested=(x, y), mapping=m)
@@ -234,7 +235,7 @@ class TestParam(unittest.TestCase):
         self.assertCountEqual(('X', 'Y'), param.getDependees())
 
     def testSParamWithMultipleNestingLevels(self):
-        m = 'dummy mapping'
+        m = DUMMY_MAPPING
         x = getParameter('X', NPARAM, INTEGER, parentId='B.A')
         y1 = getParameter('Y', NPARAM, INTEGER, parentId='B.A')
         y2 = getParameter('Y', NPARAM, INTEGER, parentId='B')

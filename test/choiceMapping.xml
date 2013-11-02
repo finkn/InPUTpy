@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<i:CodeMappings
+    id="choice"
+    xmlns:i="http://TheInPUT.org/CodeMappings"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://TheInPUT.org/CodeMappings http://theinput.org/CodeMappings.xsd">
+
+    <i:Mapping id="Empty" type="test.types.simple.EmptyClass" />
+    <i:Mapping id="Empty.E1" type="test.types.simple.Empty1" />
+    <i:Mapping id="Empty.E2" type="test.types.simple.Empty2" />
+    <i:Mapping id="Empty.E3" type="test.types.simple.Empty3" />
+
+    <i:Mapping id="Point" type="test.types.geo.Point" constructor="X Y" />
+    <i:Mapping id="Point.Regular" type="test.types.geo.Point" />
+    <i:Mapping id="Point.Double" type="test.types.geo.DoublePoint" />
+    <i:Mapping
+        id="Point.NoAccessors"
+        type="test.types.geo.PointWithoutAccessors"
+    />
+    <i:Mapping
+        id="Point.NoConstructor"
+        type="test.types.geo.PointWithoutConstructor"
+        constructor=""
+    />
+
+    <i:Mapping
+        id="NonEmpty"
+        type="test.types.simple.NonEmptyClass"
+        constructor="Obj"
+    />
+    <i:Mapping id="NonEmpty.NE1" type="test.types.simple.NonEmpty1" />
+    <i:Mapping id="NonEmpty.NE2" type="test.types.simple.NonEmpty2" />
+
+    <i:Mapping id="Shape" type="test.types.geo.Shape" />
+    <i:Mapping
+        id="Shape.Point"
+        type="test.types.geo.Point"
+        constructor="X Y"
+    />
+    <i:Mapping
+        id="Shape.Rectangle"
+        type="test.types.geo.Rectangle"
+        constructor="Point Width Height"
+    />
+    <i:Mapping
+        id="Shape.Square"
+        type="test.types.geo.Square"
+        constructor="Point Side"
+    />
+
+</i:CodeMappings>

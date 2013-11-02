@@ -4,7 +4,7 @@
 """
 import unittest
 from inputpy.factories import XMLFactory
-from test.tools import PresetCodeMappingFactory, PresetDesignSpaceFactory
+from test.factories import PresetCodeMappingFactory, PresetDesignSpaceFactory
 
 class TestFactories(unittest.TestCase):
     def testPresetCodeMappingFactory(self):
@@ -12,6 +12,7 @@ class TestFactories(unittest.TestCase):
             'triangleMapping.xml',
             'triangleCustomAccessorMapping.xml',
             'triangleDefaultAccessorMapping.xml',
+            'choiceShapeMapping.xml',
         )
         factories = (
             XMLFactory.getCodeMapping,
@@ -37,6 +38,9 @@ class TestFactories(unittest.TestCase):
             'advancedIntegerParameterSpace.xml',
             'simpleTriangleSpace.xml',
             'advancedTriangleSpace.xml',
+            'choiceShapeSpace.xml',
+            'choiceSpace.xml',
+            'arraySpace.xml',
         )
         factories = (
             XMLFactory.getDesignSpace,
@@ -50,6 +54,7 @@ class TestFactories(unittest.TestCase):
         for result in results[1:]:
             for (k,v) in result.items():
                 msg = 'Import did not match for %s' % (k)
+                # v is from a preset factory, first[k] is from an XML factory
                 self.assertEqual(v, first[k], msg=msg)
 
 
