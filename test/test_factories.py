@@ -38,7 +38,6 @@ class TestFactories(unittest.TestCase):
             'advancedIntegerParameterSpace.xml',
             'simpleTriangleSpace.xml',
             'advancedTriangleSpace.xml',
-            'choiceShapeSpace.xml',
             'choiceSpace.xml',
             'arraySpace.xml',
         )
