@@ -59,6 +59,8 @@ class DesignSpace(Identifiable):
         for API compatibility with InPUT4j.
         """
         param = self.params.getParam(paramId)
+        if param is None:
+            return None
         if param.getTag() == SCHOICE:
             parentId = param.getParentId()
             relativeId = param.getRelativeId()

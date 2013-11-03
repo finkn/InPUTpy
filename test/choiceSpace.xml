@@ -6,12 +6,14 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://TheInPUT.org/DesignSpace http://theinput.org/DesignSpace.xsd">
 
+    <!-- No nested parameters. -->
     <i:SParam id="Empty">
         <i:SChoice id="E1" />
         <i:SChoice id="E2" />
         <i:SChoice id="E3" />
     </i:SParam>
 
+    <!-- All choices share the same two nested parameters. -->
     <i:SParam id="Point">
         <i:NParam id="X" type="integer" inclMin="1" inclMax="1" />
         <i:NParam id="Y" type="integer" inclMin="2" inclMax="2" />
@@ -21,6 +23,7 @@
         <i:SChoice id="NoConstructor" />
     </i:SParam>
 
+    <!-- Each choice as its own nested parameter. -->
     <i:SParam id="NonEmpty">
         <i:SChoice id="NE1">
             <i:NParam id="Obj" type="integer" />
@@ -30,6 +33,7 @@
         </i:SChoice>
     </i:SParam>
 
+    <!-- One shared SParam and nested params in the choices. -->
     <i:SParam id="Shape">
         <i:SParam id="Point">
             <i:NParam id="X" type="integer" inclMin="1" inclMax="1" />

@@ -14,11 +14,12 @@ from test.test_types import TestTypes
 from test.test_util import TestEvaluator, TestMiscUtil
 from test.test_array_space import TestArraySpace
 from test.test_tools import TestTools
+from test.test_choice import TestChoice
 
 __all__ = (
     'TestDesign', 'TestDesignSpace', 'TestParam', 'TestParamStore',
     'TestEvaluator', 'TestMiscUtil', 'TestGenerators', 'TestMapping',
-    'TestTypes', 'TestFactories', 'TestArraySpace',
+    'TestTypes', 'TestFactories', 'TestArraySpace', 'TestChoice',
     'TestTools',
 )
 

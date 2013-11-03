@@ -673,7 +673,7 @@ class ParamStore:
         """
         Returns the parameter with the given ID.
         """
-        return self.__params[paramId]
+        return self.__params.get(paramId)
 
     def setFixed(self, paramId, value):
         self.__params[paramId].setFixed(value)
