@@ -362,12 +362,12 @@ class PresetParamStoreFactory:
             {ID: 'X', TYPE: INT, IMIN: '1', IMAX: '1'},
             {ID: 'Y', TYPE: INT, IMIN: '2', IMAX: '2'},
         ), },
-        {ID: 'EmptyChoiceArray', TAG: SP, TYPE: '[3]', NESTED: (
+        {ID: 'EmptyChoiceArray', TAG: SP, TYPE: '[10]', NESTED: (
             {ID: 'Empty1', TAG: SCHOICE},
             {ID: 'Empty2', TAG: SCHOICE},
             {ID: 'Empty3', TAG: SCHOICE},
         ), },
-        {ID: 'PointChoiceArray', TAG: SP, NESTED: (
+        {ID: 'PointChoiceArray', TAG: SP, TYPE: '[10]', NESTED: (
             {ID: 'X', TYPE: INT, IMIN: '1', IMAX: '1'},
             {ID: 'Y', TYPE: INT, IMIN: '2', IMAX: '2'},
             {ID: 'Regular', TAG: SCHOICE},

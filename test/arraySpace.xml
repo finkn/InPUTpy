@@ -42,13 +42,13 @@
     </i:SParam>
 
     <!-- Array with SChoices. -->
-    <i:SParam id="EmptyChoiceArray" type="[3]">
+    <i:SParam id="EmptyChoiceArray" type="[10]">
         <i:SChoice id="Empty1" />
         <i:SChoice id="Empty2" />
         <i:SChoice id="Empty3" />
     </i:SParam>
 
-    <i:SParam id="PointChoiceArray">
+    <i:SParam id="PointChoiceArray" type="[10]">
         <i:NParam id="X" type="integer" inclMin="1" inclMax="1" />
         <i:NParam id="Y" type="integer" inclMin="2" inclMax="2" />
         <i:SChoice id="Regular" />

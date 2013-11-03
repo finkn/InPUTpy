@@ -103,10 +103,26 @@ class TestArraySpace(unittest.TestCase):
         f = lambda: designSpace.next(paramId)
         assertVariability(f)
 
+    # It's one thing to generate different arrays each time, but we also want
+    # the elements within an array to be random.
+    def testEmptyChoiceArrayShouldHaveRandomElements(self):
+        paramId = 'EmptyChoiceArray'
+        f = generatorFromSeq(designSpace.next(paramId))
+        assertVariability(f)
+
+
     def testPointChoiceArrayShouldBeRandomForDesignSpaceNext(self):
         paramId = 'PointChoiceArray'
         f = lambda: designSpace.next(paramId)
         assertVariability(f)
+
+    # It's one thing to generate different arrays each time, but we also want
+    # the elements within an array to be random.
+    def testPointChoiceArrayShouldHaveRandomElements(self):
+        paramId = 'PointChoiceArray'
+        f = generatorFromSeq(designSpace.next(paramId))
+        assertVariability(f)
+
 
 if __name__ == '__main__':
     unittest.main()
