@@ -115,3 +115,16 @@ def assertGeneratesOnly(f, expected, iterations=10):
         if v not in expected:
             raise AssertionError('%s not in %s' % (v, expected))
     return True
+
+
+def generatorFromDesignSpace(space, paramId):
+    """
+    Return a function that will return a new value for the parameter.
+    """
+    return lambda: space.next(paramId)
+
+def generatorFromSeq(seq):
+    """ Return a function that will return the next item in the list. """
+    seq = list(seq)
+    seq.reverse()
+    return lambda: seq.pop()

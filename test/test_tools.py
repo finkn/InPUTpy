@@ -165,5 +165,13 @@ class TestTools(unittest.TestCase):
         expected = [1,2,3,4,5,6,7,8,9,10]
         assertGeneratesOnly(f, expected, 9)
 
+
+    def testGeneratorFromSeq(self):
+        seq = [0,1,2,3,4,5,6,7,8,9]
+        expected = [0,1,2,3,4,5,6,7,8,9]
+        f = generatorFromSeq(seq)
+        result = [i for i in range(10)]
+
+
 if __name__ == '__main__':
     unittest.main()
