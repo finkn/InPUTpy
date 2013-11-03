@@ -145,13 +145,11 @@ class TestGenerators(unittest.TestCase):
         self.assertEqual('some string', generator.nextValue(param))
 
     def checkDimensions(self, array, sizes):
-        result = tools.checkArrayDimensions(sizes, array)
-        self.assertTrue(result, msg='Array dimension mismatch')
+        tools.assertMatchingArrayDimensions(sizes, array)
 
     def checkGeneratorRandomness(self, param, dep={}, iterations=10):
         f = lambda: generator.nextValue(param, dep)
-        result = tools.checkVariability(f)
-        self.assertTrue(result, msg='No variation in generator output')
+        tools.assertVariability(f)
 
     # This test always assumes that the range is inclusive.
     def checkRange(self, inclMin, inclMax, param, dep={}, iterations=10):

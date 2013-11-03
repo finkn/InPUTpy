@@ -73,7 +73,7 @@ class TestArraySpace(unittest.TestCase):
         for (paramId, sizes) in EXPECTED_SIZES.items():
             param = paramStore.getParam(paramId)
             array = gen.nextValue(param)
-            self.assertTrue(checkArrayDimensions(sizes, array))
+            assertMatchingArrayDimensions(sizes, array)
 
     def testEqualityForRawParam(self):
         for (paramId, expected) in EXPECTED_ARRAYS.items():
@@ -91,23 +91,22 @@ class TestArraySpace(unittest.TestCase):
     def testUnfixedBooleanArrayShouldBeRandomForRawParam(self):
         param = paramStore.getParam('BoolArray1')
         f = lambda: gen.nextValue(param)
-        self.assertTrue(checkVariability(f))
+        assertVariability(f)
 
     def testUnfixedBooleanArrayShouldBeRandomForDesignSpaceNext(self):
         paramId = 'BoolArray1'
         f = lambda: designSpace.next(paramId)
-        self.assertTrue(checkVariability(f))
+        assertVariability(f)
 
     def testEmptyChoiceArrayShouldBeRandomForDesignSpaceNext(self):
         paramId = 'EmptyChoiceArray'
         f = lambda: designSpace.next(paramId)
-        self.assertTrue(checkVariability(f))
+        assertVariability(f)
 
-    #@unittest.skip
     def testPointChoiceArrayShouldBeRandomForDesignSpaceNext(self):
         paramId = 'PointChoiceArray'
         f = lambda: designSpace.next(paramId)
-        self.assertTrue(checkVariability(f))
+        assertVariability(f)
 
 if __name__ == '__main__':
     unittest.main()
