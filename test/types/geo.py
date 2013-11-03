@@ -12,13 +12,6 @@ actual concepts, with meaningful names and meaningful parameters, seemed
 to make them easier to understand and thus more useful.
 """
 
-__all__ = (
-    'Point', 'DoublePoint',
-    'PointWithoutConstructor', 'PointWithoutAccessors',
-    'PointWithCustomAccessors', 'PointWithCustomAccessorsNoConstructor',
-    'Triangle', 'TriangleWithoutConstructor', 'TriangleWithCustomAccessors',
-)
-
 class Point:
     def __init__(self, x, y):
         self.__x = x
