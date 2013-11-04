@@ -1,4 +1,8 @@
 """
+Note that some tests run multiple test cases and in effect bypass the
+setUp for each case. This shouldn't be a problem, but it is worth being
+aware of. Each iteration could simply call setUp if necessary.
+
 :copyright: (c) 2013 by Christoffer Fink.
 :license: MIT. See LICENSE for details.
 """
@@ -15,6 +19,13 @@ CODE_MAPPING_FILE = 'choiceMapping.xml'
 paramStore = None
 designSpace = None
 
+EXPECTED_TYPES = {
+    'Empty':    [Empty1, Empty2, Empty3],
+    'NonEmpty': [NonEmpty1, NonEmpty2],
+    'Point':
+        [Point, DoublePoint, PointWithoutConstructor, PointWithoutAccessors],
+}
+
 class TestChoice(unittest.TestCase):
 
     def setUp(self):
@@ -29,35 +40,20 @@ class TestChoice(unittest.TestCase):
         designSpace = designSpaceFactory(DESIGN_SPACE_FILE)
 
 
-    def testGetEmptyFromDesignSpaceShouldReturnOnlyValidTypes(self):
-        f = lambda: type(designSpace.next('Empty'))
-        # The generated empty objects are expected to be of these types.
-        expected = [Empty1, Empty2, Empty3]
-        assertGeneratesOnly(f, expected)
+    def testGetOnlyExpectedTypesFromDesignSpace(self):
+        for (k,v) in EXPECTED_TYPES.items():
+            assertGeneratesOnly(lambda: type(designSpace.next(k)), v)
 
-    def testGetEmptyFromDesignSpaceShouldReturnAllValidTypes(self):
-        f = lambda: type(designSpace.next('Empty'))
-        # The generated empty objects are expected to be of these types.
-        expected = [Empty1, Empty2, Empty3]
-        assertGeneratesAll(f, expected)
+    def testGetAllExpectedTypesFromDesignSpace(self):
+        for (k,v) in EXPECTED_TYPES.items():
+            assertGeneratesAll(lambda: type(designSpace.next(k)), v)
+
 
     def testGetEmptyE1FromDesignSpaceShouldBeEmpty1(self):
         f = lambda: type(designSpace.next('Empty.E1'))
         self.assertEqual(Empty1, f())
         assertConstancy(f)
 
-
-    def testGetNonEmptyFromDesignSpaceShouldReturnOnlyValidTypes(self):
-        f = lambda: type(designSpace.next('NonEmpty'))
-        # The generated nonempty objects are expected to be of these types.
-        expected = [NonEmpty1, NonEmpty2]
-        assertGeneratesOnly(f, expected)
-
-    def testGetNonEmptyFromDesignSpaceShouldReturnAllValidTypes(self):
-        f = lambda: type(designSpace.next('NonEmpty'))
-        # The generated nonempty objects are expected to be of these types.
-        expected = [NonEmpty1, NonEmpty2]
-        assertGeneratesAll(f, expected)
 
     def testGetNonEmptyObjectFromDesignSpaceShouldVary(self):
         f = lambda: designSpace.next('NonEmpty').getObject()
@@ -78,22 +74,6 @@ class TestChoice(unittest.TestCase):
         self.assertEqual(f(), NonEmpty1)
         assertConstancy(f)
 
-
-    def testGetPointFromDesignSpaceShouldReturnOnlyValidTypes(self):
-        f = lambda: type(designSpace.next('Point'))
-        # The generated points are expected to be of these types.
-        expected = [
-            Point, DoublePoint, PointWithoutConstructor, PointWithoutAccessors
-        ]
-        assertGeneratesOnly(f, expected)
-
-    # This test implicitly asserts variability as well.
-    def testGetPointFromDesignSpaceShouldReturnAllValidTypes(self):
-        f = lambda: type(designSpace.next('Point'))
-        expected = [
-            Point, DoublePoint, PointWithoutConstructor, PointWithoutAccessors
-        ]
-        assertGeneratesAll(f, expected)
 
     # Point.X is "fixed". While DoublePoint reinterprets the value and would
     # return an X value of 2 instead of 1, that is irrelevant. Point.X is
