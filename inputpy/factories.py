@@ -7,6 +7,7 @@ import inputpy.param as param
 import inputpy.util as util
 from inputpy.designspace import DesignSpace
 from inputpy.mapping import Mapping, CodeMapping, NULL_CODE_MAPPING
+from inputpy.paramstore import ParamStore
 from inputpy.q import *
 
 def getTag(tag):
@@ -59,7 +60,7 @@ class XMLFactory:
     def getParamStore(root, codeMapping=None, paramFactory=None):
         factory = paramFactory or XMLFactory.getParameter
         cm = codeMapping
-        return param.ParamStore([factory(e, codeMapping=cm) for e in root])
+        return ParamStore([factory(e, codeMapping=cm) for e in root])
 
     @staticmethod
     def getDesignSpace(fileName, codeMappingFactory=None, psFactory=None):

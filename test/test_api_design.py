@@ -1,4 +1,4 @@
-from inputpy.design import Design
+from inputpy.dummy import Design
 from inputpy.exceptions import InPUTException
 from inputpy.impexp import XMLFileImporter, XMLFileExporter
 from test import *

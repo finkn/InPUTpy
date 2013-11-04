@@ -3,7 +3,8 @@
 :license: MIT. See LICENSE for details.
 """
 import unittest
-from inputpy.param import ParamStore, getParameter
+from inputpy.param import getParameter
+from inputpy.paramstore import ParamStore
 from inputpy.mapping import DUMMY_MAPPING
 from inputpy.q import *
 

@@ -3,7 +3,9 @@
 :license: MIT. See LICENSE for details.
 """
 import unittest
-from inputpy.param import ParamStore, Design, getParameter
+from inputpy.design import Design
+from inputpy.param import getParameter
+from inputpy.paramstore import ParamStore
 from inputpy.designspace import DesignSpace
 from inputpy.exceptions import InPUTException
 from inputpy.q import *

@@ -7,7 +7,8 @@ Exports fake factories for "importing" known configurations.
 :license: MIT. See LICENSE for details.
 """
 from inputpy.designspace import DesignSpace
-from inputpy.param import ParamStore, getParameter, paramFactory
+from inputpy.param import getParameter, paramFactory
+from inputpy.paramstore import ParamStore
 from inputpy.mapping import Mapping, CodeMapping, NULL_CODE_MAPPING
 from inputpy.q import *
 

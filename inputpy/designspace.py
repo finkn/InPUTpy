@@ -8,8 +8,10 @@ import inputpy.generators as generator
 import inputpy.util as util
 import inputpy.mapping as mapping
 import inputpy.param as param
+from inputpy.design import Design
+from inputpy.param import Identifiable
+from inputpy.paramstore import ParamStore
 from inputpy.q import *
-from inputpy.param import Identifiable, Design, ParamStore
 
 class DesignSpace(Identifiable):
     """
