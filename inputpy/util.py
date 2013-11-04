@@ -11,6 +11,19 @@ This module exports utility classes/functions:
 """
 import math
 
+class Identifiable:
+    """
+    This class is a mixin. It provides all subclasses with a getId() method.
+    An instance can be initialized using an id argument. If none is
+    provided, then a unique id will be constructed automatically.
+    """
+    def __init__(self, objId=None):
+        self.__id = objId or str(id(self))
+
+    def getId(self):
+        return self.__id
+
+
 class Evaluator:
     """
     By default, the Evaluator is expected to process JavaScript

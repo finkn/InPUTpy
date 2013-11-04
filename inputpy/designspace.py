@@ -11,6 +11,7 @@ import inputpy.param as param
 from inputpy.design import Design
 from inputpy.param import Identifiable
 from inputpy.paramstore import ParamStore
+from inputpy.util import Identifiable
 from inputpy.q import *
 
 class DesignSpace(Identifiable):

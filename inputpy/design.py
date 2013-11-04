@@ -5,8 +5,8 @@ inputpy.design
 :license: MIT. See LICENSE for details.
 """
 import inputpy.util as util
-from inputpy.param import Identifiable
 from inputpy.exceptions import InPUTException
+from inputpy.util import Identifiable
 
 class Design(Identifiable):
     def __init__(self, params, designSpace=None, designId=None, readOnly=False):

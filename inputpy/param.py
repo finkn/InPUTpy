@@ -23,26 +23,14 @@ The module also contains a few supporting classes:
 """
 from inputpy.util import Evaluator
 import inputpy.util as util
+from inputpy.util import Identifiable
 from inputpy.q import *
 
 __all__ = (
-    'Identifiable', 'NParam', 'SParam',
-    'getParameter', 'paramFactory',
+    'NParam', 'SParam', 'getParameter', 'paramFactory',
 )
 
 NPARAM_TYPES = (SHORT, INTEGER, LONG, FLOAT, DOUBLE, DECIMAL, BOOLEAN)
-
-class Identifiable:
-    """
-    This class is a mixin. It provides all subclasses with a getId() method.
-    An instance can be initialized using an id argument. If none is
-    provided, then a unique id will be constructed automatically.
-    """
-    def __init__(self, objId=None):
-        self.__id = objId or str(id(self))
-
-    def getId(self):
-        return self.__id
 
 
 class Param(Identifiable):
