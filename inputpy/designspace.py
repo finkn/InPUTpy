@@ -68,8 +68,7 @@ class DesignSpace(Identifiable):
             relativeId = param.getRelativeId()
             parent = self.params.getParam(parentId)
             param = parent.getChoice(relativeId)
-        paramId = param.getId()
-        return self.__initParam(paramId, {})[paramId]
+        return self.__initParam(param, {})[paramId]
 
     # readOnly is currently ignored.
     def nextDesign(self, designId=None, readOnly=False):
@@ -78,20 +77,18 @@ class DesignSpace(Identifiable):
         """
         params = {}
         for p in self.params.getTopLevelParameters():
-            params = self.__initParam(p.getId(), params)
+            params = self.__initParam(p, params)
         return Design(params, self, designId)
 
-    def __initParam(self, paramId, init):
+    def __initParam(self, param, init):
         """
         Return a dictionary mapping parameter ID to initialized value for
         the specified parameter and any parameters it depends on. The init
         argument is a dictionary containing a subset of the result.
         """
+        paramId = param.getId()
         if paramId in init:
             return init
-        param = self.params.getParam(paramId)
-        # if Choice, get choice
-        # if SChoice, get Choice and get the corresponding choice
         param = generator.getChoice(param)
 
         # When initializing dependent parameters, find the absolute ID of the
@@ -101,7 +98,7 @@ class DesignSpace(Identifiable):
         ids = self.params.getSupportedParamIds()
         for d in param.getDependees():
             absolute = util.findAbsoluteParameter(paramId, d, ids)
-            init = self.__initParam(absolute, init)
+            init = self.__initParam(self.params.getParam(absolute), init)
             dependencies[d] = init[absolute]
 
         init[paramId] = generator.nextValue(param, dependencies)
