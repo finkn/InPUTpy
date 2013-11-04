@@ -1,4 +1,8 @@
 """
+Note that some tests run multiple test cases and in effect bypass the
+setUp for each case. This shouldn't be a problem, but it is worth being
+aware of. Each iteration could simply call setUp if necessary.
+
 :copyright: (c) 2013 by Christoffer Fink.
 :license: MIT. See LICENSE for details.
 """
@@ -55,6 +59,10 @@ EXPECTED_SIZES = {
     'EmptyClassArray2': MULTI,
 }
 
+VARIABILITY_TESTS = (
+    'BoolArray1', 'EmptyChoiceArray', 'PointChoiceArray',
+)
+
 class TestArraySpace(unittest.TestCase):
     """ Various tests using the arraySpace.xml configurations. """
 
@@ -68,6 +76,12 @@ class TestArraySpace(unittest.TestCase):
         paramStore = paramStoreFactory(DESIGN_SPACE_FILE, mapping)
 
         designSpace = designSpaceFactory(DESIGN_SPACE_FILE)
+
+
+    def testVariabilityWhenGettingArrayFromDesignSpace(self):
+        for paramId in VARIABILITY_TESTS:
+            assertVariability(lambda: designSpace.next(paramId))
+
 
     def testSizesForRawParam(self):
         for (paramId, sizes) in EXPECTED_SIZES.items():
@@ -88,19 +102,10 @@ class TestArraySpace(unittest.TestCase):
             result = designSpace.next(paramId)
             self.assertEqual(expected, result)
 
+
     def testUnfixedBooleanArrayShouldBeRandomForRawParam(self):
         param = paramStore.getParam('BoolArray1')
         f = lambda: gen.nextValue(param)
-        assertVariability(f)
-
-    def testUnfixedBooleanArrayShouldBeRandomForDesignSpaceNext(self):
-        paramId = 'BoolArray1'
-        f = lambda: designSpace.next(paramId)
-        assertVariability(f)
-
-    def testEmptyChoiceArrayShouldBeRandomForDesignSpaceNext(self):
-        paramId = 'EmptyChoiceArray'
-        f = lambda: designSpace.next(paramId)
         assertVariability(f)
 
     # It's one thing to generate different arrays each time, but we also want
@@ -108,12 +113,6 @@ class TestArraySpace(unittest.TestCase):
     def testEmptyChoiceArrayShouldHaveRandomElements(self):
         paramId = 'EmptyChoiceArray'
         f = generatorFromSeq(designSpace.next(paramId))
-        assertVariability(f)
-
-
-    def testPointChoiceArrayShouldBeRandomForDesignSpaceNext(self):
-        paramId = 'PointChoiceArray'
-        f = lambda: designSpace.next(paramId)
         assertVariability(f)
 
     # It's one thing to generate different arrays each time, but we also want
