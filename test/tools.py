@@ -68,7 +68,7 @@ def assertMatchingArrayDimensions(sizes, array):
     """
     size = sizes[0]
     if size != len(array):
-        msg = '%i does not match length of %s' % (size, len(array))
+        msg = '%i does not match length of %s' % (size, array)
         raise AssertionError(msg)
     if len(sizes) == 1:
         return True         # No more dimensions. Done.
@@ -120,9 +120,9 @@ def assertGeneratesAll(f, expected, iterations=None):
         iterations = len(expected) * DEFAULT_ITERATIONS
     else:
         msg = 'Must generate at least as many values as are expected'
-        assert iterations > len(expected), msg
+        assert iterations >= len(expected), msg
 
-    expected = list(expected)
+    expected = list(expected)   # Defensive copy.
     for i in range(iterations):
         v = f()
         if v in expected:
@@ -149,6 +149,6 @@ def generatorFromDesignSpace(space, paramId):
 
 def generatorFromSeq(seq):
     """ Return a function that will return the next item in the list. """
-    seq = list(seq)
+    seq = list(seq) # Defensive copy.
     seq.reverse()
     return lambda: seq.pop()
