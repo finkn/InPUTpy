@@ -29,6 +29,56 @@ class TestChoice(unittest.TestCase):
         designSpace = designSpaceFactory(DESIGN_SPACE_FILE)
 
 
+    def testGetEmptyFromDesignSpaceShouldReturnOnlyValidTypes(self):
+        f = lambda: type(designSpace.next('Empty'))
+        # The generated empty objects are expected to be of these types.
+        expected = [Empty1, Empty2, Empty3]
+        assertGeneratesOnly(f, expected)
+
+    def testGetEmptyFromDesignSpaceShouldReturnAllValidTypes(self):
+        f = lambda: type(designSpace.next('Empty'))
+        # The generated empty objects are expected to be of these types.
+        expected = [Empty1, Empty2, Empty3]
+        assertGeneratesAll(f, expected)
+
+    def testGetEmptyE1FromDesignSpaceShouldBeEmpty1(self):
+        f = lambda: type(designSpace.next('Empty.E1'))
+        self.assertEqual(Empty1, f())
+        assertConstancy(f)
+
+
+    def testGetNonEmptyFromDesignSpaceShouldReturnOnlyValidTypes(self):
+        f = lambda: type(designSpace.next('NonEmpty'))
+        # The generated nonempty objects are expected to be of these types.
+        expected = [NonEmpty1, NonEmpty2]
+        assertGeneratesOnly(f, expected)
+
+    def testGetNonEmptyFromDesignSpaceShouldReturnAllValidTypes(self):
+        f = lambda: type(designSpace.next('NonEmpty'))
+        # The generated nonempty objects are expected to be of these types.
+        expected = [NonEmpty1, NonEmpty2]
+        assertGeneratesAll(f, expected)
+
+    def testGetNonEmptyObjectFromDesignSpaceShouldVary(self):
+        f = lambda: designSpace.next('NonEmpty').getObject()
+        assertVariability(f)
+
+    def testGetNE1NestedParameterFromDesignSpaceShouldBeInt(self):
+        f = lambda: type(designSpace.next('NonEmpty.NE1.Obj'))
+        self.assertEqual(f(), int)
+        assertConstancy(f)
+
+    def testGetNE1FromDesignSpaceShouldBeInt(self):
+        f = lambda: type(designSpace.next('NonEmpty.NE1').getObject())
+        self.assertEqual(f(), int)
+        assertConstancy(f)
+
+    def testGetNE1FromDesignSpaceShouldBeNonEmpty1(self):
+        f = lambda: type(designSpace.next('NonEmpty.NE1'))
+        self.assertEqual(f(), NonEmpty1)
+        assertConstancy(f)
+
+
     def testGetPointFromDesignSpaceShouldReturnOnlyValidTypes(self):
         f = lambda: type(designSpace.next('Point'))
         # The generated points are expected to be of these types.
@@ -62,6 +112,13 @@ class TestChoice(unittest.TestCase):
         self.assertIsNone(f())
         assertConstancy(f)
 
+    # Explicitly getting one of the choices.
+    def testGetPointDoubleFromDesignSpaceShouldAlwaysReturnDouble(self):
+        f = lambda: designSpace.next('Point.Double')
+        self.assertEqual(DoublePoint(1, 2), f())
+        self.assertEqual(4, f().getY()) # Kinda redundant.
+        assertConstancy(f)
+
 
     def testGetPointFromDesign(self):
         # For some reason, the preset factory does not work!
@@ -88,7 +145,7 @@ class TestChoice(unittest.TestCase):
     # design.getValue('Point.X') accesses the original Point.X value, and not
     # the X value that was used to instantiate the actual Point object.
     @unittest.expectedFailure
-    def testGetDoubleXFromDesignShouldBeNone(self):
+    def testGetPointXFromDesignShouldVary(self):
         space = XMLFactory.getDesignSpace(DESIGN_SPACE_FILE)
         f = lambda: space.nextDesign('Design').getValue('Point.X')
         assertVariability(f)
