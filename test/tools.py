@@ -13,11 +13,11 @@ Functions with shortcuts: (exit as soon as possible)
 - assertMatchingArrayDimensions (when an array size is off)
 - assertGeneratesAny (when any of the expected values is encountered)
 - assertGeneratesAll (when all expected values have been encountered)
+- assertGeneratesOnly (when an unexpected value is encountered)
 
 Functions without shortcuts: (will always execute all the iterations)
 - checkAnyValueMatches
 - checkAllValuesMatch
-- assertGeneratesOnly
 
 Nonsensical values for iterations are not allowed.
 An example would be checking for variability by generating 1 value.

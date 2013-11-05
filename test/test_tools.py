@@ -6,15 +6,13 @@ import unittest
 import warnings
 from test.tools import *
 
-# TODO:
-# Make a more reliable generator that can replace random.
 class TestTools(unittest.TestCase):
 
     # ----- checkVariability tests -----
 
     def testAssertVariabilityWithOneIterationShouldFail(self):
         with self.assertRaises(AssertionError):
-            assertVariability(lambda: 1, iterations=1)
+            assertVariability(generatorFromSeq([1,2,3]), iterations=1)
 
     def testAssertVariabilityWithConstantValueShouldFail(self):
         with self.assertRaises(AssertionError):
@@ -218,6 +216,23 @@ class TestTools(unittest.TestCase):
         result = [f() for i in range(iterations)]
         self.assertEqual(expected, result)
 
+
+    # This test is partially redundant, but it specifically confirms that
+    # most functions do not execute all iterations unless they have to.
+    # A finite generator of otherwise insufficient length is used as a test.
+    def testShortcut(self):
+        seq = [1,2,3,4,1]
+        expected = [1,2,3]
+        it = len(seq) * 100  # Much greater than length.
+        # Now do tests. If they didn't shortcut, an IndexError would be raised.
+        assertVariability(finiteGeneratorFromSeq(seq), it)
+        assertGeneratesAny(finiteGeneratorFromSeq(seq), expected, it)
+        assertGeneratesAll(finiteGeneratorFromSeq(seq), expected, it)
+        # We expect these tests to fail early (not because values ran out).
+        with self.assertRaises(AssertionError):
+            assertConstancy(finiteGeneratorFromSeq(seq), it)
+        with self.assertRaises(AssertionError):
+            assertGeneratesOnly(finiteGeneratorFromSeq(seq), expected, it)
 
 if __name__ == '__main__':
     unittest.main()
