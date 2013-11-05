@@ -147,8 +147,26 @@ def generatorFromDesignSpace(space, paramId):
     """
     return lambda: space.next(paramId)
 
-def generatorFromSeq(seq):
-    """ Return a function that will return the next item in the list. """
+def finiteGeneratorFromSeq(seq):
+    """
+    Return a function that will return the next item in the list.
+    When all items have been returned, subsequent attempts to generate
+    a value will raise an IndexError.
+    """
     seq = list(seq) # Defensive copy.
     seq.reverse()
     return lambda: seq.pop()
+
+def generatorFromSeq(seq):
+    """
+    Return a function that will return the next item in the sequence.
+    When all items have been returned, the sequence starts over.
+    The returned function is an infinite generator.
+    """
+    seq = list(seq) # Defensive copy.
+    seq.reverse()
+    def gen():
+        x = seq.pop()
+        seq.insert(0, x)
+        return x
+    return gen

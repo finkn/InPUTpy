@@ -135,7 +135,7 @@ class TestTools(unittest.TestCase):
     # ----- assert generated values matching tests -----
 
     def testAssertGeneratesAnyShouldFailIfNoneMatch(self):
-        values = [6,7,8,9] * 20
+        values = [6,7,8,9]
         expected = [1,2,3,4,5]
         with self.assertRaises(AssertionError):
             assertGeneratesAny(generatorFromSeq(values), expected)
@@ -155,7 +155,7 @@ class TestTools(unittest.TestCase):
 
     # One value is missing from the range, so it's impossible to generate all.
     def testAssertGeneratesAllShouldFailIfAnyMismatch(self):
-        values = [1,2,3,4] * 20
+        values = [1,2,3,4]
         expected = [1,2,3,4,5]
         with self.assertRaises(AssertionError):
             assertGeneratesAll(generatorFromSeq(values), expected)
@@ -188,16 +188,35 @@ class TestTools(unittest.TestCase):
     # There are not enough iterations to generate all expected values, but we
     # don't need to. What is important is that no non-matching values occur.
     def testAssertGeneratesOnlyShouldSucceedIfNoMismatch(self):
-        values = [3,4,3,4,5,6,5,6] * 20
+        values = [3,4,3,4,5,6,5,6]
         expected = [1,2,3,4,5,6,7,8,9,10]
         assertGeneratesOnly(generatorFromSeq(values), expected)
 
 
-    def testGeneratorFromSeq(self):
+    # ----- generator from sequence tests -----
+
+    def testFiniteGeneratorFromSeq(self):
         seq = [0,1,2,3,4,5,6,7,8,9]
         expected = [0,1,2,3,4,5,6,7,8,9]
+        f = finiteGeneratorFromSeq(seq)
+        result = [f() for i in range(len(seq))]
+        self.assertEqual(expected, result)
+
+    def testFiniteGeneratorFromSeqShouldRaiseErrorWhenExhausted(self):
+        seq = [0,1,2,3,4,5,6,7,8,9]
+        f = finiteGeneratorFromSeq(seq)
+        with self.assertRaises(IndexError):
+            result = [f() for i in range(len(seq) + 1)]
+
+    # Expecting a result that is 3 times as long as the sequence.
+    def testInfiniteGeneratorFromSeqShouldWrapAround(self):
+        seq = [0,1,2,3]
+        expected = [0,1,2,3] * 3
         f = generatorFromSeq(seq)
-        result = [i for i in range(10)]
+        iterations = len(expected)
+        self.assertTrue(len(seq) < iterations)
+        result = [f() for i in range(iterations)]
+        self.assertEqual(expected, result)
 
 
 if __name__ == '__main__':
