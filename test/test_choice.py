@@ -19,9 +19,22 @@ CODE_MAPPING_FILE = 'choiceMapping.xml'
 paramStore = None
 designSpace = None
 
-EXPECTED_TYPES = {
+# Corresponds to generates all.
+EXPECTED_ALL_TYPES = {
     'Empty':    [Empty1, Empty2, Empty3],
     'NonEmpty': [NonEmpty1, NonEmpty2],
+    'Point':
+        [Point, DoublePoint, PointWithoutConstructor, PointWithoutAccessors],
+}
+
+# Corresponds to generates only.
+EXPECTED_ONLY_TYPES = {
+    'Empty.E1':         [Empty1],
+    'NonEmpty.NE1':     [NonEmpty1],
+    'NonEmpty.NE1.Obj': [int],
+    # Repeating all-tests:
+    'Empty':            [Empty1, Empty2, Empty3],
+    'NonEmpty':         [NonEmpty1, NonEmpty2],
     'Point':
         [Point, DoublePoint, PointWithoutConstructor, PointWithoutAccessors],
 }
@@ -40,35 +53,24 @@ class TestChoice(unittest.TestCase):
         designSpace = designSpaceFactory(DESIGN_SPACE_FILE)
 
 
+    # ----- Batch tests -----
     def testGetOnlyExpectedTypesFromDesignSpace(self):
-        for (k,v) in EXPECTED_TYPES.items():
+        for (k,v) in EXPECTED_ONLY_TYPES.items():
             assertGeneratesOnly(lambda: type(designSpace.next(k)), v)
 
     def testGetAllExpectedTypesFromDesignSpace(self):
-        for (k,v) in EXPECTED_TYPES.items():
+        for (k,v) in EXPECTED_ALL_TYPES.items():
             assertGeneratesAll(lambda: type(designSpace.next(k)), v)
-
-
-    def testGetEmptyE1FromDesignSpaceShouldBeEmpty1(self):
-        f = lambda: type(designSpace.next('Empty.E1'))
-        assertGeneratesOnly(f, [Empty1])
+    # ----- Batch tests -----
 
 
     def testGetNonEmptyObjectFromDesignSpaceShouldVary(self):
         f = lambda: designSpace.next('NonEmpty').getObject()
         assertVariability(f)
 
-    def testGetNE1NestedParameterFromDesignSpaceShouldBeInt(self):
-        f = lambda: type(designSpace.next('NonEmpty.NE1.Obj'))
-        assertGeneratesOnly(f, [int])
-
     def testGetNE1FromDesignSpaceShouldBeInt(self):
         f = lambda: type(designSpace.next('NonEmpty.NE1').getObject())
         assertGeneratesOnly(f, [int])
-
-    def testGetNE1FromDesignSpaceShouldBeNonEmpty1(self):
-        f = lambda: type(designSpace.next('NonEmpty.NE1'))
-        assertGeneratesOnly(f, [NonEmpty1])
 
 
     # Point.X is "fixed". While DoublePoint reinterprets the value and would
