@@ -51,8 +51,7 @@ class TestChoice(unittest.TestCase):
 
     def testGetEmptyE1FromDesignSpaceShouldBeEmpty1(self):
         f = lambda: type(designSpace.next('Empty.E1'))
-        self.assertEqual(Empty1, f())
-        assertConstancy(f)
+        assertGeneratesOnly(f, [Empty1])
 
 
     def testGetNonEmptyObjectFromDesignSpaceShouldVary(self):
@@ -61,18 +60,15 @@ class TestChoice(unittest.TestCase):
 
     def testGetNE1NestedParameterFromDesignSpaceShouldBeInt(self):
         f = lambda: type(designSpace.next('NonEmpty.NE1.Obj'))
-        self.assertEqual(f(), int)
-        assertConstancy(f)
+        assertGeneratesOnly(f, [int])
 
     def testGetNE1FromDesignSpaceShouldBeInt(self):
         f = lambda: type(designSpace.next('NonEmpty.NE1').getObject())
-        self.assertEqual(f(), int)
-        assertConstancy(f)
+        assertGeneratesOnly(f, [int])
 
     def testGetNE1FromDesignSpaceShouldBeNonEmpty1(self):
         f = lambda: type(designSpace.next('NonEmpty.NE1'))
-        self.assertEqual(f(), NonEmpty1)
-        assertConstancy(f)
+        assertGeneratesOnly(f, [NonEmpty1])
 
 
     # Point.X is "fixed". While DoublePoint reinterprets the value and would
@@ -80,8 +76,7 @@ class TestChoice(unittest.TestCase):
     # still defined as always being 1, so it is always 1.
     def testGetPointXFromDesignSpaceShouldBeConstant(self):
         f = lambda: designSpace.next('Point.X')
-        self.assertEqual(1, f())
-        assertConstancy(f)
+        assertGeneratesOnly(f, [1])
 
     # While Point may be initialized using the DoublePoint subtype, which will
     # then inherit the nested X parameter from Point, there does not exist any
@@ -89,15 +84,13 @@ class TestChoice(unittest.TestCase):
     # should return None.
     def testGetDoubleXFromDesignSpaceShouldBeNone(self):
         f = lambda: designSpace.next('Point.Double.X')
-        self.assertIsNone(f())
-        assertConstancy(f)
+        assertGeneratesOnly(f, [None])
 
     # Explicitly getting one of the choices.
     def testGetPointDoubleFromDesignSpaceShouldAlwaysReturnDouble(self):
         f = lambda: designSpace.next('Point.Double')
-        self.assertEqual(DoublePoint(1, 2), f())
         self.assertEqual(4, f().getY()) # Kinda redundant.
-        assertConstancy(f)
+        assertGeneratesOnly(f, [DoublePoint(1, 2)])
 
 
     def testGetPointFromDesign(self):
