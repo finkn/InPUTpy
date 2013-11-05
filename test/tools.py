@@ -77,31 +77,6 @@ def assertMatchingArrayDimensions(sizes, array):
     return True
 
 
-# Note that these two functions can be used in two different ways, simply
-# by flipping the order of their arguments. The values can either be
-# matched against expected values, or the other way around. Both are useful.
-
-# TODO:
-# These two still need to be replaced assert versions (or possibly removed).
-def checkAnyValueMatches(values, expected):
-    """
-    Return whether any of the values match an expected value.
-    The return value is True if and only if there exists some value v
-    such that v is one of the expected values.
-    """
-    warnings.warn('use the assert version instead', DeprecationWarning)
-    return any([v in expected for v in values])
-
-def checkAllValuesMatch(values, expected):
-    """
-    Return whether all of the values match an expected value.
-    The return value is True if and only if there does not exist some
-    value v such that v is not one of the expected values.
-    """
-    warnings.warn('use the assert version instead', DeprecationWarning)
-    return all([v in expected for v in values])
-
-
 def assertGeneratesAny(f, expected, iterations=DEFAULT_ITERATIONS):
     """ Assert that f generates at least one expected value. """
     for i in range(iterations):

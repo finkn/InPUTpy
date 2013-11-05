@@ -8,7 +8,7 @@ from test.tools import *
 
 class TestTools(unittest.TestCase):
 
-    # ----- checkVariability tests -----
+    # ----- assertVariability tests -----
 
     def testAssertVariabilityWithOneIterationShouldFail(self):
         with self.assertRaises(AssertionError):
@@ -30,7 +30,7 @@ class TestTools(unittest.TestCase):
             assertVariability(generatorFromSeq(values), 4)
 
 
-    # ----- checkConstancy tests -----
+    # ----- assertConstancy tests -----
 
     def testAssertConstancyWithOneIterationShouldFail(self):
         with self.assertRaises(AssertionError):
@@ -51,7 +51,7 @@ class TestTools(unittest.TestCase):
         assertConstancy(generatorFromSeq(values), 4)
 
 
-    # ----- checkArrayDimensions tests -----
+    # ----- assertMatchingArrayDimensions tests -----
 
     def testSingleDimensionArrayWithMatchingSizeShouldSucceed(self):
         tests = (
@@ -91,43 +91,6 @@ class TestTools(unittest.TestCase):
         for (sizes, array) in tests:
             with self.assertRaises(AssertionError):
                 assertMatchingArrayDimensions(sizes, array)
-
-
-    # ----- check(Any|All)ValuesMatch tests -----
-
-    def testCheckAnyValueMatchesForAnyEmptyArgumentShouldFail(self):
-        with warnings.catch_warnings(record=False):
-            warnings.simplefilter('ignore')
-            self.assertFalse(checkAnyValueMatches([], []))
-            self.assertFalse(checkAnyValueMatches([], [1,2,3]))
-            self.assertFalse(checkAnyValueMatches([1,2,3], []))
-
-    def testCheckAllValuesMatchForEmptyValuesShouldSucceed(self):
-        with warnings.catch_warnings(record=False):
-            warnings.simplefilter('ignore')
-            self.assertTrue(checkAllValuesMatch([], [1,2,3]))
-            self.assertTrue(checkAllValuesMatch([], []))
-
-    def testCheckAllValuesMatchForEmptyExpectedShouldFail(self):
-        with warnings.catch_warnings(record=False):
-            warnings.simplefilter('ignore')
-            self.assertFalse(checkAllValuesMatch([1,2,3], []))
-
-    def testCheckAnyAndAllValuesShouldMatchWithSingleElement(self):
-        with warnings.catch_warnings(record=False):
-            warnings.simplefilter('ignore')
-            self.assertTrue(checkAnyValueMatches([1], [1]))
-            self.assertTrue(checkAllValuesMatch([1], [1]))
-
-    def testCheckAnyValueMatchesShouldMatchWithMixedElements(self):
-        with warnings.catch_warnings(record=False):
-            warnings.simplefilter('ignore')
-            self.assertTrue(checkAnyValueMatches([1,2,3], ['a',2,False]))
-
-    def testCheckAllValuesMatchShouldNotMAtchWithMixedElements(self):
-        with warnings.catch_warnings(record=False):
-            warnings.simplefilter('ignore')
-            self.assertFalse(checkAllValuesMatch([1,2,3], ['a',2,False]))
 
 
     # ----- assert generated values matching tests -----
