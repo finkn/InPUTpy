@@ -3,7 +3,6 @@
 :license: MIT. See LICENSE for details.
 """
 import unittest
-import random
 import warnings
 from test.tools import *
 
@@ -15,28 +14,43 @@ class TestTools(unittest.TestCase):
 
     def testAssertVariabilityWithOneIterationShouldFail(self):
         with self.assertRaises(AssertionError):
-            assertVariability(None, iterations=1)
+            assertVariability(lambda: 1, iterations=1)
 
     def testAssertVariabilityWithConstantValueShouldFail(self):
         with self.assertRaises(AssertionError):
             assertVariability(lambda: 1)
 
-    def testAssertVariabilityWithRandomValueShouldSucceed(self):
-        assertVariability(lambda: random.randint(1, 10000))
+    def testAssertVariabilityWithDifferentValuesShouldSucceed(self):
+        values = [1, 1, 1, 1, 2]
+        assertVariability(generatorFromSeq(values), 5)
+
+    # The variability test fails even though different values are generated
+    # because not enough values are generated to see the variation.
+    def testAssertVariabilityFailsIfNotEnoughIterations(self):
+        values = [1, 1, 1, 1, 2]
+        with self.assertRaises(AssertionError):
+            assertVariability(generatorFromSeq(values), 4)
 
 
     # ----- checkConstancy tests -----
 
     def testAssertConstancyWithOneIterationShouldFail(self):
         with self.assertRaises(AssertionError):
-            assertConstancy(None, iterations=1)
+            assertConstancy(lambda: 1, iterations=1)
 
     def testAssertConstancyWithConstantValueShouldSucceed(self):
         assertConstancy(lambda: 1)
 
     def testAssertConstancyWithRandomValueShouldFail(self):
+        values = [1, 1, 1, 1, 2]
         with self.assertRaises(AssertionError):
-            assertConstancy(lambda: random.randint(1, 10000))
+            assertConstancy(generatorFromSeq(values), 5)
+
+    # Even though the values are not constant, not enough values are
+    # generated to see the variation.
+    def testAssertConstancySucceedsIfNotEnoughIterations(self):
+        values = [1, 1, 1, 1, 2]
+        assertConstancy(generatorFromSeq(values), 4)
 
 
     # ----- checkArrayDimensions tests -----
@@ -121,49 +135,62 @@ class TestTools(unittest.TestCase):
     # ----- assert generated values matching tests -----
 
     def testAssertGeneratesAnyShouldFailIfNoneMatch(self):
-        f = lambda: random.randint(10,20)
+        values = [6,7,8,9] * 20
         expected = [1,2,3,4,5]
         with self.assertRaises(AssertionError):
-            assertGeneratesAny(f, expected)
+            assertGeneratesAny(generatorFromSeq(values), expected)
 
     # Only 2 will be generated, but it matches, and that's enough.
     def testAssertGeneratesAnyShouldSucceedIfAnyMatch(self):
-        f = lambda: 2
         expected = [1,2,3,4,5]
-        assertGeneratesAny(f, expected)
+        assertGeneratesAny(lambda: 2, expected)
 
     def testAssertGeneratesAllWithTooFewIterationsShouldFail(self):
-        f = lambda: random.randint(1,5)
+        values = [2,2,1,5,4,1,1,5,4,3]    # 10 values, 1-5 occur at least once.
         expected = [1,2,3,4,5]
+        f = generatorFromSeq(values)
+        iterations = len(values) - 1
         with self.assertRaises(AssertionError):
-            assertGeneratesAll(f, expected, 4)
+            assertGeneratesAll(f, expected, iterations)
 
     # One value is missing from the range, so it's impossible to generate all.
     def testAssertGeneratesAllShouldFailIfAnyMismatch(self):
-        f = lambda: random.randint(1,4)
+        values = [1,2,3,4] * 20
         expected = [1,2,3,4,5]
         with self.assertRaises(AssertionError):
-            assertGeneratesAll(f, expected)
+            assertGeneratesAll(generatorFromSeq(values), expected)
 
     # 3 does not match, but that is irrelevant as long as 1 and 2 occur.
     def testAssertGeneratesAllShouldSucceedIfAllAreMatched(self):
-        f = lambda: random.randint(1,3)
+        values = [1,2,3]
         expected = [1,2]
-        assertGeneratesAll(f, expected)
+        assertGeneratesAll(generatorFromSeq(values), expected)
 
-    # 1 and 2 match, but 3 (which will probably be generated) does not.
+    def testAssertGeneratsAllFailsIfNotEnoughIterations(self):
+        values = [1,2,3]
+        expected = [1,2]
+        assertGeneratesAll(generatorFromSeq(values), expected, 2)
+
+    # 1 and 2 match, but 3 does not.
     def testAssertGeneratesOnlyShouldFailIfAnyMismatch(self):
-        f = lambda: random.randint(1,3)
+        values = [1,2,3]
         expected = [1,2]
         with self.assertRaises(AssertionError):
-            assertGeneratesOnly(f, expected, 20)
+            assertGeneratesOnly(generatorFromSeq(values), expected)
+
+    # The value 3 should cause the test to fail, but there are not enough
+    # iterations to reach that value.
+    def testAssertGeneratesOnlySucceedsIfNotEnoughIterations(self):
+        values = [1,2,3]
+        expected = [1,2]
+        assertGeneratesOnly(generatorFromSeq(values), expected, 2)
 
     # There are not enough iterations to generate all expected values, but we
     # don't need to. What is important is that no non-matching values occur.
     def testAssertGeneratesOnlyShouldSucceedIfNoMismatch(self):
-        f = lambda: random.randint(1,10)
+        values = [3,4,3,4,5,6,5,6] * 20
         expected = [1,2,3,4,5,6,7,8,9,10]
-        assertGeneratesOnly(f, expected, 9)
+        assertGeneratesOnly(generatorFromSeq(values), expected)
 
 
     def testGeneratorFromSeq(self):
