@@ -8,16 +8,15 @@ available. This means that the iterations can usually be set quite high
 without incurring any undue performance costs.
 
 Functions with shortcuts: (exit as soon as possible)
-- assertVariability (when a unique value is encountered)
-- assertConstancy (when a unique value is encountered)
-- assertMatchingArrayDimensions (when an array size is off)
-- assertGeneratesAny (when any of the expected values is encountered)
-- assertGeneratesAll (when all expected values have been encountered)
-- assertGeneratesOnly (when an unexpected value is encountered)
+- assertVariability             - Succeeds early
+- assertGeneratesAny            - Succeeds early
+- assertGeneratesAll            - Succeeds early
+- assertConstancy               - Fails early
+- assertGeneratesOnly           - Fails early
+- assertMatchingArrayDimensions - Fails early *
 
-Functions without shortcuts: (will always execute all the iterations)
-- checkAnyValueMatches
-- checkAllValuesMatch
+* However, the array dimensions test is controlled by the input. It
+doesn't have an iterations argument.
 
 Nonsensical values for iterations are not allowed.
 An example would be checking for variability by generating 1 value.
@@ -31,7 +30,7 @@ is proportional to the number of expected values.
 
 import warnings
 
-DEFAULT_ITERATIONS = 10
+DEFAULT_ITERATIONS = 20
 
 def assertVariability(f, iterations=DEFAULT_ITERATIONS):
     """ Assert that f will generate at least one unique value. """
