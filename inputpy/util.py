@@ -424,3 +424,141 @@ def getAbsoluteDependenciesForParam(param, supportedIds):
 def getAbsoluteDependencies(params):#, dependencies):
     return {k: getAbsoluteDependenciesForParam(params[k], params.keys())
             for k in params.keys()}
+
+
+class IntervalParser:
+    SEPARATOR = ','
+    INFINITE = '*'
+    LOWER_OPEN = '['    # Inclusive
+    LOWER_CLOSED = ']'  # Exclusive
+    UPPER_OPEN = ']'    # Inclusive
+    UPPER_CLOSED = '['  # Exclusive
+
+    @staticmethod
+    def parse(spec):
+        spec = spec.strip()
+        minIsExcl = IntervalParser.__isExclusive(spec[0],
+            IntervalParser.LOWER_OPEN, IntervalParser.LOWER_CLOSED)
+        maxIsExcl = IntervalParser.__isExclusive(spec[-1],
+            IntervalParser.UPPER_OPEN, IntervalParser.UPPER_CLOSED)
+
+        if minIsExcl is None or maxIsExcl is None:
+            raise ValueError('Invalid start or end of interval string: ' + spec)
+
+        spec = spec[1:-1]
+
+        (lower, upper) = IntervalParser.__getLowerAndUpperBounds(spec)
+        (minIncl, minExcl) = IntervalParser.__getLimit(lower, minIsExcl)
+        (maxIncl, maxExcl) = IntervalParser.__getLimit(upper, maxIsExcl)
+        assert minIncl is None or minExcl is None
+        assert maxIncl is None or maxExcl is None
+
+        return (minIncl, minExcl, maxIncl, maxExcl)
+
+    @staticmethod
+    def __isExclusive(char, open, closed):
+        if char == closed:
+            return True
+        elif char == open:
+            return False
+
+    @staticmethod
+    def __getLowerAndUpperBounds(spec):
+        separatorIndex = IntervalParser.__findBoundsSeparatorIndex(spec)
+        lower = spec[:separatorIndex].strip()
+        upper = spec[separatorIndex+1:].strip()
+        if lower == IntervalParser.INFINITE:
+            lower = None
+        if upper == IntervalParser.INFINITE:
+            upper = None
+        return (lower, upper)
+
+    @staticmethod
+    def __findBoundsSeparatorIndex(spec):
+        parenCount = 0
+        index = 0
+        for c in spec:
+            if c == '(':
+                parenCount += 1
+            elif c == ')':
+                parenCount -= 1
+            elif c == IntervalParser.SEPARATOR and parenCount == 0:
+                return index
+            index += 1
+        msg = 'Separator not be found while parsing interval %s' % (spec)
+        raise ValueError(msg)
+
+    @staticmethod
+    def __getLimit(limit, exclusive):
+        if exclusive:
+            return (None, limit)
+        else:
+            return (limit, None)
+
+
+class Interval:
+    def __init__(self, spec):
+        self.spec = spec
+        (inclMin, exclMin, inclMax, exclMax) = IntervalParser.parse(spec)
+        self.minIsExcl = exclMin is not None
+        self.maxIsExcl = exclMax is not None
+
+        self.min = Interval.__getLimit(inclMin, exclMin, self.minIsExcl)
+        self.max = Interval.__getLimit(inclMax, exclMax, self.maxIsExcl)
+
+        if not (isinstance(self.min, str) or isinstance(self.max, str)):
+            self.initialized = True
+        else:
+            self.initialized = False
+
+
+    @staticmethod
+    def __getLimit(inclLimit, exclLimit, exclusive):
+        if exclusive:
+            return Interval.__evaluateLimit(exclLimit)
+        else:
+            return Interval.__evaluateLimit(inclLimit)
+
+    @staticmethod
+    def __evaluateLimit(limit):
+        try:
+            return int(limit)
+        except ValueError: pass
+        try:
+            return float(limit)
+        except ValueError: pass
+        try:
+            return Evaluator.evaluate(limit)
+        except NameError: pass
+        return limit
+
+
+    def getLimits(self):
+        if self.minIsExcl:
+            (inclMin, exclMin) = (None, self.min)
+        else:
+            (inclMin, exclMin) = (self.min, None)
+        if self.maxIsExcl:
+            (inclMax, exclMax) = (None, self.max)
+        else:
+            (inclMax, exclMax) = (self.max, None)
+        return (inclMin, exclMin, inclMax, exclMax)
+
+    def __eq__(self, other):
+        if not isinstance(other, Interval):
+            return False
+        if self.min != other.min:
+            return False
+        if self.max != other.max:
+            return False
+        if self.minIsExcl != other.minIsExcl:
+            return False
+        if self.maxIsExcl != other.maxIsExcl:
+            return False
+        return True
+
+    def __str__(self):
+        return self.spec
+
+    def __repr__(self):
+        return self.__str__()
