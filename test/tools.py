@@ -29,6 +29,7 @@ is proportional to the number of expected values.
 """
 
 import warnings
+from inputpy.util import Interval
 
 DEFAULT_ITERATIONS = 20
 
@@ -144,3 +145,29 @@ def generatorFromSeq(seq):
         seq.insert(0, x)
         return x
     return gen
+
+
+def assertInterval(spec):
+    """
+    Return a special testing interval created from the spec string.
+    The object supports 'contains' and 'doesNotContain' methods.
+    This function is intended to be used together with the instance
+    methods. For example:
+    assertInterval('[1,3]').contains(2)
+    assertInterval(']1,3]').doesNotContain(1)
+    """
+    return TestInterval(spec)
+
+class TestInterval:
+    def __init__(self, spec):
+        self.interval = Interval(spec=spec)
+        msg = 'TestIntervals are useless unless fully evaluated.'
+        assert self.interval.isFullyEvaluated(), msg
+
+    def contains(self, value):
+        msg = '%s does not contain %s' % (self.interval, value)
+        assert self.interval.contains(value), msg
+
+    def doesNotContain(self, value):
+        msg = '%s does contain %s' % (self.interval, value)
+        assert not self.interval.contains(value), msg

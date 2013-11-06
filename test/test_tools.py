@@ -197,5 +197,41 @@ class TestTools(unittest.TestCase):
         with self.assertRaises(AssertionError):
             assertGeneratesOnly(finiteGeneratorFromSeq(seq), expected, it)
 
+
+    # ----- Interval tests -----
+    def testAssertInterval(self):
+        tests = {
+            '[1,3]':    ([1,2,3], [0,4]),
+            ']1,3]':    ([2,3], [0,1,4]),
+            '[1,3[':    ([1,2], [0,3,4]),
+            ']1,3[':    ([2], [0,1,3,4]),
+
+            '[*,3]':    ([-1,3], [4,5]),
+            '[1,*]':    ([1,2,3], [-1,0]),
+            '[*,3[':    ([-1,2], [3,4,5]),
+            ']1,*]':    ([2,3], [-1,0,1]),
+            '[*,*]':    ([1,2,3], []),
+            ']*,*[':    ([1,2,2], []),
+
+            '[.005,.01]': ([.005, .0051, .009, .01], [.0049, .011]),
+            '].005,.01]': ([.0051, .009, .01], [.005, .0049, .011]),
+            '[.005,.01[': ([.005, .0051, .009], [.0049, .011, .01]),
+            '].005,.01[': ([.0051, .009], [.005, .0049, .011, .01]),
+        }
+        for (k, v) in tests.items():
+            (included, excluded) = v
+            for value in included:
+                assertInterval(k).contains(value)
+                with self.assertRaises(AssertionError):
+                    assertInterval(k).doesNotContain(value)
+            for value in excluded:
+                assertInterval(k).doesNotContain(value)
+                with self.assertRaises(AssertionError):
+                    assertInterval(k).contains(value)
+
+    def testEvaluatedAssertIntervalWithDependenciesFails(self):
+        with self.assertRaises(AssertionError):
+            assertInterval('[A, 3]')
+
 if __name__ == '__main__':
     unittest.main()
