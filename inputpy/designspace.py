@@ -79,6 +79,18 @@ class DesignSpace(Identifiable):
         params = {}
         for p in self.params.getTopLevelParameters():
             params = self.__initParam(p, params)
+
+        # This only makes sense as long as the behavior* of the "current"
+        # InPUT4j is imitated. Future specifications may require getters and
+        # setters to be invoked, but for now this is good enough.
+        # What we really want is for only the top level parameters to be
+        # included, and have nested parameters retrieved by getter.
+        # For now SChoices are removed (they are replaced by their parent).
+        # * "Point.X" gets the value of the parameter X, not p.getX().
+        params = {
+            k: v for (k,v) in params.items()
+            if self.params.getParam(k).getTag() != SCHOICE
+        }
         return Design(params, self, designId)
 
     def __initParam(self, param, init):

@@ -115,10 +115,17 @@ class TestChoice(unittest.TestCase):
         ]
         assertGeneratesAll(f, expected)
 
-    # A random Point is created, and when the type is DoublePoint, then the
-    # X value is indeed different (2 instead of 1). However, it seems that
-    # design.getValue('Point.X') accesses the original Point.X value, and not
-    # the X value that was used to instantiate the actual Point object.
+    # The behavior asserted by this test makes sense, but it contradicts
+    # the current implementation of InPUT. Future specifications will have
+    # to determine which behavior is correct.
+    # It is tagged as an expected failure rather, than "fixed" to conform to
+    # the current behavior, because it seems likely that it will change.
+    #
+    # A random Point is created, and when the type is DoublePoint the
+    # X value is indeed different (2 instead of 1).
+    # However, design.getValue('Point.X') accesses the original Point.X
+    # parameter value, not the X value of the instantiated object. In other
+    # words, the getter is not invoked. Therefore X does not vary.
     @unittest.expectedFailure
     def testGetPointXFromDesignShouldVary(self):
         space = XMLFactory.getDesignSpace(DESIGN_SPACE_FILE)
@@ -143,6 +150,19 @@ class TestChoice(unittest.TestCase):
         height = space.next('Shape.Rectangle.Height')
         expected = [Square(point, side), Rectangle(point, width, height)]
         assertGeneratesAll(f, expected)
+
+
+    # SChoices aren't "real" parameters. They do not exist in the design.
+    def testGettingAnySChoiceFromDesignShouldYieldNone(self):
+        space = XMLFactory.getDesignSpace(DESIGN_SPACE_FILE)
+        design = space.nextDesign('Design')
+        choices = [
+            'Empty.E1', 'Empty.E2', 'Empty.E3', 'NonEmpty.NE1', 'NonEmpty.NE2',
+            'Point.Double', 'Point.NoConstructor', 'Point.NoAccessors',
+            'Shape.Square', 'Shape.Rectangle',
+        ]
+        for paramId in choices:
+            self.assertIsNone(design.getValue(paramId))
 
 
 if __name__ == '__main__':
