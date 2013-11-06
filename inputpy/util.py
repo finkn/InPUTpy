@@ -543,13 +543,16 @@ class Interval:
         self.minIsExcl = exclMin is not None
         self.maxIsExcl = exclMax is not None
 
-        self.min = Interval.__getLimit(inclMin, exclMin, self.minIsExcl)
-        self.max = Interval.__getLimit(inclMax, exclMax, self.maxIsExcl)
+        self.min = Interval.__getLimit(
+            self.inclMin, self.exclMin, self.minIsExcl)
+        self.max = Interval.__getLimit(
+            self.inclMax, self.exclMax, self.maxIsExcl)
 
-        if not (isinstance(self.min, str) or isinstance(self.max, str)):
-            self.fullyEvaluated = True
-        else:
+        if isinstance(self.min, str) or isinstance(self.max, str):
             self.fullyEvaluated = False
+        else:
+            self.fullyEvaluated = True
+            self.containmentTest = self.__getContainmentTest()
 
 
     @staticmethod
@@ -574,6 +577,53 @@ class Interval:
         except NameError: pass
         return limit
 
+    def __getContainmentTest(self):
+        minVal = self.min
+        leftOpen = self.isLeftOpen()
+        lowerLimitTest = self.__getLowerLimitTest(minVal, leftOpen)
+
+        maxVal = self.max
+        rightOpen = self.isRightOpen()
+        upperLimitTest = self.__getUpperLimitTest(maxVal, rightOpen)
+
+        return lambda x: lowerLimitTest(x) and upperLimitTest(x)
+
+    def isLeftOpen(self):
+        return not self.isLeftClosed()
+
+    def isLeftClosed(self):
+        return self.__isClosed(self.min, self.minIsExcl)
+
+    def isRightOpen(self):
+        return not self.isRightClosed()
+
+    def isRightClosed(self):
+        return self.__isClosed(self.max, self.maxIsExcl)
+
+    @staticmethod
+    def __isClosed(limit, exclusive):
+        return exclusive or limit is None
+
+    @staticmethod
+    def __getLowerLimitTest(limit, open):
+        if open:
+            return lambda x: limit <= x
+        elif limit is None:
+            return lambda x: True
+        else:
+            return lambda x: limit < x
+
+    @staticmethod
+    def __getUpperLimitTest(limit, open):
+        if open:
+            return lambda x: x <= limit
+        elif limit is None:
+            return lambda x: True
+        else:
+            return lambda x: x < limit
+
+    def contains(self, value):
+        return self.containmentTest(value)
 
     def getLimits(self):
         return (self.inclMin, self.exclMin, self.inclMax, self.exclMax)

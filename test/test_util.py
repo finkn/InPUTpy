@@ -340,6 +340,53 @@ class TestMiscUtil(unittest.TestCase):
             interval = util.Interval(spec=k)
             self.assertEqual(v, interval.getLimits())
 
+    def testIntervalLeftRightOpenClosed(self):
+                    # left open, left closed, right open, right closed
+        tests = {
+            '[1, 5]':    (True,  False, True,  False),
+            ']1, 5]':    (False, True,  True,  False),
+            '[1, 5[':    (True,  False, False, True),
+            ']1, 5[':    (False, True,  False, True),
+            '[1, *]':    (True,  False, False, True),
+            '[*, 5]':    (False, True,  True,  False),
+            '[*, *]':    (False, True,  False, True),
+            ']1, *]':    (False, True,  False, True),
+            '[*, 5[':    (False, True,  False, True),
+            '[*, *]':    (False, True,  False, True),
+        }
+        for (k, v) in tests.items():
+            interval = util.Interval(spec=k)
+            self.assertEqual(interval.isLeftOpen(), v[0])
+            self.assertEqual(interval.isLeftClosed(), v[1])
+            self.assertEqual(interval.isRightOpen(), v[2])
+            self.assertEqual(interval.isRightClosed(), v[3])
+
+    def testIntervalContainment(self):
+            # interval  included    excluded
+        tests = {
+            '[1,3]':    ([1,2,3], [0,4]),
+            ']1,3]':    ([2,3], [0,1,4]),
+            '[1,3[':    ([1,2], [0,3,4]),
+            ']1,3[':    ([2], [0,1,3,4]),
+
+            '[*,3]':    ([-1,3], [4,5]),
+            '[1,*]':    ([1,2,3], [-1,0]),
+            '[*,3[':    ([-1,2], [3,4,5]),
+            ']1,*]':    ([2,3], [-1,0,1]),
+            '[*,*]':    ([1,2,3], []),
+            ']*,*[':    ([1,2,2], []),
+
+            '[.005,.01]': ([.005, .0051, .009, .01], [.0049, .011]),
+            '].005,.01]': ([.0051, .009, .01], [.005, .0049, .011]),
+            '[.005,.01[': ([.005, .0051, .009], [.0049, .011, .01]),
+            '].005,.01[': ([.0051, .009], [.005, .0049, .011, .01]),
+        }
+        for (k, v) in tests.items():
+            interval = util.Interval(spec=k)
+            (included, excluded) = v
+            self.assertTrue(all(map(interval.contains, included)))
+            self.assertFalse(any(map(interval.contains, excluded)))
+
 
     def checkInitOrder(self, dep):
         dependencies = dep[0]
