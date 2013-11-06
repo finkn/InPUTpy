@@ -427,6 +427,15 @@ def getAbsoluteDependencies(params):#, dependencies):
 
 
 class IntervalParser:
+    """
+    This class has functions for translating between string
+    representations of intervals and incl/excl min/max values.
+
+    Only square brackets are allowed. Infinite endpoints are expressed as
+    '*'. They are allowed to be specified as open ('[*, 3]' for
+    example), but internally, an infinite endpoint will always be treated
+    as closed.
+    """
     SEPARATOR = ','
     INFINITE = '*'
     LOWER_OPEN = '['    # Inclusive
@@ -436,6 +445,7 @@ class IntervalParser:
 
     @staticmethod
     def parse(spec):
+        """ Return (inclMin, exclMin, inclMax, exclMax). """
         spec = spec.strip()
         minIsExcl = IntervalParser.__isExclusive(spec[0],
             IntervalParser.LOWER_OPEN, IntervalParser.LOWER_CLOSED)
@@ -485,7 +495,7 @@ class IntervalParser:
             elif c == IntervalParser.SEPARATOR and parenCount == 0:
                 return index
             index += 1
-        msg = 'Separator not be found while parsing interval %s' % (spec)
+        msg = 'Separator not found while parsing interval %s' % (spec)
         raise ValueError(msg)
 
     @staticmethod
@@ -497,6 +507,10 @@ class IntervalParser:
 
     @staticmethod
     def makeIntervalSpec(inclMin, exclMin, inclMax, exclMax):
+        """
+        Return a string representation of the interval that is described
+        by the arguments. Infinite endpoints default to open as usual.
+        """
         (start, min) = IntervalParser.__getEndPoint(inclMin, exclMin,
             IntervalParser.LOWER_CLOSED, IntervalParser.LOWER_OPEN)
         (end, max) = IntervalParser.__getEndPoint(inclMax, exclMax,

@@ -289,13 +289,13 @@ class TestMiscUtil(unittest.TestCase):
             '[*, *]':    (None, None, None, None),
             ']1, *]':    (None, '1',  None, None),
             '[*, 5[':    (None, None, None, '5'),
-            '[*, *]':    (None, None, None, None),
+            ']*, *[':    (None, None, None, None),
             # This might be controversial. In mathematical terms, this is
             # illegal, assuming * stands for infinity. However, in InPUT
             # we might choose to interpret it as "no limit" in which case
             # the inclusive/exclusive limit is simply irrelevant.
-            ']*, *[':    (None, None, None, None),
-            # Here's the first test with some weird white space.
+            '[*, *]':    (None, None, None, None),
+            # Here's the first test again, with some weird white space.
             ' [ 1 , 5 ] ': ('1',  None, '5',  None),
         }
         for (k, v) in tests.items():
