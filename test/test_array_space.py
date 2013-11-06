@@ -119,8 +119,12 @@ class TestArraySpace(unittest.TestCase):
     # the elements within an array to be random.
     def testPointChoiceArrayShouldHaveRandomElements(self):
         paramId = 'PointChoiceArray'
-        f = generatorFromSeq(designSpace.next(paramId))
-        assertVariability(f)
+        # The array is only 10 elements long. Increasing the number of
+        # iterations simply pops the same items multiple times.
+        # Two arrays should be enough to guarantee variance.
+        # The finite generator will prevent values from being repeated.
+        values = designSpace.next(paramId) + designSpace.next(paramId)
+        assertVariability(finiteGeneratorFromSeq(values), len(values))
 
 
 if __name__ == '__main__':
