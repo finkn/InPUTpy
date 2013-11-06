@@ -280,26 +280,36 @@ class TestMiscUtil(unittest.TestCase):
     def testIntervalParserForSimpleValues(self):
                         # inclMin, exclMin, inclMax, exclMax
         tests = {
-            '[1,5]':    ('1',  None, '5',  None),
-            ']1,5]':    (None, '1',  '5',  None),
-            '[1,5[':    ('1',  None, None, '5'),
-            ']1,5[':    (None, '1',  None, '5'),
-            '[1,*]':    ('1',  None, None, None),
-            '[*,5]':    (None, None, '5',  None),
-            '[*,*]':    (None, None, None, None),
-            ']1,*]':    (None, '1',  None, None),
-            '[*,5[':    (None, None, None, '5'),
-            '[*,*]':    (None, None, None, None),
+            '[1, 5]':    ('1',  None, '5',  None),
+            ']1, 5]':    (None, '1',  '5',  None),
+            '[1, 5[':    ('1',  None, None, '5'),
+            ']1, 5[':    (None, '1',  None, '5'),
+            '[1, *]':    ('1',  None, None, None),
+            '[*, 5]':    (None, None, '5',  None),
+            '[*, *]':    (None, None, None, None),
+            ']1, *]':    (None, '1',  None, None),
+            '[*, 5[':    (None, None, None, '5'),
+            '[*, *]':    (None, None, None, None),
             # This might be controversial. In mathematical terms, this is
             # illegal, assuming * stands for infinity. However, in InPUT
             # we might choose to interpret it as "no limit" in which case
             # the inclusive/exclusive limit is simply irrelevant.
-            ']*,*[':    (None, None, None, None),
+            ']*, *[':    (None, None, None, None),
             # Here's the first test with some weird white space.
             ' [ 1 , 5 ] ': ('1',  None, '5',  None),
         }
         for (k, v) in tests.items():
             self.assertEqual(v, util.IntervalParser.parse(k))
+
+    def testIntervalParserMakeIntervalSpec(self):
+        tests = {
+            '[1, 5]':    ('1',  None, '5',  None),
+            ']1, 5[':    (None, '1',  None, '5'),
+            ']1, 5]':    (None, '1',  '5',  None),
+            ']*, *[':    (None, None, None, None),
+        }
+        for (k, v) in tests.items():
+            self.assertEqual(k, util.IntervalParser.makeIntervalSpec(*v))
 
     def testParseWithInvalidStartOrEndRaisesError(self):
         with self.assertRaises(ValueError):
@@ -327,7 +337,7 @@ class TestMiscUtil(unittest.TestCase):
             ']1, 3 + (Math.sqrt(4) - 1) * 2[':  (None, 1,  None, 5),
         }
         for (k, v) in tests.items():
-            interval = util.Interval(k)
+            interval = util.Interval(spec=k)
             self.assertEqual(v, interval.getLimits())
 
 

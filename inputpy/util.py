@@ -495,11 +495,51 @@ class IntervalParser:
         else:
             return (limit, None)
 
+    @staticmethod
+    def makeIntervalSpec(inclMin, exclMin, inclMax, exclMax):
+        (start, min) = IntervalParser.__getEndPoint(inclMin, exclMin,
+            IntervalParser.LOWER_CLOSED, IntervalParser.LOWER_OPEN)
+        (end, max) = IntervalParser.__getEndPoint(inclMax, exclMax,
+            IntervalParser.UPPER_CLOSED, IntervalParser.UPPER_OPEN)
+
+        if min is None:
+            min = IntervalParser.INFINITE
+        if max is None:
+            max = IntervalParser.INFINITE
+
+        return '%s%s%s %s%s' % (start, min, IntervalParser.SEPARATOR, max, end)
+
+    @staticmethod
+    def __getEndPoint(incl, excl, closed, open):
+        if incl is not None:
+            return (open, IntervalParser.__interpretLimit(incl))
+        else:
+            return (closed, IntervalParser.__interpretLimit(excl))
+
+    @staticmethod
+    def __interpretLimit(limit):
+        if limit is None:
+            return IntervalParser.INFINITE
+        else:
+            return limit
+
 
 class Interval:
-    def __init__(self, spec):
-        self.spec = spec
-        (inclMin, exclMin, inclMax, exclMax) = IntervalParser.parse(spec)
+    def __init__(self,
+            inclMin=None, exclMin=None, inclMax=None, exclMax=None, spec=None):
+        if spec is not None:
+            assert all(map(
+                lambda x: x is None, [inclMin, exclMin, inclMax, exclMax]))
+            limits = IntervalParser.parse(spec)
+            (inclMin, exclMin, inclMax, exclMax) = limits
+
+        self.inclMin = Interval.__evaluateLimit(inclMin)
+        self.exclMin = Interval.__evaluateLimit(exclMin)
+        self.inclMax = Interval.__evaluateLimit(inclMax)
+        self.exclMax = Interval.__evaluateLimit(exclMax)
+
+        self.spec = IntervalParser.makeIntervalSpec(*self.getLimits())
+
         self.minIsExcl = exclMin is not None
         self.maxIsExcl = exclMax is not None
 
@@ -507,20 +547,22 @@ class Interval:
         self.max = Interval.__getLimit(inclMax, exclMax, self.maxIsExcl)
 
         if not (isinstance(self.min, str) or isinstance(self.max, str)):
-            self.initialized = True
+            self.fullyEvaluated = True
         else:
-            self.initialized = False
+            self.fullyEvaluated = False
 
 
     @staticmethod
     def __getLimit(inclLimit, exclLimit, exclusive):
         if exclusive:
-            return Interval.__evaluateLimit(exclLimit)
+            return exclLimit
         else:
-            return Interval.__evaluateLimit(inclLimit)
+            return inclLimit
 
     @staticmethod
     def __evaluateLimit(limit):
+        if limit is None:
+            return limit
         try:
             return int(limit)
         except ValueError: pass
@@ -534,15 +576,10 @@ class Interval:
 
 
     def getLimits(self):
-        if self.minIsExcl:
-            (inclMin, exclMin) = (None, self.min)
-        else:
-            (inclMin, exclMin) = (self.min, None)
-        if self.maxIsExcl:
-            (inclMax, exclMax) = (None, self.max)
-        else:
-            (inclMax, exclMax) = (self.max, None)
-        return (inclMin, exclMin, inclMax, exclMax)
+        return (self.inclMin, self.exclMin, self.inclMax, self.exclMax)
+
+    def isFullyEvaluated(self):
+        return self.fullyEvaluated
 
     def __eq__(self, other):
         if not isinstance(other, Interval):
