@@ -539,13 +539,20 @@ class IntervalParser:
 
 
 class Interval:
-    def __init__(self,
-            inclMin=None, exclMin=None, inclMax=None, exclMax=None, spec=None):
+    types = {
+        'int': int, int: int, 'float': float, float: float,
+    }
+
+    def __init__(self, inclMin=None, exclMin=None, inclMax=None, exclMax=None,
+            spec=None, type=None):
         if spec is not None:
             assert all(map(
                 lambda x: x is None, [inclMin, exclMin, inclMax, exclMax]))
             limits = IntervalParser.parse(spec)
             (inclMin, exclMin, inclMax, exclMax) = limits
+
+        # Update this to types[type]. We want an invalid type to fail.
+        self.type = Interval.types.get(type)
 
         self.inclMin = Interval.__evaluateLimit(inclMin)
         self.exclMin = Interval.__evaluateLimit(exclMin)
@@ -644,6 +651,36 @@ class Interval:
 
     def isFullyEvaluated(self):
         return self.fullyEvaluated
+
+    def getUpdated(self, newEndpoints):
+        """
+        Return a new Interval with updated endpoints. Intended for use
+        with dependent (and thus unresolved) intervals.
+        """
+        (left, right) = newEndpoints
+        if left is None:
+            left = self.min
+        if right is None:
+            right = self.max
+        inclMin = None
+        exclMin = None
+        inclMax = None
+        exclMax = None
+
+        if self.isLeftOpen():
+            inclMin = left
+        else:
+            exclMin = left
+        if self.isRightOpen():
+            inclMax = right
+        else:
+            exclMax = right
+
+        return Interval(inclMin=inclMin, exclMin=exclMin, inclMax=inclMax,
+            exclMax=exclMax, type=self.type)
+
+    def getType(self):
+        return self.type
 
     def __eq__(self, other):
         if not isinstance(other, Interval):

@@ -277,44 +277,22 @@ class TestMiscUtil(unittest.TestCase):
             self.assertEqual(t[1], util.findAbsoluteParameter(*args))
 
 
-    def testIntervalParserForSimpleValues(self):
-                        # inclMin, exclMin, inclMax, exclMax
-        tests = {
-            '[1, 5]':    ('1',  None, '5',  None),
-            ']1, 5]':    (None, '1',  '5',  None),
-            '[1, 5[':    ('1',  None, None, '5'),
-            ']1, 5[':    (None, '1',  None, '5'),
-            '[1, *]':    ('1',  None, None, None),
-            '[*, 5]':    (None, None, '5',  None),
-            '[*, *]':    (None, None, None, None),
-            ']1, *]':    (None, '1',  None, None),
-            '[*, 5[':    (None, None, None, '5'),
-            ']*, *[':    (None, None, None, None),
-            # This might be controversial. In mathematical terms, this is
-            # illegal, assuming * stands for infinity. However, in InPUT
-            # we might choose to interpret it as "no limit" in which case
-            # the inclusive/exclusive limit is simply irrelevant.
-            '[*, *]':    (None, None, None, None),
-            # Here's the first test again, with some weird white space.
-            ' [ 1 , 5 ] ': ('1',  None, '5',  None),
-        }
-        for (k, v) in tests.items():
-            self.assertEqual(v, util.IntervalParser.parse(k))
 
-    def testIntervalParserMakeIntervalSpec(self):
-        tests = {
-            '[1, 5]':    ('1',  None, '5',  None),
-            ']1, 5[':    (None, '1',  None, '5'),
-            ']1, 5]':    (None, '1',  '5',  None),
-            ']*, *[':    (None, None, None, None),
-        }
-        for (k, v) in tests.items():
-            self.assertEqual(k, util.IntervalParser.makeIntervalSpec(*v))
+    def checkInitOrder(self, dep):
+        dependencies = dep[0]
+        lengths = dep[1]
+        order = initOrder(dependencies)
+        for (k, v) in lengths.items():
+            self.assertIn(k, order[v])
 
-    def testParseWithInvalidStartOrEndRaisesError(self):
-        with self.assertRaises(ValueError):
-            util.IntervalParser.parse('<1,5)')
+    def checkDependencyLength(self, dep):
+        dependencies = dep[0]
+        lengths = dep[1]
+        for k in dependencies.keys():
+            val = depLen(dependencies, k)
+            self.assertEqual(val, lengths[k])
 
+class TestInterval(unittest.TestCase):
     def testIntervalParserForSimpleExpressions(self):
         tests = {
             '[1+1,5+2]':
@@ -387,20 +365,67 @@ class TestMiscUtil(unittest.TestCase):
             self.assertTrue(all(map(interval.contains, included)))
             self.assertFalse(any(map(interval.contains, excluded)))
 
+    def testIntervalParserForSimpleValues(self):
+                        # inclMin, exclMin, inclMax, exclMax
+        tests = {
+            '[1, 5]':    ('1',  None, '5',  None),
+            ']1, 5]':    (None, '1',  '5',  None),
+            '[1, 5[':    ('1',  None, None, '5'),
+            ']1, 5[':    (None, '1',  None, '5'),
+            '[1, *]':    ('1',  None, None, None),
+            '[*, 5]':    (None, None, '5',  None),
+            '[*, *]':    (None, None, None, None),
+            ']1, *]':    (None, '1',  None, None),
+            '[*, 5[':    (None, None, None, '5'),
+            ']*, *[':    (None, None, None, None),
+            # This might be controversial. In mathematical terms, this is
+            # illegal, assuming * stands for infinity. However, in InPUT
+            # we might choose to interpret it as "no limit" in which case
+            # the inclusive/exclusive limit is simply irrelevant.
+            '[*, *]':    (None, None, None, None),
+            # Here's the first test again, with some weird white space.
+            ' [ 1 , 5 ] ': ('1',  None, '5',  None),
+        }
+        for (k, v) in tests.items():
+            self.assertEqual(v, util.IntervalParser.parse(k))
 
-    def checkInitOrder(self, dep):
-        dependencies = dep[0]
-        lengths = dep[1]
-        order = initOrder(dependencies)
-        for (k, v) in lengths.items():
-            self.assertIn(k, order[v])
+    def testIntervalParserMakeIntervalSpec(self):
+        tests = {
+            '[1, 5]':    ('1',  None, '5',  None),
+            ']1, 5[':    (None, '1',  None, '5'),
+            ']1, 5]':    (None, '1',  '5',  None),
+            ']*, *[':    (None, None, None, None),
+        }
+        for (k, v) in tests.items():
+            self.assertEqual(k, util.IntervalParser.makeIntervalSpec(*v))
 
-    def checkDependencyLength(self, dep):
-        dependencies = dep[0]
-        lengths = dep[1]
-        for k in dependencies.keys():
-            val = depLen(dependencies, k)
-            self.assertEqual(val, lengths[k])
+    def testParseWithInvalidStartOrEndRaisesError(self):
+        tests = (
+            '<1,5]', '(1,5]', '[1,5>', '[1,5)',
+        )
+        for t in tests:
+            with self.assertRaises(ValueError):
+                util.IntervalParser.parse(t)
+
+    def testCreatingIntervalWithMissingSeparatorShouldFail(self):
+        with self.assertRaises(ValueError):
+            util.Interval(spec='[1 2]')
+
+    def testIntervalType(self):
+        tests = {
+            'int': int, int: int, 'float': float, float: float,
+        }
+        for (k, v) in tests.items():
+            interval = util.Interval(spec=']*, *[', type=k)
+            self.assertEqual(v, interval.getType())
+
+    def testGetUpdated(self):
+        interval = util.Interval(spec='[A, A * 2]', type=int)
+        updated = interval.getUpdated((2, 4))
+        self.assertEqual(interval.isRightOpen(), updated.isRightOpen())
+        self.assertEqual(interval.isLeftOpen(), updated.isLeftOpen())
+        self.assertEqual(interval.getType(), updated.getType())
+
 
 if __name__ == '__main__':
     unittest.main()

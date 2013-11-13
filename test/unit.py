@@ -11,7 +11,7 @@ from test.test_mapping import TestMapping
 from test.test_param import TestParam
 from test.test_param_store import TestParamStore
 from test.test_types import TestTypes
-from test.test_util import TestEvaluator, TestMiscUtil
+from test.test_util import TestEvaluator, TestMiscUtil, TestInterval
 from test.test_array_space import TestArraySpace
 from test.test_tools import TestTools
 from test.test_choice import TestChoice
@@ -20,7 +20,7 @@ __all__ = (
     'TestDesign', 'TestDesignSpace', 'TestParam', 'TestParamStore',
     'TestEvaluator', 'TestMiscUtil', 'TestGenerators', 'TestMapping',
     'TestTypes', 'TestFactories', 'TestArraySpace', 'TestChoice',
-    'TestTools',
+    'TestTools', 'TestInterval',
 )
 
 if __name__ == '__main__':
