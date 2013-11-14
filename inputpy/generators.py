@@ -65,6 +65,7 @@ class ValueGenerator:
             maxVal = RANGE_MAP[param.getType()][1]
         return (minVal, maxVal)
 
+
 class IntGenerator(ValueGenerator):
     @classmethod
     def nextValue(cls, param, dep={}):

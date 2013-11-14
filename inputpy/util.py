@@ -595,7 +595,7 @@ class Interval:
         except ValueError: pass
         try:
             return Evaluator.evaluate(limit)
-        except NameError: pass
+        except (NameError, KeyError): pass
         return limit
 
     def __getContainmentTest(self):

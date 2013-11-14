@@ -160,7 +160,7 @@ class NParam(Param):
         if inclMax is not None and exclMax is not None:
             raise ValueError('Defined both inclusive and exclusive limits')
 
-        assert type in NPARAM_TYPES
+        assert type in NPARAM_TYPES, 'Invalid NParam type: %s' % (type)
 
         if inclMin is None:
             minTmp = exclMin
@@ -192,6 +192,31 @@ class NParam(Param):
         self.__padLimits(self.min, self.max)
         self.min = tuple(self.min)
         self.max = tuple(self.max)
+
+        # Make intervals.
+        intervals = []
+        intervalTypes = {
+            'short': int, 'integer': int, 'long': int,
+            'float': float, 'double': float, 'decimal': float,
+        }
+        intervalType = intervalTypes.get(type)
+        for (left, right) in (zip(self.min, self.max)):
+            if self.exclMin:
+                inclMin = None
+                exclMin = left
+            else:
+                inclMin = left
+                exclMin = None
+            if self.exclMax:
+                inclMax = None
+                exclMax = right
+            else:
+                inclMax = right
+                exclMax = None
+            intervals.append(util.Interval(inclMin=inclMin, exclMin=exclMin,
+                inclMax=inclMax, exclMax=exclMax, type=intervalType))
+        self.intervals = tuple(intervals)
+
         self.minDependees = tuple(self.minDependees)
         self.maxDependees = tuple(self.maxDependees)
 
@@ -254,6 +279,9 @@ class NParam(Param):
                 return Evaluator.evaluate(value)
         else:
             return value
+
+    def getIntervals(self):
+        return self.intervals
 
     def setFixed(self, value):
         """

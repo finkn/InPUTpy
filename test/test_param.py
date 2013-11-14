@@ -78,6 +78,14 @@ class TestParam(unittest.TestCase):
         param = NParam('A', INTEGER, inclMin=1, inclMax=2)
         self.assertIsNotNone(iter(param.getMin()))
 
+    def testGetIntervalsWithSingleInterval(self):
+        param = NParam('A', INTEGER, inclMin=1, inclMax=3)
+        self.assertEqual(1, len(param.getIntervals()))
+
+    def testgetIntervalsWithMultipleIntervals(self):
+        param = NParam('A', INTEGER, inclMin=(1,1,2), inclMax=(3,4))
+        self.assertEqual(3, len(param.getIntervals()))
+
     def testNoneIdShouldNotRaiseError(self):
         param = NParam(None, INTEGER)
         self.assertIsNotNone(param.getId())
