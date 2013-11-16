@@ -28,8 +28,7 @@ is proportional to the number of expected values.
 :license: MIT. See LICENSE for details.
 """
 
-import warnings
-from inputpy.util import Interval
+import inputpy.util as util
 
 DEFAULT_ITERATIONS = 20
 
@@ -147,20 +146,19 @@ def generatorFromSeq(seq):
     return gen
 
 
-def assertInterval(spec):
+class Interval:
     """
-    Return a special testing interval created from the spec string.
-    The object supports 'contains' and 'doesNotContain' methods.
-    This function is intended to be used together with the instance
-    methods. For example:
-    assertInterval('[1,3]').contains(2)
-    assertInterval(']1,3]').doesNotContain(1)
-    """
-    return TestInterval(spec)
+    A util.Interval decorator that makes assertions.
+    The 'contains' and 'doesNotContain' methods assert that the wrapped
+    util.Interval contains/does not contain the value.
+    Only supports interval notation (no incl/excl min/max).
 
-class TestInterval:
+    Example usage:
+    Interval('[1,3]').contains(2)
+    Interval(']1,3]').doesNotContain(1)
+    """
     def __init__(self, spec):
-        self.interval = Interval(spec=spec)
+        self.interval = util.Interval(spec=spec)
         msg = 'TestIntervals are useless unless fully evaluated.'
         assert self.interval.isFullyEvaluated(), msg
 

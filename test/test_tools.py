@@ -199,7 +199,7 @@ class TestTools(unittest.TestCase):
 
 
     # ----- Interval tests -----
-    def testAssertInterval(self):
+    def testInterval(self):
         tests = {
             '[1,3]':    ([1,2,3], [0,4]),
             ']1,3]':    ([2,3], [0,1,4]),
@@ -221,17 +221,17 @@ class TestTools(unittest.TestCase):
         for (k, v) in tests.items():
             (included, excluded) = v
             for value in included:
-                assertInterval(k).contains(value)
+                Interval(k).contains(value)
                 with self.assertRaises(AssertionError):
-                    assertInterval(k).doesNotContain(value)
+                    Interval(k).doesNotContain(value)
             for value in excluded:
-                assertInterval(k).doesNotContain(value)
+                Interval(k).doesNotContain(value)
                 with self.assertRaises(AssertionError):
-                    assertInterval(k).contains(value)
+                    Interval(k).contains(value)
 
-    def testEvaluatedAssertIntervalWithDependenciesFails(self):
+    def testEvaluatedIntervalWithDependenciesFails(self):
         with self.assertRaises(AssertionError):
-            assertInterval('[A, 3]')
+            Interval('[A, 3]')
 
 if __name__ == '__main__':
     unittest.main()
