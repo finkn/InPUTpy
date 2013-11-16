@@ -169,3 +169,62 @@ class Interval:
     def doesNotContain(self, value):
         msg = '%s does contain %s' % (self.interval, value)
         assert not self.interval.contains(value), msg
+
+
+class ValueSink:
+    def __init__(self, f):
+        self.f = f
+
+    def accepts(self, value):
+        try:
+            self.f(value)
+        except:
+            msg = '%s was unexpectedly rejected by %s' % (value, self.f)
+            raise AssertionError(msg)
+
+    def rejects(self, value):
+        try:
+            self.f(value)
+        except:
+            pass
+        else:
+            msg = '%s was unexpectedly accepted by %s' % (value, self.f)
+            raise AssertionError(msg)
+
+
+class Generator:
+    @staticmethod
+    def fromFunction(f):
+        return Generator(f)
+
+    @staticmethod
+    def fromSequence(seq, finite=False):
+        if finite:
+            return Generator(finiteGeneratorFromSeq(seq))
+        else:
+            return Generator(generatorFromSeq(seq))
+
+    def __init__(self, f):
+        self.f = f
+
+    def generatesOnly(self, expected, iterations=DEFAULT_ITERATIONS):
+        assertGeneratesOnly(self.f, expected, iterations=iterations)
+
+    def generatesAll(self, expected, iterations=None):
+        if iterations is None:
+            iterations = len(expected) * DEFAULT_ITERATIONS
+        assertGeneratesAll(self.f, expected, iterations=iterations)
+
+    def generatesAny(self, expected, iterations=DEFAULT_ITERATIONS):
+        assertGeneratesAny(self.f, expected, iterations=iterations)
+
+    def isVariable(self, iterations=DEFAULT_ITERATIONS):
+        assertVariability(self.f, iterations=iterations)
+
+    def isConstant(self, iterations=DEFAULT_ITERATIONS):
+        assertConstancy(self.f, iterations=iterations)
+
+    # Add args? Sounds useful, but generator functions aren't really meant
+    # to take arguments (they don't anywhere else at least).
+    def __call__(self):
+        return self.f()

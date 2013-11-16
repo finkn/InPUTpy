@@ -12,43 +12,39 @@ class TestTools(unittest.TestCase):
 
     def testAssertVariabilityWithOneIterationShouldFail(self):
         with self.assertRaises(AssertionError):
-            assertVariability(generatorFromSeq([1,2,3]), iterations=1)
+            Generator.fromSequence([1,2,3]).isVariable(iterations=1)
 
     def testAssertVariabilityWithConstantValueShouldFail(self):
         with self.assertRaises(AssertionError):
-            assertVariability(lambda: 1)
+            Generator.fromFunction(lambda: 1).isVariable()
 
     def testAssertVariabilityWithDifferentValuesShouldSucceed(self):
-        values = [1, 1, 1, 1, 2]
-        assertVariability(generatorFromSeq(values), 5)
+        Generator.fromSequence([1,1,1,1,2]).isVariable(iterations=5)
 
     # The variability test fails even though different values are generated
     # because not enough values are generated to see the variation.
     def testAssertVariabilityFailsIfNotEnoughIterations(self):
-        values = [1, 1, 1, 1, 2]
         with self.assertRaises(AssertionError):
-            assertVariability(generatorFromSeq(values), 4)
+            Generator.fromSequence([1,1,1,1,2]).isVariable(iterations=4)
 
 
     # ----- assertConstancy tests -----
 
     def testAssertConstancyWithOneIterationShouldFail(self):
         with self.assertRaises(AssertionError):
-            assertConstancy(lambda: 1, iterations=1)
+            Generator.fromFunction(lambda: 1).isConstant(iterations=1)
 
     def testAssertConstancyWithConstantValueShouldSucceed(self):
-        assertConstancy(lambda: 1)
+        Generator.fromFunction(lambda: 1).isConstant()
 
-    def testAssertConstancyWithRandomValueShouldFail(self):
-        values = [1, 1, 1, 1, 2]
+    def testAssertConstancyWithDifferentValueShouldFail(self):
         with self.assertRaises(AssertionError):
-            assertConstancy(generatorFromSeq(values), 5)
+            Generator.fromSequence([1,1,1,1,2]).isConstant(iterations=5)
 
     # Even though the values are not constant, not enough values are
     # generated to see the variation.
     def testAssertConstancySucceedsIfNotEnoughIterations(self):
-        values = [1, 1, 1, 1, 2]
-        assertConstancy(generatorFromSeq(values), 4)
+        Generator.fromSequence([1,1,1,1,2]).isConstant(iterations=4)
 
 
     # ----- assertMatchingArrayDimensions tests -----
@@ -99,59 +95,52 @@ class TestTools(unittest.TestCase):
         values = [6,7,8,9]
         expected = [1,2,3,4,5]
         with self.assertRaises(AssertionError):
-            assertGeneratesAny(generatorFromSeq(values), expected)
+            Generator.fromSequence(values).generatesAny(expected)
 
     # Only 2 will be generated, but it matches, and that's enough.
     def testAssertGeneratesAnyShouldSucceedIfAnyMatch(self):
         expected = [1,2,3,4,5]
-        assertGeneratesAny(lambda: 2, expected)
+        Generator.fromFunction(lambda: 2).generatesAny(expected)
 
     def testAssertGeneratesAllWithTooFewIterationsShouldFail(self):
         values = [2,2,1,5,4,1,1,5,4,3]    # 10 values, 1-5 occur at least once.
         expected = [1,2,3,4,5]
-        f = generatorFromSeq(values)
+        gen = Generator.fromSequence(values)
         iterations = len(values) - 1
         with self.assertRaises(AssertionError):
-            assertGeneratesAll(f, expected, iterations)
+            gen.generatesAll(expected, iterations)
 
-    # One value is missing from the range, so it's impossible to generate all.
-    def testAssertGeneratesAllShouldFailIfAnyMismatch(self):
+    def testAssertGeneratesAllShouldFailIfAnyMissing(self):
         values = [1,2,3,4]
         expected = [1,2,3,4,5]
         with self.assertRaises(AssertionError):
-            assertGeneratesAll(generatorFromSeq(values), expected)
+            Generator.fromSequence(values).generatesAll(expected)
 
     # 3 does not match, but that is irrelevant as long as 1 and 2 occur.
     def testAssertGeneratesAllShouldSucceedIfAllAreMatched(self):
-        values = [1,2,3]
-        expected = [1,2]
-        assertGeneratesAll(generatorFromSeq(values), expected)
+        Generator.fromSequence([3,1,2]).generatesAll([1,2])
 
     def testAssertGeneratsAllFailsIfNotEnoughIterations(self):
-        values = [1,2,3]
-        expected = [1,2]
-        assertGeneratesAll(generatorFromSeq(values), expected, 2)
+        Generator.fromSequence([1,2,3]).generatesAll([1,2], 2)
 
     # 1 and 2 match, but 3 does not.
     def testAssertGeneratesOnlyShouldFailIfAnyMismatch(self):
         values = [1,2,3]
         expected = [1,2]
         with self.assertRaises(AssertionError):
-            assertGeneratesOnly(generatorFromSeq(values), expected)
+            Generator.fromSequence([1,2,3]).generatesOnly([1,2])
 
     # The value 3 should cause the test to fail, but there are not enough
     # iterations to reach that value.
     def testAssertGeneratesOnlySucceedsIfNotEnoughIterations(self):
-        values = [1,2,3]
-        expected = [1,2]
-        assertGeneratesOnly(generatorFromSeq(values), expected, 2)
+        Generator.fromSequence([1,2,3]).generatesOnly([1,2], 2)
 
-    # There are not enough iterations to generate all expected values, but we
-    # don't need to. What is important is that no non-matching values occur.
+    # All accepted values are not generated, but we don't need to.
+    # What is important is that no non-matching values occur.
     def testAssertGeneratesOnlyShouldSucceedIfNoMismatch(self):
         values = [3,4,3,4,5,6,5,6]
         expected = [1,2,3,4,5,6,7,8,9,10]
-        assertGeneratesOnly(generatorFromSeq(values), expected)
+        Generator.fromSequence(values).generatesOnly(expected)
 
 
     # ----- generator from sequence tests -----
@@ -159,13 +148,13 @@ class TestTools(unittest.TestCase):
     def testFiniteGeneratorFromSeq(self):
         seq = [0,1,2,3,4,5,6,7,8,9]
         expected = [0,1,2,3,4,5,6,7,8,9]
-        f = finiteGeneratorFromSeq(seq)
+        f = Generator.fromSequence(seq, finite=True)
         result = [f() for i in range(len(seq))]
         self.assertEqual(expected, result)
 
     def testFiniteGeneratorFromSeqShouldRaiseErrorWhenExhausted(self):
         seq = [0,1,2,3,4,5,6,7,8,9]
-        f = finiteGeneratorFromSeq(seq)
+        f = Generator.fromSequence(seq, finite=True)
         with self.assertRaises(IndexError):
             result = [f() for i in range(len(seq) + 1)]
 
@@ -173,7 +162,7 @@ class TestTools(unittest.TestCase):
     def testInfiniteGeneratorFromSeqShouldWrapAround(self):
         seq = [0,1,2,3]
         expected = [0,1,2,3] * 3
-        f = generatorFromSeq(seq)
+        f = Generator.fromSequence(seq)
         iterations = len(expected)
         self.assertTrue(len(seq) < iterations)
         result = [f() for i in range(iterations)]
@@ -232,6 +221,44 @@ class TestTools(unittest.TestCase):
     def testEvaluatedIntervalWithDependenciesFails(self):
         with self.assertRaises(AssertionError):
             Interval('[A, 3]')
+
+
+    def testValueSink(self):
+        def acceptGT3(x):
+            if x <= 3: raise ValueError
+        def acceptLT3(x):
+            if x >= 3: raise ValueError
+        def accept3(x):
+            if x != 3: raise ValueError
+        def acceptAll(x):
+            pass
+        def rejectAll(x):
+            raise ValueError
+
+        tests = {
+            # function    accepts, rejects
+            acceptGT3:    ([4,5],   [2,3]),
+            acceptLT3:    ([1,2],   [3,4]),
+            accept3:      ([3],     [2,4]),
+            acceptAll:    ([1,2,3], []),
+            rejectAll:    ([],      [1,2,3]),
+        }
+
+        # Make a ValueSink from each (lambda) function...
+        for (k,v) in tests.items():
+            (accepted, rejected) = v
+            sink = ValueSink(k)
+
+            # ...and check that it accepts and rejects the appropriate values.
+            for value in accepted:
+                sink.accepts(value)
+                with self.assertRaises(AssertionError):
+                    sink.rejects(value)
+
+            for value in rejected:
+                sink.rejects(value)
+                with self.assertRaises(AssertionError):
+                    sink.accepts(value)
 
 if __name__ == '__main__':
     unittest.main()
