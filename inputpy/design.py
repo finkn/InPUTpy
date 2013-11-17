@@ -15,6 +15,7 @@ class Design(Identifiable):
         self.__readOnly = readOnly
         self.__ext = [self]
         self.space = designSpace
+        self.__updateSupportedIds()
 
     def getValue(self, paramId):
         result = None
@@ -26,7 +27,26 @@ class Design(Identifiable):
     def setValue(self, paramId, value):
         if self.__readOnly:
             raise InPUTException('Cannot set value on a read-only Design')
-        util.setValue(paramId, self.params, value)
+
+        if self.__checkValidity(paramId, value):
+            util.setValue(paramId, self.params, value)
+        self.__updateSupportedIds()
+
+    def __checkValidity(self, paramId, value):
+        # Hack: this should never happen. Fix old tests.
+        if self.space is None:
+            return True
+        # Array elements are not part of the supported keys.
+        if paramId not in self.params:
+            paramId = util.root(paramId)
+        param = self.space.params.getParam(paramId)
+        return param.isValid(value)
+
+    def __updateSupportedIds(self):
+        self.supportedIds = set()
+        for (paramId, value) in self.params.items():
+            for id in util.getAllIds(paramId, value):
+                self.supportedIds.add(id)
 
     def setReadOnly(self):
         self.__readOnly = True
@@ -48,7 +68,8 @@ class Design(Identifiable):
         return self.space
 
     def getSupportedParamIds(self):
-        return self.params.keys()
+        #return self.params.keys()
+        return self.supportedIds
 
     # -------------------------------------------------------------------------
     # These are dummy implementations, taken from the first version of Design.

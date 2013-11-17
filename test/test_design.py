@@ -174,5 +174,24 @@ class TestDesign(unittest.TestCase):
             msg = 'wrong value for parameter %s' % (k)
             self.assertEqual(v, design.getValue(k), msg=msg)
 
+    def testGetSupportedParamIds(self):
+        space = PresetDesignSpaceFactory.getDesignSpace('arraySpace.xml')
+        design = space.nextDesign('design')
+        expected = [
+            'IntArray1', 'IntArray1.1', 'IntArray1.2', 'IntArray1.3',
+            'IntArray2', 'IntArray2.1.1.1', 'IntArray2.3.1.2',
+            'IntArray2', 'StringArray1', 'EmptyChoiceArray',
+            'PointChoiceArray.10',
+        ]
+        supportedIds = design.getSupportedParamIds()
+        for paramId in expected:
+            self.assertIn(paramId, supportedIds)
+        self.assertNotIn('PointChoiceArray.NoConstructor', supportedIds)
+        self.assertNotIn('EmptyChoiceArray.Empty1', supportedIds)
+        self.assertNotIn('IntArray2.1.2.1', supportedIds)
+
+    def testSetValueShouldValidateValues(self):
+        pass
+
 if __name__ == '__main__':
     unittest.main()

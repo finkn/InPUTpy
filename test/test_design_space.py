@@ -169,6 +169,17 @@ class TestDesignSpace(unittest.TestCase):
         self.assertCountEqual(space.getSupportedParamIds(), paramIds)
         self.assertTrue(all([design.getValue(p) is None for p in paramIds]))
 
+    def testGetSupportedParamIds(self):
+        space = PresetDesignSpaceFactory.getDesignSpace('arraySpace.xml')
+        expected = [
+            'IntArray1', 'IntArray2', 'StringArray1', 'EmptyChoiceArray',
+            'PointChoiceArray.NoConstructor',
+        ]
+        supportedIds = space.getSupportedParamIds()
+        for paramId in expected:
+            self.assertIn(paramId, supportedIds)
+        self.assertNotIn('IntArray1.1', supportedIds)
+
 
 if __name__ == '__main__':
     unittest.main()

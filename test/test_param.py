@@ -8,6 +8,7 @@ from inputpy.mapping import DUMMY_MAPPING
 from inputpy.param import *
 from inputpy.q import *
 from test.factories import PresetCodeMappingFactory
+import test.tools as tools
 
 class TestParam(unittest.TestCase):
 
@@ -272,6 +273,14 @@ class TestParam(unittest.TestCase):
         self.assertCountEqual(paramArgs.keys(), results.keys())
         p = results['P1']
         self.assertEqual(2, len(p.getNestedParameters()))
+
+    # This test is not very exhaustive!
+    def testIsValid(self):
+        param = getParameter('X', NPARAM, INTEGER, inclMin=1, inclMax=3)
+        self.assertTrue(param.isValid(1))
+        self.assertTrue(param.isValid(3))
+        self.assertFalse(param.isValid(0))
+        self.assertFalse(param.isValid(4))
 
     def compareParameters(self, reference, param):
         self.assertEqual(reference.getId(), param.getId())

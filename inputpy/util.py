@@ -388,6 +388,13 @@ def relative(paramId):
     else:
         return paramId[index + 1:]
 
+def root(paramId):
+    index = paramId.find('.')
+    if index == -1:
+        return paramId
+    else:
+        return paramId[:index]
+
 def findAbsoluteParameter(contextId, paramId, ids):
     """
     Return the absolute name of a parameter, relative to a context.
@@ -424,6 +431,22 @@ def getAbsoluteDependenciesForParam(param, supportedIds):
 def getAbsoluteDependencies(params):#, dependencies):
     return {k: getAbsoluteDependenciesForParam(params[k], params.keys())
             for k in params.keys()}
+
+def getAllIds(paramId, value):
+    result = [paramId]
+    if not isinstance(value, list):
+        return result
+    getElementIds(paramId, value, result)
+    return result
+
+def getElementIds(paramId, value, ids):
+    if not isinstance(value, list):
+        return
+    for i in range(len(value)):
+        elementId = '%s.%d' % (paramId, i+1)
+        ids.append(elementId)
+        #ids.append(getElementIds(elementId, value[i], ids)
+        getElementIds(elementId, value[i], ids)
 
 
 class IntervalParser:

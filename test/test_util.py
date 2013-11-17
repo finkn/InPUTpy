@@ -276,6 +276,13 @@ class TestMiscUtil(unittest.TestCase):
             args = (t[0][0], t[0][1], ids)
             self.assertEqual(t[1], util.findAbsoluteParameter(*args))
 
+    def testRoot(self):
+        tests = {
+            'A': 'A',
+            'A.B.C': 'A'
+        }
+        for (k, v) in tests.items():
+            self.assertEqual(v, util.root(k))
 
 
     def checkInitOrder(self, dep):
@@ -425,6 +432,17 @@ class TestInterval(unittest.TestCase):
         self.assertEqual(interval.isRightOpen(), updated.isRightOpen())
         self.assertEqual(interval.isLeftOpen(), updated.isLeftOpen())
         self.assertEqual(interval.getType(), updated.getType())
+
+    def testGetElementIds(self):
+        tests = (
+            ('X', [1,2,3], ('X.1', 'X.2', 'X.3')),
+            ('X', [[1,2], [3,4]], (
+                'X.1', 'X.1.1', 'X.1.2', 'X.2', 'X.2.1', 'X.2.2')),
+        )
+        for (paramId, value, expected) in tests:
+            ids = []
+            util.getElementIds(paramId, value, ids)
+            self.assertCountEqual(expected, ids)
 
 
 if __name__ == '__main__':

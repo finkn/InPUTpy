@@ -283,6 +283,12 @@ class NParam(Param):
     def getIntervals(self):
         return self.intervals
 
+    def isValid(self, value):
+        for interval in self.intervals:
+            if interval.contains(value):
+                return True
+        return False
+
     def setFixed(self, value):
         """
         Sets this parameter to a fixed value. A parameter can also be
@@ -393,6 +399,13 @@ class SParam(Param):
             if type != STRING:
                 dep = dep + list(mapping.getDependencies())
         Param.__init__(self, id, type, tag, fixed, parentId, mapping, dep)
+
+    # It is not yet clear what constitutes a valid value for SParams.
+    # In particular, to what extent can the dynamic typing of Python be
+    # extended to InPUTpy?
+    # For now, SParams consider any value valid.
+    def isValid(self, value):
+        return True
 
     def getNestedParameters(self):
         return self.nested
@@ -630,6 +643,12 @@ class ParamArray():
         Return the parameter that this array should have elements of.
         """
         return self.__param
+
+    # Array validation is a little tricky.
+    # There is no spec for this. Additionally, the "original" InPUT4j that
+    # I started porting did no validation.
+    def isValid(self, value):
+        return True
 
     def __eq__(self, other):
         if not isinstance(other, ParamArray):
