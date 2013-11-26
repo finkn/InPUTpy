@@ -10,12 +10,16 @@ class NonEmptyClass:
     def __init__(self, obj): self.obj = obj
     def getObject(self): return self.obj
 
+    def __eq__(self, other):
+        return self.obj == other.obj
+
 class NonEmpty1(NonEmptyClass):
     def __init__(self, obj):
         if not isinstance(obj, int):
             raise ValueError('NonEmpty1 expects integers')
         else:
             NonEmptyClass.__init__(self, obj)
+
 
 class NonEmpty2(NonEmptyClass):
     def __init__(self, obj):

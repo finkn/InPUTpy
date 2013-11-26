@@ -7,10 +7,13 @@ Exports fake factories for "importing" known configurations.
 :license: MIT. See LICENSE for details.
 """
 from inputpy.designspace import DesignSpace
+from inputpy.design import Design
 from inputpy.param import getParameter, paramFactory
 from inputpy.paramstore import ParamStore
 from inputpy.mapping import Mapping, CodeMapping, NULL_CODE_MAPPING
 from inputpy.q import *
+from test.types.simple import *
+from test.types.geo import *
 
 __all__ = (
     'PresetCodeMappingFactory', 'PresetParamStoreFactory',
@@ -119,28 +122,26 @@ class PresetCodeMappingFactory:
         M('PointChoiceArray.NoConstructor', NCPOINT, constructor=''),
     )
 
+    SIMPLE_SPARAM_PMAP = (
+        M('Empty', EMPTY),
+        M('Point', POINT, constructor='X Y'),
+        M('Rectangle', RECT, constructor='Point Width Height'),
+        M('Rectangle.Point', POINT, constructor='X Y'),
+    )
+
     MAPPINGS = {
-        'triangleMapping.xml': (
-            TRIANGLE_PMAP, TRIANGLE_MAPT,
-        ),
+        'triangleMapping.xml': (TRIANGLE_PMAP, TRIANGLE_MAPT,),
         'triangleCustomAccessorMapping.xml': (
             CUSTOM_ACCESSOR_TRIANGLE_PMAP, CUSTOM_ACCESSOR_TRIANGLE_MAPT
         ),
         'triangleDefaultAccessorMapping.xml': (
             DEFAULT_ACCESSOR_TRIANGLE_PMAP, DEFAULT_ACCESSOR_TRIANGLE_MAPT
         ),
-        'choicePointMapping.xml': (
-            CHOICE_POINT_PMAP, [],
-        ),
-        'choiceShapeMapping.xml': (
-            CHOICE_SHAPE_PMAP, [],
-        ),
-        'choiceMapping.xml': (
-            CHOICE_PMAP, [],
-        ),
-        'arrayMapping.xml': (
-            ARRAY_PMAP, ARRAY_MAPT,
-        )
+        'choicePointMapping.xml': (CHOICE_POINT_PMAP, [],),
+        'choiceShapeMapping.xml': (CHOICE_SHAPE_PMAP, [],),
+        'choiceMapping.xml': (CHOICE_PMAP, [],),
+        'arrayMapping.xml': (ARRAY_PMAP, ARRAY_MAPT,),
+        'simpleStructuredMapping.xml': (SIMPLE_SPARAM_PMAP, []),
     }
 
     @staticmethod
@@ -320,6 +321,10 @@ class PresetParamStoreFactory:
                 {ID: 'Height', TYPE: INT, IMIN: '2', IMAX: '2'},
             ), },
         ), },
+        {ID: 'Name', TAG: SP, TYPE: STRING, NESTED: (
+            {ID: 'Alice', TAG: SCHOICE},
+            {ID: 'Bob', TAG: SCHOICE},
+        ), },
     )
     #"""
     CHOICE_SHAPE_SPACE = (
@@ -377,8 +382,25 @@ class PresetParamStoreFactory:
         ), },
     )
 
+    SIMPLE_STRUCTURED_SPACE = (
+        {ID: 'Empty', TAG: SP},
+        {ID: 'Name', TAG: SP, TYPE: STRING},
+        {ID: 'Point', TAG: SP, NESTED: (
+            {ID: 'X', TYPE: INT, IMIN: '1', IMAX: '1'},
+            {ID: 'Y', TYPE: INT, IMIN: '2', IMAX: '2'},
+        ),},
+        {ID: 'Rectangle', TAG: SP, NESTED: (
+            {ID: 'Point', TAG: SP, NESTED: (
+                {ID: 'X', TYPE: INT, IMIN: '1', IMAX: '1'},
+                {ID: 'Y', TYPE: INT, IMIN: '2', IMAX: '2'},
+            ),},
+            {ID: 'Width', TYPE: INT, IMIN: '4', IMAX: '4'},
+            {ID: 'Height', TYPE: INT, IMIN: '2', IMAX: '2'},
+        ),}
+    )
+
     STORES = {
-        'simpleIntegerParameterSpace.xml': SIMPLE_INTEGER_SPACE,
+        'simpleIntegerSpace.xml': SIMPLE_INTEGER_SPACE,
         'advancedIntegerParameterSpace.xml': ADVANCED_INTEGER_SPACE,
         'simpleTriangleSpace.xml': SIMPLE_TRIANGLE_SPACE,
         'advancedTriangleSpace.xml': ADVANCED_TRIANGLE_SPACE,
@@ -386,6 +408,7 @@ class PresetParamStoreFactory:
         'choiceShapeSpace.xml': CHOICE_SHAPE_SPACE,
         'choiceSpace.xml': CHOICE_SPACE,
         'arraySpace.xml': ARRAY_SPACE,
+        'simpleStructuredSpace.xml': SIMPLE_STRUCTURED_SPACE,
     }
 
     @staticmethod
@@ -397,7 +420,7 @@ class PresetParamStoreFactory:
 
 class PresetDesignSpaceFactory:
     IDS = {
-        'simpleIntegerParameterSpace.xml': 'simpleInteger',
+        'simpleIntegerSpace.xml': 'simpleInteger',
         'advancedIntegerParameterSpace.xml': 'advancedInteger',
         'simpleTriangleSpace.xml': 'triangle',
         'advancedTriangleSpace.xml': 'triangle',
@@ -405,6 +428,7 @@ class PresetDesignSpaceFactory:
         'choiceShapeSpace.xml': 'choiceShape',
         'choiceSpace.xml': 'choice',
         'arraySpace.xml': 'array',
+        'simpleStructuredSpace.xml': 'simpleStructured',
     }
 
     MAPPING = {
@@ -414,6 +438,7 @@ class PresetDesignSpaceFactory:
         'choiceShapeSpace.xml': 'choiceShapeMapping.xml',
         'choiceSpace.xml': 'choiceMapping.xml',
         'arraySpace.xml': 'arrayMapping.xml',
+        'simpleStructuredSpace.xml': 'simpleStructuredMapping.xml',
     }
 
     @staticmethod
@@ -424,5 +449,77 @@ class PresetDesignSpaceFactory:
         mappingFile = PresetDesignSpaceFactory.MAPPING.get(fileName)
         mapping = codeMappingFactory(mappingFile)
         ps = psFactory(fileName, mapping)
+        spaceId = PresetDesignSpaceFactory.IDS[fileName]
 
-        return DesignSpace(ps, PresetDesignSpaceFactory.IDS[fileName], fileName)
+        return DesignSpace(ps, spaceId, fileName)
+
+class PresetDesignFactory:
+    SIMPLE_INTEGER_DESIGN = {
+        'A': 1, 'B': 1, 'C': 1, 'D': 2, 'E': 0, 'F': 1,
+        'G': 2, 'H': 1, 'I': 2, 'J': 1, 'K': 0, 'L': 0,
+        'M': 43, 'N': 43, 'O': 43,
+        'P': 2, 'Q': 0,
+    }
+
+    SIMPLE_STRUCTURED_DESIGN = {
+        'Empty': EmptyClass(),
+        'Name': 'Alice',
+        'Point.X': 1, 'Point.Y': 2,
+        'Point': Point(1, 2),
+        'Rectangle.Point.X': 1, 'Rectangle.Point.Y': 2,
+        'Rectangle.Point': Point(1, 2),
+        'Rectangle.Width': 4, 'Rectangle.Height': 2,
+        'Rectangle': Rectangle(Point(1, 2), 4, 2),
+    }
+
+    CHOICE_DESIGN = {
+        'Empty': Empty1(),
+        'Point.X': 1, 'Point.Y': 2,
+        'Point': DoublePoint(1, 2),
+        'NonEmpty.Obj': 3,
+        'NonEmpty': NonEmpty1(3),
+        'Shape.Point.X': 1, 'Shape.Point.Y': 2,
+        'Shape.Point': Point(1, 2),
+        'Shape.Width': 4, 'Shape.Height': 2,
+        'Shape': Rectangle(Point(1, 2), 4, 2),
+        'Name': 'Alice',
+    }
+
+    SA1 = 'StringArray1'
+    SA2 = 'StringArray2'
+    ARRAY_DESIGN = {
+        'IntArray1': [1,1,1],
+        'IntArray2': [ [[2,2]], [[2,2]], [[2,2]], ],
+        'StringArray1': [SA1, SA1, SA1],
+        'StringArray2': [ [[SA2,SA2]], [[SA2,SA2]], [[SA2,SA2]], ],
+    }
+
+    IDS = {
+        'simpleIntegerDesign.xml': 'simpleInteger',
+        'simpleStructuredDesign.xml': 'simpleStructured',
+        'choiceDesign.xml': 'choice',
+        'arrayDesign.xml': 'array',
+    }
+
+    PARAMS = {
+        'simpleIntegerDesign.xml': SIMPLE_INTEGER_DESIGN,
+        'simpleStructuredDesign.xml': SIMPLE_STRUCTURED_DESIGN,
+        'choiceDesign.xml': CHOICE_DESIGN,
+        'arrayDesign.xml': ARRAY_DESIGN,
+    }
+
+    SPACE = {
+        'simpleIntegerDesign.xml': 'simpleIntegerSpace.xml',
+        'simpleStructuredDesign.xml': 'simpleStructuredSpace.xml',
+        'choiceDesign.xml': 'choiceSpace.xml',
+        'arrayDesign.xml': 'arraySpace.xml',
+    }
+
+    @staticmethod
+    def getDesign(fileName, dsFactory=PresetDesignSpaceFactory.getDesignSpace):
+        spaceFile = PresetDesignFactory.SPACE[fileName]
+        space = dsFactory(spaceFile)
+        designId = PresetDesignFactory.IDS[fileName]
+        params = PresetDesignFactory.PARAMS[fileName]
+        return Design(params, space, designId)
+

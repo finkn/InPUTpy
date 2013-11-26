@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<i:Design
+    id="simpleStructured"
+    ref="simpleStructuredSpace.xml"
+    xmlns:i="http://TheInPUT.org/Design"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://TheInPUT.org/Design http://theinput.org/Design.xsd" >
+
+    <i:SValue id="Empty" />
+    <i:SValue id="Point">
+        <i:NValue id="X" value="1" />
+        <i:NValue id="Y" value="2" />
+    </i:SValue>
+    <i:SValue id="Rectangle">
+        <i:SValue id="Point">
+            <i:NValue id="X" value="1" />
+            <i:NValue id="Y" value="2" />
+        </i:SValue>
+        <i:NValue id="Width" value="4" />
+        <i:NValue id="Height" value="2" />
+    </i:SValue>
+    <i:SValue id="Name" value="Alice" />
+
+</i:Design>

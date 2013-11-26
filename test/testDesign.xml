@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<in:Design xmlns:in="http://TheInPUT.org/Design" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://TheInPUT.org/Design http://TheInPUT.org/Design.xsd" id="testDesign" ref="testSpace.xml">
+  <in:SValue id="SomeComplexStructural">
+    <in:SValue id="1" value="TheSingleChoice" />
+    <in:SValue id="2" value="TheSingleChoice" />
+    <in:SValue id="3" value="TheSingleChoice" />
+  </in:SValue>
+  <in:SValue id="SomeStructuralArrayOfUnspecifiedSize">
+    <in:SValue id="1">
+      <in:SValue id="1">
+        <in:SValue id="1" value="SecondChoice" />
+      </in:SValue>
+    </in:SValue>
+  </in:SValue>
+  <in:SValue id="CustomizableInputDemonstrator" value="FirstChoice">
+    <in:NValue id="WrappedPrimitive" value="0.9369297592420026" />
+    <in:NValue id="CustomizableSetGetPrimitive" value="2.860933188245651E-4" />
+  </in:SValue>
+  <in:SValue id="AnotherStringCustomizedByTheUser" value="anotherFile.xml" />
+  <in:SValue id="SomeStringArrayCustomizedByTheUser">
+    <in:SValue id="1">
+      <in:SValue id="1" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="2" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="3" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="4" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="5" value="SomeStringArrayCustomizedByTheUser" />
+    </in:SValue>
+    <in:SValue id="2">
+      <in:SValue id="1" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="2" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="3" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="4" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="5" value="SomeStringArrayCustomizedByTheUser" />
+    </in:SValue>
+    <in:SValue id="3">
+      <in:SValue id="1" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="2" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="3" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="4" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="5" value="SomeStringArrayCustomizedByTheUser" />
+    </in:SValue>
+    <in:SValue id="4">
+      <in:SValue id="1" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="2" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="3" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="4" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="5" value="SomeStringArrayCustomizedByTheUser" />
+    </in:SValue>
+    <in:SValue id="5">
+      <in:SValue id="1" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="2" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="3" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="4" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="5" value="SomeStringArrayCustomizedByTheUser" />
+    </in:SValue>
+    <in:SValue id="6">
+      <in:SValue id="1" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="2" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="3" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="4" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="5" value="SomeStringArrayCustomizedByTheUser" />
+    </in:SValue>
+    <in:SValue id="7">
+      <in:SValue id="1" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="2" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="3" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="4" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="5" value="SomeStringArrayCustomizedByTheUser" />
+    </in:SValue>
+    <in:SValue id="8">
+      <in:SValue id="1" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="2" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="3" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="4" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="5" value="SomeStringArrayCustomizedByTheUser" />
+    </in:SValue>
+    <in:SValue id="9">
+      <in:SValue id="1" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="2" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="3" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="4" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="5" value="SomeStringArrayCustomizedByTheUser" />
+    </in:SValue>
+    <in:SValue id="10">
+      <in:SValue id="1" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="2" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="3" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="4" value="SomeStringArrayCustomizedByTheUser" />
+      <in:SValue id="5" value="SomeStringArrayCustomizedByTheUser" />
+    </in:SValue>
+  </in:SValue>
+  <in:SValue id="SomeStringCustomizedByTheUser" value="SomeStringCustomizedByTheUser" />
+  <in:SValue id="AnotherStructuralParent" value="AndYetAnotherFirstChoice">
+    <in:SValue id="SomeSharedStructuralSub" value="AnotherSubChoice" />
+  </in:SValue>
+  <in:SValue id="SomeStructuralParent" value="YetAnotherFirstChoice">
+    <in:NValue id="SomeSharedPrimitiveSub" value="1618927800" />
+    <in:NValue id="AnotherSharedPrimitiveSub" value="5938400921453047807" />
+    <in:SValue id="SomeSharedStructuralSub" value="testString"/>
+  </in:SValue>
+  <in:SValue id="AnotherStructural" value="AnotherFirstChoice" />
+  <in:SValue id="SomeStructural" value="SomeSecondChoice" />
+  <in:NValue id="SomeVeryRestrictedPrimitive" value="0.42222222222031306877387873177642774180640117265284061431884765625000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000369425187846001924281750349798919622334670394115432775855964097747236045144739983127692535707869163601795447671106889055667045534133489539909376438382187962526484439658998102096029735001092526228674700039370959343184464174949022254713336919229008173540344587697396670614142480748706988916827882683870341259493304738140731816339543506186598382865030005247887062101541979078632673710734546996767324588216168459308919178481539557567760304734858183723630434962885808608090754084066374548765732033954121775538131078994920011094883507937718649376830444245670715329867936520636093848357177600203303363167433851531178832701344931462693684104786687496589802635322776086406067728728707055082015337629955861476365167914917327729806473954947874811798283119892359043335108067379612961644852475728839635848999023437500" />
+  <in:NValue id="SomeRestrictedPrimitive" value="-5" />
+  <in:NValue id="SomeLargePrimitiveArray">
+    <in:NValue id="1">
+      <in:NValue id="1">
+        <in:NValue id="1">
+          <in:NValue id="1" value="-5756421694435518464" />
+        </in:NValue>
+        <in:NValue id="2">
+          <in:NValue id="1" value="6866433717130389503" />
+        </in:NValue>
+        <in:NValue id="3">
+          <in:NValue id="1" value="-4749185923279724544" />
+        </in:NValue>
+        <in:NValue id="4">
+          <in:NValue id="1" value="-2950836799062800384" />
+        </in:NValue>
+        <in:NValue id="5">
+          <in:NValue id="1" value="3437094068712060927" />
+        </in:NValue>
+        <in:NValue id="6">
+          <in:NValue id="1" value="-4033045997948291072" />
+        </in:NValue>
+        <in:NValue id="7">
+          <in:NValue id="1" value="-7360621161780727808" />
+        </in:NValue>
+        <in:NValue id="8">
+          <in:NValue id="1" value="-6845253688726808576" />
+        </in:NValue>
+        <in:NValue id="9">
+          <in:NValue id="1" value="7859913477934729215" />
+        </in:NValue>
+        <in:NValue id="10">
+          <in:NValue id="1" value="1511514159526256639" />
+        </in:NValue>
+      </in:NValue>
+    </in:NValue>
+    <in:NValue id="2">
+      <in:NValue id="1">
+        <in:NValue id="1">
+          <in:NValue id="1" value="8039197753850918911" />
+        </in:NValue>
+        <in:NValue id="2">
+          <in:NValue id="1" value="-8772014769745983488" />
+        </in:NValue>
+        <in:NValue id="3">
+          <in:NValue id="1" value="5172793833268011007" />
+        </in:NValue>
+        <in:NValue id="4">
+          <in:NValue id="1" value="3114213124978753535" />
+        </in:NValue>
+        <in:NValue id="5">
+          <in:NValue id="1" value="832017378746918911" />
+        </in:NValue>
+        <in:NValue id="6">
+          <in:NValue id="1" value="-3975240118502912000" />
+        </in:NValue>
+        <in:NValue id="7">
+          <in:NValue id="1" value="-5461347436186990592" />
+        </in:NValue>
+        <in:NValue id="8">
+          <in:NValue id="1" value="-8913273211539499008" />
+        </in:NValue>
+        <in:NValue id="9">
+          <in:NValue id="1" value="-6250957384467079168" />
+        </in:NValue>
+        <in:NValue id="10">
+          <in:NValue id="1" value="3472320665456080895" />
+        </in:NValue>
+      </in:NValue>
+    </in:NValue>
+    <in:NValue id="3">
+      <in:NValue id="1">
+        <in:NValue id="1">
+          <in:NValue id="1" value="4290063306054285311" />
+        </in:NValue>
+        <in:NValue id="2">
+          <in:NValue id="1" value="-6689309107618992128" />
+        </in:NValue>
+        <in:NValue id="3">
+          <in:NValue id="1" value="-1547386351602030592" />
+        </in:NValue>
+        <in:NValue id="4">
+          <in:NValue id="1" value="620388590266275839" />
+        </in:NValue>
+        <in:NValue id="5">
+          <in:NValue id="1" value="-6566455592526733312" />
+        </in:NValue>
+        <in:NValue id="6">
+          <in:NValue id="1" value="8832485691193962495" />
+        </in:NValue>
+        <in:NValue id="7">
+          <in:NValue id="1" value="-5424601961495740416" />
+        </in:NValue>
+        <in:NValue id="8">
+          <in:NValue id="1" value="1843288640519174143" />
+        </in:NValue>
+        <in:NValue id="9">
+          <in:NValue id="1" value="-5559332289163788288" />
+        </in:NValue>
+        <in:NValue id="10">
+          <in:NValue id="1" value="7029930939116984319" />
+        </in:NValue>
+      </in:NValue>
+    </in:NValue>
+    <in:NValue id="4">
+      <in:NValue id="1">
+        <in:NValue id="1">
+          <in:NValue id="1" value="-2152851205718886400" />
+        </in:NValue>
+        <in:NValue id="2">
+          <in:NValue id="1" value="-4741748287892674560" />
+        </in:NValue>
+        <in:NValue id="3">
+          <in:NValue id="1" value="3368130719441750015" />
+        </in:NValue>
+        <in:NValue id="4">
+          <in:NValue id="1" value="5020897685761959935" />
+        </in:NValue>
+        <in:NValue id="5">
+          <in:NValue id="1" value="-4096693223839070208" />
+        </in:NValue>
+        <in:NValue id="6">
+          <in:NValue id="1" value="-6561568265204305920" />
+        </in:NValue>
+        <in:NValue id="7">
+          <in:NValue id="1" value="3038021625989994495" />
+        </in:NValue>
+        <in:NValue id="8">
+          <in:NValue id="1" value="-3088304061143508992" />
+        </in:NValue>
+        <in:NValue id="9">
+          <in:NValue id="1" value="6638986877322098687" />
+        </in:NValue>
+        <in:NValue id="10">
+          <in:NValue id="1" value="5892816474858172415" />
+        </in:NValue>
+      </in:NValue>
+    </in:NValue>
+    <in:NValue id="5">
+      <in:NValue id="1">
+        <in:NValue id="1">
+          <in:NValue id="1" value="4329519873910067199" />
+        </in:NValue>
+        <in:NValue id="2">
+          <in:NValue id="1" value="2240792375607353343" />
+        </in:NValue>
+        <in:NValue id="3">
+          <in:NValue id="1" value="870185134211725311" />
+        </in:NValue>
+        <in:NValue id="4">
+          <in:NValue id="1" value="-589917804914829312" />
+        </in:NValue>
+        <in:NValue id="5">
+          <in:NValue id="1" value="2461008276668235775" />
+        </in:NValue>
+        <in:NValue id="6">
+          <in:NValue id="1" value="-1706068438161147904" />
+        </in:NValue>
+        <in:NValue id="7">
+          <in:NValue id="1" value="7370792819284686847" />
+        </in:NValue>
+        <in:NValue id="8">
+          <in:NValue id="1" value="3711768826420887551" />
+        </in:NValue>
+        <in:NValue id="9">
+          <in:NValue id="1" value="2851566241977292799" />
+        </in:NValue>
+        <in:NValue id="10">
+          <in:NValue id="1" value="-4603348225067159552" />
+        </in:NValue>
+      </in:NValue>
+    </in:NValue>
+    <in:NValue id="6">
+      <in:NValue id="1">
+        <in:NValue id="1">
+          <in:NValue id="1" value="7352277038015125503" />
+        </in:NValue>
+        <in:NValue id="2">
+          <in:NValue id="1" value="-2670970071227062272" />
+        </in:NValue>
+        <in:NValue id="3">
+          <in:NValue id="1" value="6013443656051736575" />
+        </in:NValue>
+        <in:NValue id="4">
+          <in:NValue id="1" value="8928170182299848703" />
+        </in:NValue>
+        <in:NValue id="5">
+          <in:NValue id="1" value="-6955303108188774400" />
+        </in:NValue>
+        <in:NValue id="6">
+          <in:NValue id="1" value="-8591646659639791616" />
+        </in:NValue>
+        <in:NValue id="7">
+          <in:NValue id="1" value="-1427694451711680512" />
+        </in:NValue>
+        <in:NValue id="8">
+          <in:NValue id="1" value="-1466271228053585920" />
+        </in:NValue>
+        <in:NValue id="9">
+          <in:NValue id="1" value="5327797308749131775" />
+        </in:NValue>
+        <in:NValue id="10">
+          <in:NValue id="1" value="-1845035202554159104" />
+        </in:NValue>
+      </in:NValue>
+    </in:NValue>
+    <in:NValue id="7">
+      <in:NValue id="1">
+        <in:NValue id="1">
+          <in:NValue id="1" value="-8531208830645442560" />
+        </in:NValue>
+        <in:NValue id="2">
+          <in:NValue id="1" value="-7548501212882290688" />
+        </in:NValue>
+        <in:NValue id="3">
+          <in:NValue id="1" value="7929147089291851775" />
+        </in:NValue>
+        <in:NValue id="4">
+          <in:NValue id="1" value="411027496710825983" />
+        </in:NValue>
+        <in:NValue id="5">
+          <in:NValue id="1" value="-7498800185234464768" />
+        </in:NValue>
+        <in:NValue id="6">
+          <in:NValue id="1" value="-831922051790442496" />
+        </in:NValue>
+        <in:NValue id="7">
+          <in:NValue id="1" value="-4531957579202222080" />
+        </in:NValue>
+        <in:NValue id="8">
+          <in:NValue id="1" value="-547475978760325120" />
+        </in:NValue>
+        <in:NValue id="9">
+          <in:NValue id="1" value="-322098688282656768" />
+        </in:NValue>
+        <in:NValue id="10">
+          <in:NValue id="1" value="-184624220775272448" />
+        </in:NValue>
+      </in:NValue>
+    </in:NValue>
+    <in:NValue id="8">
+      <in:NValue id="1">
+        <in:NValue id="1">
+          <in:NValue id="1" value="3394124230140661759" />
+        </in:NValue>
+        <in:NValue id="2">
+          <in:NValue id="1" value="953979975573565439" />
+        </in:NValue>
+        <in:NValue id="3">
+          <in:NValue id="1" value="-5449732120770781184" />
+        </in:NValue>
+        <in:NValue id="4">
+          <in:NValue id="1" value="-3168418719740760064" />
+        </in:NValue>
+        <in:NValue id="5">
+          <in:NValue id="1" value="3562151152492523519" />
+        </in:NValue>
+        <in:NValue id="6">
+          <in:NValue id="1" value="1318980592397484031" />
+        </in:NValue>
+        <in:NValue id="7">
+          <in:NValue id="1" value="7647559010362814463" />
+        </in:NValue>
+        <in:NValue id="8">
+          <in:NValue id="1" value="-330667671149434880" />
+        </in:NValue>
+        <in:NValue id="9">
+          <in:NValue id="1" value="-8680128148436555776" />
+        </in:NValue>
+        <in:NValue id="10">
+          <in:NValue id="1" value="1258480854322542591" />
+        </in:NValue>
+      </in:NValue>
+    </in:NValue>
+    <in:NValue id="9">
+      <in:NValue id="1">
+        <in:NValue id="1">
+          <in:NValue id="1" value="-1350870984800602112" />
+        </in:NValue>
+        <in:NValue id="2">
+          <in:NValue id="1" value="-4474428913507526656" />
+        </in:NValue>
+        <in:NValue id="3">
+          <in:NValue id="1" value="-1672782628775931904" />
+        </in:NValue>
+        <in:NValue id="4">
+          <in:NValue id="1" value="-2452200661002289152" />
+        </in:NValue>
+        <in:NValue id="5">
+          <in:NValue id="1" value="6306385979945932799" />
+        </in:NValue>
+        <in:NValue id="6">
+          <in:NValue id="1" value="5792287925214025727" />
+        </in:NValue>
+        <in:NValue id="7">
+          <in:NValue id="1" value="1722455858500579327" />
+        </in:NValue>
+        <in:NValue id="8">
+          <in:NValue id="1" value="6437979723594975231" />
+        </in:NValue>
+        <in:NValue id="9">
+          <in:NValue id="1" value="-1442068775699853312" />
+        </in:NValue>
+        <in:NValue id="10">
+          <in:NValue id="1" value="8582098469241167871" />
+        </in:NValue>
+      </in:NValue>
+    </in:NValue>
+    <in:NValue id="10">
+      <in:NValue id="1">
+        <in:NValue id="1">
+          <in:NValue id="1" value="2673591959449053183" />
+        </in:NValue>
+        <in:NValue id="2">
+          <in:NValue id="1" value="659062257784045567" />
+        </in:NValue>
+        <in:NValue id="3">
+          <in:NValue id="1" value="-7808711389355112448" />
+        </in:NValue>
+        <in:NValue id="4">
+          <in:NValue id="1" value="4943869682563491839" />
+        </in:NValue>
+        <in:NValue id="5">
+          <in:NValue id="1" value="-8475446567187902464" />
+        </in:NValue>
+        <in:NValue id="6">
+          <in:NValue id="1" value="-8898329015799830528" />
+        </in:NValue>
+        <in:NValue id="7">
+          <in:NValue id="1" value="-8017783631369756672" />
+        </in:NValue>
+        <in:NValue id="8">
+          <in:NValue id="1" value="-8186950848097005568" />
+        </in:NValue>
+        <in:NValue id="9">
+          <in:NValue id="1" value="-7752747641607927808" />
+        </in:NValue>
+        <in:NValue id="10">
+          <in:NValue id="1" value="-8457654117327364096" />
+        </in:NValue>
+      </in:NValue>
+    </in:NValue>
+  </in:NValue>
+  <in:NValue id="SomePrimitiveArrayOfSpecifiedSize">
+    <in:NValue id="1" value="0.29232498356699177" />
+    <in:NValue id="2" value="0.4424910120947866" />
+    <in:NValue id="3" value="0.409433635519999" />
+    <in:NValue id="4" value="0.25961563624853434" />
+    <in:NValue id="5" value="0.9513086845036403" />
+    <in:NValue id="6" value="0.37575378628453426" />
+    <in:NValue id="7" value="0.7113625846020813" />
+    <in:NValue id="8" value="0.07882618206589065" />
+    <in:NValue id="9" value="0.7344413622423268" />
+    <in:NValue id="10" value="0.5271478006370952" />
+    <in:NValue id="11" value="0.8201993318134672" />
+    <in:NValue id="12" value="0.31864031039852714" />
+    <in:NValue id="13" value="0.47226218091230265" />
+    <in:NValue id="14" value="0.8059880217081009" />
+    <in:NValue id="15" value="0.2558898827390842" />
+    <in:NValue id="16" value="0.28153721811115384" />
+    <in:NValue id="17" value="0.9899727272904582" />
+    <in:NValue id="18" value="0.3793899627513292" />
+    <in:NValue id="19" value="0.23147100342238214" />
+    <in:NValue id="20" value="0.05809336200347448" />
+    <in:NValue id="21" value="0.015157337266767157" />
+    <in:NValue id="22" value="0.6842041146633211" />
+    <in:NValue id="23" value="0.895189229583875" />
+    <in:NValue id="24" value="0.7115761658852566" />
+    <in:NValue id="25" value="0.5571952303310655" />
+    <in:NValue id="26" value="0.49835715102177136" />
+    <in:NValue id="27" value="0.8928989330904831" />
+    <in:NValue id="28" value="0.0063960087380299235" />
+    <in:NValue id="29" value="0.6696504904573092" />
+    <in:NValue id="30" value="0.6471928214250837" />
+    <in:NValue id="31" value="0.20352896224996075" />
+    <in:NValue id="32" value="0.8639191622713506" />
+    <in:NValue id="33" value="0.6289950045692498" />
+    <in:NValue id="34" value="0.23778665192660708" />
+    <in:NValue id="35" value="0.02560206580615032" />
+    <in:NValue id="36" value="0.874651299783876" />
+    <in:NValue id="37" value="0.34134071116387077" />
+    <in:NValue id="38" value="0.5378426188053584" />
+    <in:NValue id="39" value="0.4742375688998425" />
+    <in:NValue id="40" value="0.74755972065468" />
+    <in:NValue id="41" value="0.22342736026841659" />
+    <in:NValue id="42" value="0.7456620391504135" />
+  </in:NValue>
+  <in:NValue id="SomePrimitiveArrayOfUnspecifiedSize">
+    <in:NValue id="1" value="-1722954144" />
+  </in:NValue>
+  <in:NValue id="SomeFixedArray">
+    <in:NValue id="1" value="42" />
+    <in:NValue id="2" value="42" />
+    <in:NValue id="3" value="42" />
+    <in:NValue id="4" value="42" />
+    <in:NValue id="5" value="42" />
+    <in:NValue id="6" value="42" />
+    <in:NValue id="7" value="42" />
+    <in:NValue id="8" value="42" />
+    <in:NValue id="9" value="42" />
+    <in:NValue id="10" value="42" />
+    <in:NValue id="11" value="42" />
+    <in:NValue id="12" value="42" />
+    <in:NValue id="13" value="42" />
+    <in:NValue id="14" value="42" />
+    <in:NValue id="15" value="42" />
+    <in:NValue id="16" value="42" />
+    <in:NValue id="17" value="42" />
+    <in:NValue id="18" value="42" />
+    <in:NValue id="19" value="42" />
+    <in:NValue id="20" value="42" />
+    <in:NValue id="21" value="42" />
+    <in:NValue id="22" value="42" />
+    <in:NValue id="23" value="42" />
+    <in:NValue id="24" value="42" />
+    <in:NValue id="25" value="42" />
+    <in:NValue id="26" value="42" />
+    <in:NValue id="27" value="42" />
+    <in:NValue id="28" value="42" />
+    <in:NValue id="29" value="42" />
+    <in:NValue id="30" value="42" />
+    <in:NValue id="31" value="42" />
+    <in:NValue id="32" value="42" />
+    <in:NValue id="33" value="42" />
+    <in:NValue id="34" value="42" />
+    <in:NValue id="35" value="42" />
+    <in:NValue id="36" value="42" />
+    <in:NValue id="37" value="42" />
+    <in:NValue id="38" value="42" />
+    <in:NValue id="39" value="42" />
+    <in:NValue id="40" value="42" />
+    <in:NValue id="41" value="42" />
+    <in:NValue id="42" value="42" />
+  </in:NValue>
+  <in:NValue id="SomeFixed" value="42" />
+  <in:NValue id="SomeLong" value="1700584710333745153" />
+  <in:NValue id="SomeShort" value="-7448" />
+  <in:NValue id="SomeDecimal" value="-7889858943241994240.07228988965664218113715833169408142566680908203125" />
+  <in:NValue id="SomeFloat" value="0.73908234" />
+  <in:NValue id="SomeDouble" value="0.12345778699671628" />
+  <in:NValue id="SomeInteger" value="-1966342580" />
+  <in:NValue id="SomeBoolean" value="false" />
+  <in:NValue id="ASmallerLong" value="-3991818661248199656" />
+  <in:NValue id="ABiggerLong" value="6671154699664551937" />
+  <in:NValue id="AStrangeLong" value="5908891008213154534" />
+</in:Design>

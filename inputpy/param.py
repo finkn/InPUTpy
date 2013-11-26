@@ -200,7 +200,7 @@ class NParam(Param):
             'float': float, 'double': float, 'decimal': float,
         }
         intervalType = intervalTypes.get(type)
-        for (left, right) in (zip(self.min, self.max)):
+        for (left, right) in zip(self.min, self.max):
             if self.exclMin:
                 inclMin = None
                 exclMin = left
@@ -242,9 +242,9 @@ class NParam(Param):
     def __transformLimit(limit):
         if limit is None:
             return (None,)
-        # A string is also a sequence, but it always represents a single limit.
+        # A string is also a sequence, but it may represent one or more limits.
         if isinstance(limit, str):
-            return (limit,)
+            return NParam.__transformLimit(limit.split(','))
         try:
             iter(limit)
         except TypeError:
@@ -283,8 +283,16 @@ class NParam(Param):
     def getIntervals(self):
         return self.intervals
 
-    def isValid(self, value):
+    def isValid(self, value, dep={}):
         for interval in self.intervals:
+            if not interval.isFullyEvaluated():
+                minVal = interval.getMin()
+                maxVal = interval.getMax()
+                if isinstance(minVal, str):
+                    minVal = Evaluator.evaluate(minVal, dep)
+                if isinstance(maxVal, str):
+                    maxVal = Evaluator.evaluate(maxVal, dep)
+                interval = interval.getUpdated((minVal, maxVal))
             if interval.contains(value):
                 return True
         return False
@@ -404,7 +412,7 @@ class SParam(Param):
     # In particular, to what extent can the dynamic typing of Python be
     # extended to InPUTpy?
     # For now, SParams consider any value valid.
-    def isValid(self, value):
+    def isValid(self, value, dep={}):
         return True
 
     def getNestedParameters(self):
@@ -499,7 +507,14 @@ def paramFactory(kwargs, mappings=None):
         kwargs[MAPPING_ATTR] = mappings.getMapping(absoluteId)
 
     if tag == SCHOICE:
-        kwargs[MAPPING_ATTR] = mappings.getInherited(absoluteId, parentId)
+        # Another hack:
+        # String SParams have no mapping for SChoice children to inherit.
+        parentMapping = mappings.getMapping(parentId)
+        if parentMapping is not None:
+            kwargs[MAPPING_ATTR] = mappings.getInherited(absoluteId, parentId)
+        # Assume a missing mapping means string type.
+        else:
+            kwargs[TYPE_ATTR] = STRING
 
     return getParameter(paramId, **kwargs)
 
@@ -585,6 +600,12 @@ class Choice():
     def getOriginal(self):
         return self.original
 
+    def isFixed(self):
+        return self.original.isFixed()
+
+    def isValid(self, value, dep={}):
+        return self.original.isValid(value, dep)
+
     def __eq__(self, other):
         if not isinstance(other, Choice):
             return False
@@ -620,14 +641,6 @@ class ParamArray():
     def __getattr__(self, attr):
         return getattr(self.__param, attr)
 
-    # TODO:
-    # This shouldn't be needed anymore.
-    def getType(self):
-        """
-        Always returns inputpy.q.ARRAY.
-        """
-        return ARRAY
-
     def getTag(self):
         return ARRAY
 
@@ -647,7 +660,14 @@ class ParamArray():
     # Array validation is a little tricky.
     # There is no spec for this. Additionally, the "original" InPUT4j that
     # I started porting did no validation.
-    def isValid(self, value):
+    def isValid(self, value, dep={}):
+        return True
+
+        if len(value) != self.__size and self.__size != 0:
+            return False
+        for element in value:
+            if not self.__param.isValid(element, dep):
+                return False
         return True
 
     def __eq__(self, other):

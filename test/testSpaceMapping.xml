@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<i:CodeMappings id="testSpace" xmlns:i="http://TheInPUT.org/CodeMappings"
+	xmlns:i1="http://TheInPUT.org/DesignSpace" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://TheInPUT.org/CodeMappings http://theinput.org/CodeMappings.xsd ">
+
+
+	<i:Mapping id="SomeStructural" type="test.SomeStructural" />
+	<i:Mapping id="SomeStructural.SomeFirstChoice" type="test.SomeFirstChoice" />
+	<i:Mapping id="SomeStructural.SomeSecondChoice" type="test.SomeSecondChoice" />
+	<i:Mapping id="SomeStructural.SomeThirdChoice" type="test.SomeThirdChoice" />
+
+
+    <!--
+	<i:Mapping id="AnotherStructural" type="test.AnotherStructural" />
+	<i:Mapping id="AnotherStructural.AnotherFirstChoice" type="FIRST" />
+	<i:Mapping id="AnotherStructural.AnotherSecondChoice" type="SECOND" />
+	<i:Mapping id="AnotherStructural.AnotherThirdChoice" type="THIRD" />
+    -->
+
+
+	<i:Mapping id="SomeStructuralParent" type="test.SomeStructuralParent"
+		constructor="SomeSharedPrimitiveSub" />
+	<i:Mapping id="SomeStructuralParent.YetAnotherFirstChoice"
+		type="test.YetAnotherFirstChoice" />
+	<i:Mapping id="SomeStructuralParent.YetAnotherSecondChoice"
+		type="test.YetAnotherSecondChoice" constructor="" />
+	<i:Mapping id="SomeStructuralParent.YetAnotherThirdChoice"
+		type="test.YetAnotherThirdChoice" constructor="SomeSharedPrimitiveSub SomeChoiceSpecificPrimitiveSub" />
+
+	<i:Mapping id="AnotherStructuralParent" type="test.AnotherStructuralParent"
+		constructor="SomeSharedStructuralSub" />
+	<i:Mapping id="AnotherStructuralParent.SomeSharedStructuralSub"
+		type="test.SomeSharedStructuralSub" />
+	<i:Mapping
+		id="AnotherStructuralParent.SomeSharedStructuralSub.SomeSubChoice"
+		type="test.SomeSubChoice" />
+	<i:Mapping
+		id="AnotherStructuralParent.SomeSharedStructuralSub.AnotherSubChoice"
+		type="test.AnotherSubChoice" />
+
+	<i:Mapping id="AnotherStructuralParent.AndYetAnotherFirstChoice"
+		type="test.AndYetAnotherFirstChoice" />
+	<i:Mapping id="AnotherStructuralParent.AndYetAnotherSecondChoice"
+		type="test.AndYetAnotherSecondChoice" constructor="SomeSharedStructuralSub SomeChoiceSpecificStructuralSub" />
+	<i:Mapping
+		id="AnotherStructuralParent.AndYetAnotherSecondChoice.SomeChoiceSpecificStructuralSub"
+		type="test.SomeChoiceSpecificStructuralSub" />
+	<i:Mapping
+		id="AnotherStructuralParent.AndYetAnotherSecondChoice.SomeChoiceSpecificStructuralSub.AlsoSingleChoicesAreValid"
+		type="test.AlsoSingleChoicesAreValid" />
+
+	<i:Mapping id="SomeStructuralArrayOfUnspecifiedSize" type="test.SomeStructural" />
+	<i:Mapping id="SomeStructuralArrayOfUnspecifiedSize.FirstChoice"
+		type="test.SomeFirstChoice" />
+	<i:Mapping id="SomeStructuralArrayOfUnspecifiedSize.SecondChoice"
+		type="test.SomeSecondChoice" />
+
+	<i:Mapping id="CustomizableInputDemonstrator" type="test.SomeCommonStructural" />
+	<i:Mapping id="CustomizableInputDemonstrator.WrappedPrimitive" get="toValue">
+		<i:Wrapper type="test.Wrapper" get="getPrimitive"
+			set="setPrimitive" />
+	</i:Mapping>
+	<i:Mapping id="CustomizableInputDemonstrator.CustomizableSetGetPrimitive"
+		set="customizableSetter" get="andTheCustomizableGetter" />
+	<i:Mapping id="CustomizableInputDemonstrator.FirstChoice"
+		type="test.SomeFirstChoice" />
+	<i:Mapping id="CustomizableInputDemonstrator.SecondChoice"
+		type="test.SomeSecondChoice" />
+		
+		<i:Mapping id="SomeComplexStructural" type="test.SomeAbstractComplexStructural">
+			<i:Complex type="test.SomeComplexStructural" add="addEntry"/>
+		</i:Mapping>
+	<i:Mapping id="SomeComplexStructural.TheSingleChoice"
+		type="test.SingleComplexChoice" />
+	<i:Mapping id="SomeComplexStructural.TheSecondSingleChoice"
+		type="test.SecondSingleComplexChoice" />
+
+</i:CodeMappings>

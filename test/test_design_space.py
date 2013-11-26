@@ -116,7 +116,7 @@ class TestDesignSpace(unittest.TestCase):
     def testCreateDesignSpaceWithArray(self):
         t = INTEGER + '[2][2]'
         param = getParameter('A', NPARAM, t, fixed=1)
-        self.assertEqual(ARRAY, param.getType())
+        self.assertEqual(ARRAY, param.getTag())
         space = DesignSpace(ParamStore(param))
         expected = [[1,1], [1,1]]
         result = space.next('A')
@@ -150,7 +150,7 @@ class TestDesignSpace(unittest.TestCase):
 
     def testIsFileShouldBeTrueWhenImportingFromAFile(self):
         factory = PresetDesignSpaceFactory.getDesignSpace
-        space = factory('simpleIntegerParameterSpace.xml')
+        space = factory('simpleIntegerSpace.xml')
         self.assertTrue(space.isFile())
 
     def testGetFile(self):
@@ -159,7 +159,7 @@ class TestDesignSpace(unittest.TestCase):
 
     def testNextEmptyDesign(self):
         factory = PresetDesignSpaceFactory.getDesignSpace
-        space = factory('simpleIntegerParameterSpace.xml')
+        space = factory('simpleIntegerSpace.xml')
         design = space.nextEmptyDesign('some design ID')
         self.assertEqual(design.getId(), 'some design ID')
         # The new design should support exactly the same parameters

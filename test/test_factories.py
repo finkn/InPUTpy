@@ -5,6 +5,8 @@
 import unittest
 from inputpy.factories import XMLFactory
 from test.factories import PresetCodeMappingFactory, PresetDesignSpaceFactory
+from test.factories import PresetDesignFactory
+#from test.factories import *
 
 class TestFactories(unittest.TestCase):
     def testPresetCodeMappingFactory(self):
@@ -12,7 +14,6 @@ class TestFactories(unittest.TestCase):
             'triangleMapping.xml',
             'triangleCustomAccessorMapping.xml',
             'triangleDefaultAccessorMapping.xml',
-            'choiceShapeMapping.xml',
         )
         factories = (
             XMLFactory.getCodeMapping,
@@ -34,12 +35,13 @@ class TestFactories(unittest.TestCase):
     # Should it test design space/param store/code mapping for equality?
     def testDesignSpaceFactory(self):
         configs = (
-            'simpleIntegerParameterSpace.xml',
+            'simpleIntegerSpace.xml',
             'advancedIntegerParameterSpace.xml',
             'simpleTriangleSpace.xml',
             'advancedTriangleSpace.xml',
             'choiceSpace.xml',
             'arraySpace.xml',
+            'simpleStructuredSpace.xml',
         )
         factories = (
             XMLFactory.getDesignSpace,
@@ -54,6 +56,29 @@ class TestFactories(unittest.TestCase):
             for (k,v) in result.items():
                 msg = 'Import did not match for %s' % (k)
                 # v is from a preset factory, first[k] is from an XML factory
+                self.assertEqual(v, first[k], msg=msg)
+
+
+    def testDesignFactory(self):
+        configs = (
+            'simpleIntegerDesign.xml',
+            'simpleStructuredDesign.xml',
+            'choiceDesign.xml',
+            'arrayDesign.xml',
+        )
+        factories = (
+            XMLFactory.getDesign,
+            PresetDesignFactory.getDesign,
+        )
+
+        results = []
+        for factory in factories:
+            results.append({config: factory(config) for config in configs})
+
+        first = results[0]
+        for result in results[1:]:
+            for (k,v) in result.items():
+                msg = 'Import did not match for %s' % (k)
                 self.assertEqual(v, first[k], msg=msg)
 
 

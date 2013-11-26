@@ -15,6 +15,7 @@ class SomeStructural:
 class SomeCommonStructural(SomeStructural):
     def __init__(self):
         self.wrapper = None
+        self.customizableSetGetPrimitive = 0
 
     def setPrimitive(self, wrapper):
         self.wrapper = wrapper
@@ -22,12 +23,30 @@ class SomeCommonStructural(SomeStructural):
     def getPrimitive(self):
         return self.wrapper
 
+    def customizableSetter(self, value):
+        self.customizableSetGetPrimitive = value
+
+    def andTheCustomizableGetter(self):
+        return self.customizableSetGetPrimitive
+
 
 class SomeFirstChoice(SomeCommonStructural):
     pass
 
 
 class SomeSecondChoice(SomeCommonStructural):
+    pass
+
+
+class SomeThirdChoice(SomeSecondChoice):
+    pass
+
+
+class SomeChoiceSpecificStructuralSub:
+    pass
+
+
+class AlsoSingleChoicesAreValid(SomeChoiceSpecificStructuralSub):
     pass
 
 
@@ -97,6 +116,17 @@ class AnotherStructuralParent:
         return self.sub
 
 
+class AndYetAnotherFirstChoice(AnotherStructuralParent):
+    def __init__(self, sub):
+        AnotherStructuralParent.__init__(self, sub)
+
+
+class AndYetAnotherSecondChoice(AnotherStructuralParent):
+    def __init__(self, sub, bar):
+        AnotherStructuralParent.__init__(self, sub)
+        self.bar = bar
+
+
 class SomeAbstractComplexStructural:
     pass
 
@@ -158,7 +188,7 @@ ANOTHER_SHARED_PRIMITIVE_SUB = "AnotherSharedPrimitiveSub"
 ANOTHER_STRING_CUSTOMIZED_BY_THE_USER = "AnotherStringCustomizedByTheUser"
 ANOTHER_STRUCTURAL = "AnotherStructural"
 ANOTHER_STRUCTURAL_PARENT = "AnotherStructuralParent"
-ANOTHER_TEST_DESIGN = "test/anotherTestDesign.xml"
+ANOTHER_TEST_DESIGN = "anotherTestDesign.xml"
 A_SMALLER_LONG = "ASmallerLong"
 A_STRANGE_LONG = "AStrangeLong"
 CUSTOMIZABLE_INPUT_DEMONSTRATOR = "CustomizableInputDemonstrator"

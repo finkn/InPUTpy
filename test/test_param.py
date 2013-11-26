@@ -54,6 +54,7 @@ class TestParam(unittest.TestCase):
         NParam('A', 'float',
             inclMin=('Math.cos(Math.pi)','.5/2 + B'),
             inclMax=(.9,'Math.sqrt(16) + B'))
+        NParam('A', 'float', exclMin='.5,5.0,-5', exclMax='.9,7,5')
 
     def testParamLimits(self):
         # No limits.
@@ -184,9 +185,9 @@ class TestParam(unittest.TestCase):
             getParameter('A', NPARAM, LONG + '[2][1][3]'),
         )
         for p in params:
-            self.assertNotEqual(ARRAY, p.getType())
+            self.assertNotEqual(ARRAY, p.getTag())
         for p in arrays:
-            self.assertEqual(ARRAY, p.getType())
+            self.assertEqual(ARRAY, p.getTag())
             self.assertIsNotNone(p.getParameter())
             self.assertIsNotNone(p.getSize())
 

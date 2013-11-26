@@ -74,6 +74,8 @@ class IntGenerator(ValueGenerator):
             return result
 
         (minVal, maxVal) = cls.__getMinMax__(param, dep)
+        minVal = int(minVal)
+        maxVal = int(maxVal)
         if not cls.__isValid(minVal, maxVal):
             raise ValueError('Invalid range')
         return cls.rng.randint(minVal, maxVal)
@@ -222,6 +224,9 @@ class SParamGenerator(ValueGenerator):
     @staticmethod
     def getValueForSParamWithSChoice(param, dep):
         choice = SParamGenerator.getSChoice(param)
+        # Special case for String type.
+        if choice.getType() == STRING:
+            return choice.getRelativeId()
         tmp = dep[choice.getRelativeId()]
         nested = param.getRealNested()
         args = SParamGenerator.getConstructorArgs(choice)
@@ -265,6 +270,8 @@ def __getGenerator(param):
         return ChoiceGenerator
     elif tag == SPARAM or tag == SCHOICE:
         return SParamGenerator
+    elif tag == ARRAY:
+        return ArrayGenerator
     else:
         return GENERATORS[param.getType()]
 
@@ -278,6 +285,8 @@ def nextValue(param, dep={}):
     Return a value for the parameter. Optionally, a dictionary of
     parameter ID to value mappings can be supplied to resolve dependencies.
     """
+    assert param is not None, 'None parameter'
+    assert dep is not None, 'None dependency dicitionary'
     return __getGenerator(param).nextValue(param, dep)
 
 def isValid(param, dep={}):

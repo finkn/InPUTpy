@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<i:CodeMappings
+    id="simpleStructured"
+    xmlns:i="http://TheInPUT.org/CodeMappings"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://TheInPUT.org/CodeMappings http://theinput.org/CodeMappings.xsd">
+
+    <i:Mapping id="Empty" type="test.types.simple.EmptyClass" />
+    <i:Mapping
+        id="Point"
+        type="test.types.geo.Point"
+        constructor="X Y"
+    />
+    <i:Mapping
+        id="Rectangle.Point"
+        type="test.types.geo.Point"
+        constructor="X Y"
+    />
+    <i:Mapping
+        id="Rectangle"
+        type="test.types.geo.Rectangle"
+        constructor="Point Width Height"
+    />
+
+</i:CodeMappings>

@@ -71,7 +71,6 @@ class DesignSpace(Identifiable):
             param = parent.getChoice(relativeId)
         return self.__initParam(param, {})[paramId]
 
-    # readOnly is currently ignored.
     def nextDesign(self, designId=None, readOnly=False):
         """
         Return a new design with freshly initialized parameters.
@@ -91,7 +90,7 @@ class DesignSpace(Identifiable):
             k: v for (k,v) in params.items()
             if self.params.getParam(k).getTag() != SCHOICE
         }
-        return Design(params, self, designId)
+        return Design(params, self, designId, readOnly=readOnly)
 
     def __initParam(self, param, init):
         """

@@ -273,7 +273,10 @@ def getValue(paramId, params):
     if isArrayElement(paramId, params):
         indexes = [int(i)-1 for i in parts[1:]]
         for i in indexes:
-            result = result[i]
+            try:
+                result = result[i]
+            except IndexError:
+                result = None
         return result
     elif isSParam(paramId, params):
         return params.get(paramId)
@@ -287,6 +290,7 @@ def setValue(paramId, params, value):
             return
         else:
             raise KeyError('No parameter with ID %s exists.' % (paramId))
+
     # Handle parameter ID with one or more dots.
     # This may be a regular parameter after all, or it may be an array element.
     parts = paramId.split('.')
@@ -295,10 +299,13 @@ def setValue(paramId, params, value):
         if paramId in params:
             params[paramId] = value
             return
-        else:
-            raise KeyError('No parameter with ID %s exists.' % (paramId))
 
-    indexes = [int(i)-1 for i in parts[1:]]
+    try:
+        indexes = [int(i)-1 for i in parts[1:]]
+    except:
+        if paramId in params:
+            params[paramId] = value
+            return
 
     target = result
     for i in range(len(indexes) - 1):
@@ -671,6 +678,12 @@ class Interval:
 
     def getLimits(self):
         return (self.inclMin, self.exclMin, self.inclMax, self.exclMax)
+
+    def getMin(self):
+        return self.min
+
+    def getMax(self):
+        return self.max
 
     def isFullyEvaluated(self):
         return self.fullyEvaluated

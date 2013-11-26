@@ -48,4 +48,9 @@
         </i:SChoice>
     </i:SParam>
 
+    <i:SParam id="Name" type="String">
+        <i:SChoice id="Alice" />
+        <i:SChoice id="Bob" />
+    </i:SParam>
+
 </i:DesignSpace>

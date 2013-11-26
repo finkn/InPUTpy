@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<i:Design
+    id="array"
+    ref="arraySpace.xml"
+    xmlns:i="http://TheInPUT.org/Design"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://TheInPUT.org/Design http://theinput.org/Design.xsd" >
+
+    <i:NValue id="IntArray1">
+        <i:NValue id="1" value="1" />
+        <i:NValue id="2" value="1" />
+        <i:NValue id="3" value="1" />
+    </i:NValue>
+
+    <i:NValue id="IntArray2">
+        <i:NValue id="1">
+            <i:NValue id="1">
+                <i:NValue id="1" value="2" />
+                <i:NValue id="2" value="2" />
+            </i:NValue>
+        </i:NValue>
+        <i:NValue id="2">
+            <i:NValue id="1">
+                <i:NValue id="1" value="2" />
+                <i:NValue id="2" value="2" />
+            </i:NValue>
+        </i:NValue>
+        <i:NValue id="3">
+            <i:NValue id="1">
+                <i:NValue id="1" value="2" />
+                <i:NValue id="2" value="2" />
+            </i:NValue>
+        </i:NValue>
+    </i:NValue>
+
+    <i:SValue id="StringArray1">
+        <i:SValue id="1" value="StringArray1" />
+        <i:SValue id="2" value="StringArray1" />
+        <i:SValue id="3" value="StringArray1" />
+    </i:SValue>
+
+    <i:SValue id="StringArray2">
+        <i:SValue id="1">
+            <i:SValue id="1">
+                <i:SValue id="1" value="StringArray2" />
+                <i:SValue id="2" value="StringArray2" />
+            </i:SValue>
+        </i:SValue>
+        <i:SValue id="2">
+            <i:SValue id="1">
+                <i:SValue id="1" value="StringArray2" />
+                <i:SValue id="2" value="StringArray2" />
+            </i:SValue>
+        </i:SValue>
+        <i:SValue id="3">
+            <i:SValue id="1">
+                <i:SValue id="1" value="StringArray2" />
+                <i:SValue id="2" value="StringArray2" />
+            </i:SValue>
+        </i:SValue>
+    </i:SValue>
+    <!--
+    -->
+
+</i:Design>

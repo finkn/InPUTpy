@@ -18,6 +18,9 @@ class Design(Identifiable):
         self.__updateSupportedIds()
 
     def getValue(self, paramId):
+        if paramId is None:
+            return None
+
         result = None
         for d in self.__ext:
             result = util.getValue(paramId, d.params)
@@ -25,28 +28,62 @@ class Design(Identifiable):
                 return result
 
     def setValue(self, paramId, value):
-        if self.__readOnly:
-            raise InPUTException('Cannot set value on a read-only Design')
+        if value is None:
+            raise InPUTException('Cannot set to None value')
+        succeeded = False
+        for d in self.__ext:
+            try:
+                d.__setValue(paramId, value)
+            except RuntimeError as e:
+                print(e)
+                continue
+            else:
+                succeeded = True
+                break
+        if not succeeded:
+            raise InPUTException('Could not set %s to %s' % (paramId, value))
 
-        if self.__checkValidity(paramId, value):
-            util.setValue(paramId, self.params, value)
+    def __setValue(self, paramId, value):
+        if not self.__checkValidity(paramId, value):
+            raise InPUTException('Invalid value (%s) for parameter %s' % (value, paramId))
+        util.setValue(paramId, self.params, value)
         self.__updateSupportedIds()
 
     def __checkValidity(self, paramId, value):
-        # Hack: this should never happen. Fix old tests.
-        if self.space is None:
-            return True
+        if self.__readOnly:
+            raise InPUTException('Cannot set value on a read-only Design')
+
         # Array elements are not part of the supported keys.
         if paramId not in self.params:
             paramId = util.root(paramId)
         param = self.space.params.getParam(paramId)
-        return param.isValid(value)
+
+        if param is not None and param.isFixed():
+            raise InPUTException('%s is fixed' % (param.getId(),))
+
+        if param is None:
+            return False
+        return param.isValid(value, self.params)
 
     def __updateSupportedIds(self):
         self.supportedIds = set()
         for (paramId, value) in self.params.items():
             for id in util.getAllIds(paramId, value):
                 self.supportedIds.add(id)
+
+    def __eq__(self, other):
+        if not isinstance(other, Design):
+            return False
+        if self.getId() != other.getId():
+            return False
+        if self.space != other.space:
+            return False
+        if self.params.keys() != other.params.keys():
+            return False
+        for (k, v) in self.params.items():
+            if other.params[k] != v:
+                return False
+        return True
 
     def setReadOnly(self):
         self.__readOnly = True
@@ -68,7 +105,6 @@ class Design(Identifiable):
         return self.space
 
     def getSupportedParamIds(self):
-        #return self.params.keys()
         return self.supportedIds
 
     # -------------------------------------------------------------------------

@@ -1,19 +1,21 @@
-from inputpy.dummy import Design
+from inputpy.design import Design
 from inputpy.exceptions import InPUTException
 from inputpy.impexp import XMLFileImporter, XMLFileExporter
+from inputpy.factories import XMLFactory
 from test import *
 import unittest
 
-DESIGN_FILE = "test/testDesign.xml"
+DESIGN_FILE = "testDesign.xml"
 PRECISION = 6
 
 class TestDesign(unittest.TestCase):
 
     def setUp(self):
-        self.design = Design(DESIGN_FILE)
+        global design
+        self.design = XMLFactory.getDesign(DESIGN_FILE)
+        design = self.design
 
     def testSetReadOnly(self):
-        design = self.design    # Alias to save typing.
         paramId = SOME_BOOLEAN
         design.setReadOnly()
         with self.assertRaises(InPUTException):
@@ -27,7 +29,6 @@ class TestDesign(unittest.TestCase):
         self.assertEqual(expected, value)
 
     def testExtendScope(self):
-        design = self.design    # Alias to save typing.
         anotherDesignFile = ANOTHER_TEST_DESIGN
         paramId = ANOTHER_INTEGER
         expected = 42
@@ -35,7 +36,7 @@ class TestDesign(unittest.TestCase):
         # The 'AnotherInteger' parameter should not be present in the design.
         self.assertIsNone(design.getValue(paramId))
         # Now extend the current design with the new one.
-        anotherDesign = Design(anotherDesignFile)
+        anotherDesign = XMLFactory.getDesign(anotherDesignFile)
         design.extendScope(anotherDesign)
         # Now the parameter should be available.
         value = design.getValue(paramId)
@@ -45,7 +46,6 @@ class TestDesign(unittest.TestCase):
         value = anotherDesign.getValue(paramId)
         self.assertEqual(expected, value)
 
-    @unittest.skip("Not implemented yet.")
     def testGetId(self):
         self.assertEqual("testDesign", self.design.getId())
 
@@ -63,7 +63,7 @@ class TestDesign(unittest.TestCase):
             self.getAndCompare(key, value)
 
     def getAndCompare(self, paramId, expected):
-        value = self.design.getValue(paramId)
+        value = design.getValue(paramId)
         self.assertEqual(expected, value)
 
     def testSetPrimitive(self):
@@ -83,23 +83,29 @@ class TestDesign(unittest.TestCase):
     # one that is set. That makes it easier to tell whether the parameter was
     # really set or if the expected value already existed.
     def setAndCompare(self, paramId, value):
-        design = self.design    # Alias to save typing.
         before = design.getValue(paramId)
         self.assertNotEqual(value, before)
         design.setValue(paramId, value)
         after = design.getValue(paramId)
         self.assertEqual(value, after)
 
-    @unittest.skip("Not implemented yet.")
+    # It is still unclear whether this is really the desired behavior or not.
+    # For example, in Python, 1 is True. A user familiar with Python would
+    # expect to be able to set a boolean parameter to 1.
+    # As for numbers, how types can be reliably distinguished when there only
+    # exist one arbitrary-precision type each for integers and floating point
+    # numbers is an open question. It should be fairly simple for integers, but
+    # what about floats?
+    @unittest.skip("Not implemented.")
     def testSettingPrimitivesOfWrongTypeShouldFail(self):
         args = {
-            someBoolean: True,
-            someInteger: 1,
-            someShort: 42,
-            someLong: 1,
-            someDouble: 0.42,
-            someFloat: 0.84,
-            someDecimal: 42,
+            SOME_BOOLEAN: True,
+            SOME_INTEGER: 1,
+            SOME_SHORT: 42,
+            SOME_LONG: 1,
+            SOME_DOUBLE: 0.42,
+            SOME_FLOAT: 0.84,
+            SOME_DECIMAL: 42,
         }
         for (key, value) in args.items():
             self.setValueShouldFail(key, value)
@@ -108,70 +114,74 @@ class TestDesign(unittest.TestCase):
         with self.assertRaises(InPUTException):
             self.design.setValue(paramId, value)
 
-    @unittest.skip("Not implemented yet.")
+    # Python does not have native support for an enum-like value.
+    # It is unclear what the best way to simulate one would be. The biggest
+    # problem is to minimize the intrusion upon the user.
+    @unittest.skip("Not implemented.")
     def testGetEnum(self):
         self.fail("Need to figure out how to handle enums.")
 
-    @unittest.skip("Not implemented yet.")
+    # See comment for testGetEnum above.
+    @unittest.skip("Not implemented.")
     def testSetEnum(self):
         self.fail("Need to figure out how to handle enums.")
 
-    @unittest.skip("Not implemented yet.")
     def testGetStringParameter(self):
-        firstParamId = someStringCustomizedByTheUser
-        secondParamId = anotherStringCustomizedByTheUser
-        secondValue = anotherFile
-        self.setAndCompare(firstParamId, firstParamId)
-        self.setAndCompare(secondValue, secondParamId)
+        firstParamId = SOME_STRING_CUSTOMIZED_BY_THE_USER
+        secondParamId = ANOTHER_STRING_CUSTOMIZED_BY_THE_USER
+        secondValue = ANOTHER_FILE
+        self.getAndCompare(firstParamId, firstParamId)
+        self.getAndCompare(secondParamId, secondValue)
 
-    @unittest.skip("Not implemented yet.")
+    # Note that this test proves nothing! It is here only for "completeness"
+    # but does not have any value.  It is a direct clone of the corresponding
+    # test in InPUT4j, which also does nothing.
     def testGetInjectedPrimitive(self):
-        design = self.design    # Alias to save typing.
-        paramId = someStructuralParent
-        childId = paramId + "." + anotherSharedPrimitiveSub
+        paramId = SOME_STRUCTURAL_PARENT
+        childId = paramId + "." + ANOTHER_SHARED_PRIMITIVE_SUB
         expected = 5938400921453047807
         parent = design.getValue(paramId)
-        # Get child value by implicitly using the custom getter.
+
         child = design.getValue(childId)
         self.assertEqual(expected, child)
-        # Get child value by explicitly using the custom getter on the parent.
+
         childValue = parent.getAnotherSharedPrimitiveSub()
         self.assertEqual(childValue, child)
 
-    @unittest.skip("Not implemented yet.")
+    # Because ABiggerLong is relative, the interval has not been fully
+    # evaluated. Therefore the check to see if the value is valid fails.
     def testSetRelativePrimitives(self):
-        design = self.design    # Alias to save typing.
-        someLongId = someLong
-        biggerLongId = aBiggerLong
+        someLongId = SOME_LONG
+        biggerLongId = A_BIGGER_LONG
 
         someLong = design.getValue(someLongId)
         # someLong is just outside of (1 below) the range of allowed values
         # for the 'ABiggerLong' parameter.
         with self.assertRaises(InPUTException):
-            design.setValue(biggerLongId, someLong)
+            design.setValue(A_BIGGER_LONG, someLong)
         # Adding 1 should make the value valid.
-        design.setValues(biggerLongId, someLong + 1)
+        design.setValue(A_BIGGER_LONG, someLong + 1)
 
-    @unittest.skip("I don't know what this test is supposed to do.")
+    # Note that this test proves nothing! It is here only for "completeness"
+    # but does not have any value.  It is a direct clone of the corresponding
+    # test in InPUT4j, which also does nothing.
     def testGetInjectedStructural(self):
-        design = self.design    # Alias to save typing.
-        paramId = anotherStructuralParent
-        childId = paramId + "." + someStructuralSub
+        paramId = ANOTHER_STRUCTURAL_PARENT
+        childId = paramId + "." + SOME_SHARED_STRUCTURAL_SUB
         parent = design.getValue(paramId)
-        # Get child value by implicitly using the custom getter.
+
         child = design.getValue(childId)
-        # Get child value by explicitly using the custom getter on the parent.
+
         childValue = parent.getSomeSharedStructuralSub()
         self.assertEqual(child, childValue)
 
     # The Java version has a case that is expected to fail because it tries to
     # set a parameter that was initialized by the constructor. That case is
     # handled separately in the next test below.
-    @unittest.skip("Not implemented yet.")
+    @unittest.skip("Not implemented.")
     def testSetInjectedStructural(self):
-        design = self.design    # Alias to save typing.
-        parentId = SomeStructuralParent
-        paramId = parentId + "." + someSharedStructuralSub
+        parentId = SOME_STRUCTURAL_PARENT
+        paramId = parentId + "." + SOME_SHARED_STRUCTURAL_SUB
         value = "anotherString"
         # Because SomeSharedStructuralSub is initialized by injection, rather
         # than the constructor, setting the value should work.
@@ -188,10 +198,9 @@ class TestDesign(unittest.TestCase):
     # which is present in testSetInjectedStructural in the Java version.
     # The test also checks to make sure that trying to set the parameter
     # really didn't have any effect.
-    @unittest.skip("Not implemented yet.")
+    @unittest.skip("Not implemented.")
     def testSettingConstructorInitializedParamWithInjectionShouldFail(self):
-        design = self.design    # Alias to save typing.
-        paramId = anotherStructuralParent + "." + someSharedStructuralSub
+        paramId = ANOTHER_STRUCTURAL_PARENT + "." + SOME_SHARED_STRUCTURAL_SUB
         value = SomeSubChoice()
         # value was created locally, so it shouldn't be identical to the
         # current parameter value. Check before and after trying to set the
@@ -210,11 +219,11 @@ class TestDesign(unittest.TestCase):
 
     # This test should use a mock object to check that the expected method
     # calls are made.
-    @unittest.skip("Not implemented yet.")
+    # The CustomizableSetGetPrimitive parameter is not currently supported.
+    @unittest.skip("Not implemented.")
     def testGetCustomizableGetter(self):
-        design = self.design    # Alias to save typing.
-        parentId = customizableInputDemonstrator
-        mutatorId = parentId + "." + customizableSetGetPrimitive
+        parentId = CUSTOMIZABLE_INPUT_DEMONSTRATOR
+        mutatorId = parentId + "." + CUSTOMIZABLE_SET_GET_PRIMITIVE
         value = 2.860933188245651E-4
         # Get the value by using the custom getter and by getting the parent
         # and then invoking the getter manually.
@@ -229,11 +238,11 @@ class TestDesign(unittest.TestCase):
     # mapping configuration to use a custom setter and getter method. 
     # This test should use a mock object to check that the expected method
     # calls are made.
-    @unittest.skip("Not implemented yet.")
+    # The CustomizableSetGetPrimitive parameter is not currently supported.
+    @unittest.skip("Not implemented.")
     def testSetCustomizableGetter(self):
-        design = self.design    # Alias to save typing.
-        parentId = customizableInputDemonstrator
-        mutatorId = parentId + "." + customizableSetGetPrimitive
+        parentId = CUSTOMIZABLE_INPUT_DEMONSTRATOR
+        mutatorId = parentId + "." + CUSTOMIZABLE_SET_GET_PRIMITIVE
         value = 0.5
         # Set the value that is wrapped by the parent by invoking the mutator.
         design.setValue(mutatorId, value)
@@ -264,15 +273,17 @@ class TestDesign(unittest.TestCase):
 
     # This test handles the negative case that was part of the
     # testSetStructural test in the Java version.
-    @unittest.skip("Not implemented yet.")
+    # See comment for testSettingPrimitivesOfWrongTypeShouldFail.
+    @unittest.skip("Not implemented.")
     def testSetStructuralWithWrongTypeShouldFail(self):
-        paramId = someStructural
+        paramId = SOME_STRUCTURAL
         choice = AnotherSubChoice()     # This is not a SomeStructural!
         with self.assertRaises(InPUTException):
             self.design.setValue(paramId, choice)
 
+    # Wrappers are not supported.
+    @unittest.skip("Not implemented.")
     def testGetWrapper(self):
-        design = self.design    # Alias to save typing.
         parentId = CUSTOMIZABLE_INPUT_DEMONSTRATOR
         wrapperId = parentId + "." + WRAPPED_PRIMITIVE
         expected = 0.9369297592420026
@@ -281,9 +292,9 @@ class TestDesign(unittest.TestCase):
         parent = design.getValue(parentId)
         self.assertEqual(value, parent.getPrimitive())
 
-    @unittest.skip("Not implemented yet.")
+    # Wrappers are not supported.
+    @unittest.skip("Not implemented.")
     def testSetWrapper(self):
-        design = self.design    # Alias to save typing.
         parentId = CUSTOMIZABLE_INPUT_DEMONSTRATOR
         wrapperId = parentId + "." + WRAPPED_PRIMITIVE
         # Create a Wrapper object and set the parameter.
@@ -298,7 +309,6 @@ class TestDesign(unittest.TestCase):
         self.assertEqual(value, parent.getPrimitive())
 
     def testGetArray(self):
-        design = self.design    # Alias to save typing.
         paramId = SOME_FIXED_ARRAY
         elemValue = 42              # All elements are set to the value 42.
         length = 42                 # Total length of array, also last index.
@@ -323,20 +333,15 @@ class TestDesign(unittest.TestCase):
         value = design.getValue(outsideId)
         self.assertIsNone(value)
 
-        largeArray = design.getValue(largeId)
-        self.assertEqual(length, len(largeArray))
-        self.assertEqual(length, len(largeArray[0][0]))
-
     def testSetArray(self):
-        design = self.design    # Alias to save typing.
         elemId = SOME_LARGE_PRIMITIVE_ARRAY + ".1.1.1.1"
-        arrayId = SOME_LARGE_PRIMITIVE_ARRAY + ".1.1.42"
+        arrayId = SOME_LARGE_PRIMITIVE_ARRAY + ".1.1.10"
         value = 13
         design.setValue(elemId, value)
         current = design.getValue(elemId)
         self.assertEqual(value, current)
 
-        values = (1,2,3)
+        values = [1,2,3]
         design.setValue(arrayId, values)
         currentValues = design.getValue(arrayId)
         self.assertEqual(values, currentValues)
@@ -355,25 +360,26 @@ class TestDesign(unittest.TestCase):
     # since such a parameter shouldn't be settable anyway?
     # The same fixed array is currently used for both.
     def testSetValueForArrayElementWithOutOfRangeIndexShouldFail(self):
-        paramId = SOME_FIXED_ARRAY + ".43"   # 43 is out of range.
+        paramId = SOME_FIXED_ARRAY + ".11"   # 11 is out of range.
         with self.assertRaises(InPUTException):
             self.design.setValue(paramId, 42)   # The value is irrelevant.
 
-    @unittest.skip("Not implemented yet.")
     def testSetValueForFixedArrayElementShouldFail(self):
-        paramId = someFixedArray + ".1"    # 1 is valid.
+        paramId = SOME_FIXED_ARRAY + ".1"    # 1 is valid.
         with self.assertRaises(InPUTException):
             self.design.setValue(paramId, 42)   # The value is irrelevant.
 
+    # Complex types are not supported.
+    @unittest.skip("Not implemented.")
     def testGetComplex(self):
-        design = self.design    # Alias to save typing.
         paramId = SOME_COMPLEX_STRUCTURAL
         value = design.getValue(paramId)
         self.assertIsInstance(value, SomeComplexStructural)
         self.assertEqual(3, value.size())
 
+    # Complex types are not supported.
+    @unittest.skip("Not implemented.")
     def testSetComplex(self):
-        design = self.design    # Alias to save typing.
         paramId = SOME_COMPLEX_STRUCTURAL
         # Construct expected complex object.
         complexStructural = SomeComplexStructural()
@@ -393,11 +399,14 @@ class TestDesign(unittest.TestCase):
         self.getInvalidId("IDoNotExist")
         self.getInvalidId(None)
 
+    # Overloaded versions of getValue that take more parameters than the
+    # param ID are not supported. It would have to be added to fully support
+    # the InPUT4j API, but it poses a conceptual challenge.
     def getInvalidId(self, invalidId):
-        design = self.design    # Alias to save typing.
         self.assertIsNone(design.getValue(invalidId))
-        self.assertIsNone(design.getValue(invalidId, None))
-        self.assertIsNone(design.getValue(invalidId, ()))     # Empty tuple.
+        # There is no initialization when fetching values from designs...
+        #self.assertIsNone(design.getValue(invalidId, None))
+        #self.assertIsNone(design.getValue(invalidId, ()))     # Empty tuple.
 
     # The Java version has a testSetNegative test which itself contains two
     # cases where a setValue call fails for different reasons.
@@ -408,7 +417,6 @@ class TestDesign(unittest.TestCase):
             self.design.setValue(invalidId, "some value")
 
     def testSetValueWithNullValueShouldFail(self):
-        design = self.design    # Alias to save typing.
         validId = SOME_STRUCTURAL_PARENT
         # Check that the parameter isn't None to begin with.
         self.assertIsNotNone(design.getValue(validId))
@@ -417,14 +425,12 @@ class TestDesign(unittest.TestCase):
         # Check that the parameter is still not None (it wasn't set).
         self.assertIsNotNone(design.getValue(validId))
 
-    @unittest.skip("Not implemented yet.")
     def testSetFixed(self):
         with self.assertRaises(InPUTException):
             self.design.setValue(SOME_FIXED, 43)
 
     @unittest.skip("Not implemented yet.")
     def testExport(self):
-        design = self.design    # Alias to save typing.
         designSpace = design.getSpace()
         # Export to file.
         designName = someOtherTestDesign
@@ -439,32 +445,7 @@ class TestDesign(unittest.TestCase):
         flawedFileNames = (None, "someNotExistent.xml")
         for fileName in flawedFileNames:
             with self.assertRaises(InPUTException):
-                self.design = Design(fileName)
-
-
-    # ------------------------------------------------------------------------
-    # Local tests (new and internal to InPUTpy)
-    # These will be moved to a separate location...
-    # ------------------------------------------------------------------------
-
-    # Testing an incomplete version of Design.same().
-    def testSameShouldBeTrueWhenBothDesignsWereCreatedFromTheSameFile(self):
-        thisDesign = self.design
-        otherDesign = Design(DESIGN_FILE)
-        self.assertIsNot(thisDesign, otherDesign)
-        self.assertTrue(thisDesign.same(otherDesign))
-        self.assertTrue(otherDesign.same(thisDesign))
-
-    def testSameShouldBeFalseWhenComparingDifferentDesigns(self):
-        thisDesign = self.design
-        otherDesign = Design(ANOTHER_TEST_DESIGN)
-        self.assertIsNot(thisDesign, otherDesign)
-        # anotherTestDesign.xml only defines one single parameter: the
-        # "AnotherInteger" parameter. This parameter does not exist in the
-        # standard test design. This means that none of the designs is a
-        # subset of the other, and same() should report False in both cases.
-        self.assertFalse(thisDesign.same(otherDesign))
-        self.assertFalse(otherDesign.same(thisDesign))
+                self.design = XMLFactory.getDesign(fileName)
 
 if __name__ == '__main__':
     unittest.main()

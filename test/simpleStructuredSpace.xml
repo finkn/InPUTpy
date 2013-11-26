@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<i:DesignSpace
+    id="simpleStructured"
+    mapping="simpleStructuredMapping.xml"
+    xmlns:i="http://TheInPUT.org/DesignSpace"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://TheInPUT.org/DesignSpace http://theinput.org/DesignSpace.xsd">
+
+    <i:SParam id="Empty" />
+
+    <i:SParam id="Name" type="String" />
+
+    <i:SParam id="Point">
+        <i:NParam id="X" type="integer" inclMin="1" inclMax="1" />
+        <i:NParam id="Y" type="integer" inclMin="2" inclMax="2" />
+    </i:SParam>
+
+    <!-- Considered simple because there are no SChoices. -->
+    <i:SParam id="Rectangle">
+        <i:SParam id="Point">
+            <i:NParam id="X" type="integer" inclMin="1" inclMax="1" />
+            <i:NParam id="Y" type="integer" inclMin="2" inclMax="2" />
+        </i:SParam>
+        <i:NParam id="Width" type="integer" inclMin="4" inclMax="4" />
+        <i:NParam id="Height" type="integer" inclMin="2" inclMax="2" />
+    </i:SParam>
+
+</i:DesignSpace>
+

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<i:Design
+    id="simpleInteger"
+    ref="simpleIntegerSpace.xml"
+    xmlns:i="http://TheInPUT.org/Design"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://TheInPUT.org/Design http://theinput.org/Design.xsd" >
+
+    <i:NValue id="A" value="1" />
+    <i:NValue id="B" value="1" />
+    <i:NValue id="C" value="1" />
+    <i:NValue id="D" value="2" />
+    <i:NValue id="E" value="0" />
+    <i:NValue id="F" value="1" />
+    <i:NValue id="G" value="2" />
+    <i:NValue id="H" value="1" />
+    <i:NValue id="I" value="2" />
+    <i:NValue id="J" value="1" />
+    <i:NValue id="K" value="0" />
+    <i:NValue id="L" value="0" />
+
+    <!-- Fixed values. -->
+    <i:NValue id="M" value="43" />
+    <i:NValue id="N" value="43" />
+    <i:NValue id="O" value="43" />
+
+    <!-- Truncating float values. -->
+    <i:NValue id="P" value="2" />
+    <i:NValue id="Q" value="0" />
+
+</i:Design>
